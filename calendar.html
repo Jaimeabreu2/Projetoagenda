@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Agenda - Calendário</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="calendar-wrap">
+        <div class="calendar-header">
+            <div id="calendarTitle" class="calendar-title"></div>
+
+            <div class="calendar-controls">
+                <button id="prevBtn" class="btn" aria-label="Anterior">◀</button>
+                <button id="nextBtn" class="btn" aria-label="Próximo">▶</button>
+            </div>
+
+            <div class="view-toggle">
+                <button class="btn primary" data-view="month">Mês</button>
+                <button class="btn" data-view="week">Semana</button>
+                <button class="btn" data-view="day">Dia</button>
+            </div>
+        </div>
+
+        <div class="calendar-grid weekday-labels" id="weekdayLabels">
+            <div class="calendar-weekday">Dom</div>
+            <div class="calendar-weekday">Seg</div>
+            <div class="calendar-weekday">Ter</div>
+            <div class="calendar-weekday">Qua</div>
+            <div class="calendar-weekday">Qui</div>
+            <div class="calendar-weekday">Sex</div>
+            <div class="calendar-weekday">Sáb</div>
+        </div>
+
+        <div id="calendarContent" class="calendar-grid"></div>
+    </div>
+
+    <script>
+        // inicialização e funções do calendário
+        (function () {
+            const content = document.getElementById('calendarContent');
+            const title = document.getElementById('calendarTitle'); // Agora busca o elemento diretamente
+            const weekdayLabels = document.getElementById('weekdayLabels');
+            
+            let view = 'month'; // 'month' | 'week' | 'day'
+            let current = new Date(); // Data atualmente selecionada/visualizada
+
+            function clearContent() {
+                content.innerHTML = '';
+            }
+            
+            // Renderiza visualização por mês
+            function renderMonth() {
+                clearContent();
+                content.classList.remove('week-view', 'day-view'); // Garante estilo de mês
+                weekdayLabels.style.display = 'grid'; // Mostra os dias da semana
+
+                const first = new Date(current.getFullYear(), current.getMonth(), 1);
+                const last = new Date(current.getFullYear(), current.getMonth() + 1, 0);
+                const startDay = first.getDay(); // 0 (Dom) a 6 (Sáb)
+                const daysInMonth = last.getDate();
+
+                title.textContent = first.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+
+                // Células vazias (dias do mês anterior)
+                for (let i = 0; i < startDay; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'calendar-cell empty';
+                    content.appendChild(empty);
+                }
+
+                // Dias do mês atual
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'calendar-cell';
+
+                    const dayNum = document.createElement('div');
+                    dayNum.className = 'day-num';
+                    dayNum.textContent = day;
+                    cell.appendChild(dayNum);
+
+                    // Destaca o dia atual
+                    const today = new Date();
+                    const cellDate = new Date(current.getFullYear(), current.getMonth(), day);
+                    if (cellDate.toDateString() === today.toDateString()) {
+                        cell.classList.add('today');
+                    }
+                    
+                    // Placeholder de eventos (simplificado)
+                    cell.innerHTML += '<div class="event-info"><span class="event-dot"></span><small>Sem eventos</small></div>';
+                    
+                    content.appendChild(cell);
+                }
+
+                // Células vazias (dias do próximo mês)
+                const totalCells = startDay + daysInMonth;
+                const trailing = (7 - (totalCells % 7)) % 7;
+                for (let i = 0; i < trailing; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'calendar-cell empty';
+                    content.appendChild(empty);
+                }
+            }
+
+            // Renderiza visualização por semana
+            function renderWeek() {
+                clearContent();
+                content.classList.add('week-view'); // Use esta classe para CSS de 7 colunas mais compactas
+                content.classList.remove('day-view');
+                weekdayLabels.style.display = 'grid'; // Mostra os dias da semana
+
+                const cur = new Date(current);
+                const dayOfWeek = cur.getDay();
+                const sunday = new Date(cur);
+                sunday.setDate(cur.getDate() - dayOfWeek); // Começa no Domingo da semana atual
+
+                const endDate = new Date(sunday);
+                endDate.setDate(sunday.getDate() + 6);
+                title.textContent = `${sunday.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(sunday);
+                    d.setDate(sunday.getDate() + i);
+
+                    const cell = document.createElement('div');
+                    cell.className = 'calendar-cell week';
+
+                    const dayNum = document.createElement('div');
+                    dayNum.className = 'day-num';
+                    dayNum.textContent = d.getDate();
+                    cell.appendChild(dayNum);
+
+                    // Adiciona o dia da semana no modo semana para melhor contexto
+                    const dayName = d.toLocaleDateString('pt-BR', { weekday: 'short' });
+                    cell.innerHTML += `<div class="event-info"><small>${dayName}, ${d.toLocaleDateString()}</small></div>`;
+                    
+                    content.appendChild(cell);
+                }
+            }
+
+            // Renderiza visualização por dia (foco no dia atual)
+            function renderDay() {
+                clearContent();
+                // O modo dia geralmente mostra apenas UMA célula grande, não um grid
+                content.classList.add('day-view'); 
+                content.classList.remove('week-view');
+                weekdayLabels.style.display = 'none'; // Esconde os dias da semana
+
+                title.textContent = current.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                const cell = document.createElement('div');
+                cell.className = 'calendar-cell day-focus'; // Classe para estilizar a célula de foco
+                cell.innerHTML = `
+                    <div class="day-num">${current.getDate()}</div>
+                    <div style="margin-top:24px">
+                        <strong>Agenda do dia</strong>
+                        <p style="color:#6b6b6b">Sem compromissos</p>
+                        </div>
+                `;
+                content.appendChild(cell);
+            }
+
+            // Escolhe a renderização correta
+            function render() {
+                if (view === 'month') renderMonth();
+                else if (view === 'week') renderWeek();
+                else renderDay();
+            }
+
+            // Controles: Prev / Next
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.addEventListener('click', function () {
+                if (view === 'month') {
+                    current.setMonth(current.getMonth() - 1);
+                } else if (view === 'week') {
+                    current.setDate(current.getDate() - 7);
+                } else { // view === 'day'
+                    current.setDate(current.getDate() - 1); // Corrigido para navegar por 1 dia
+                }
+                render();
+            });
+
+            nextBtn.addEventListener('click', function () {
+                if (view === 'month') {
+                    current.setMonth(current.getMonth() + 1);
+                } else if (view === 'week') {
+                    current.setDate(current.getDate() + 7);
+                } else { // view === 'day'
+                    current.setDate(current.getDate() + 1); // Corrigido para navegar por 1 dia
+                }
+                render();
+            });
+
+            // Alterna entre Month / Week / Day
+            document.querySelectorAll('.view-toggle .btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    view = this.getAttribute('data-view');
+                    // Remove destaque de todos e adiciona no botão clicado
+                    document.querySelectorAll('.view-toggle .btn').forEach(b => b.classList.remove('primary'));
+                    this.classList.add('primary');
+                    render();
+                });
+            });
+
+            // inicializa
+            render();
+        })();
+    </script>
+</body>
+</html>
