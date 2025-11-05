@@ -22,6 +22,7 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             text-align: center;
             width: 100%;
+            height: 80%;
             max-width: 400px;
         }
 
@@ -70,7 +71,7 @@
         }
 
         .voltar {
-            margin-top: 20px;
+            margin-top: 10px;
             display: block;
             color: #4a90e2;
             text-decoration: none;
@@ -103,7 +104,7 @@
         <p th:text="${warning}"></p>
     </div>
 
-    <form action="/cadastro" method="post">
+    <form action="/cadastro" method="post" onsubmit="return validarSenhas()">
         <label for="nome">Nome:</label>
         <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required>
 
@@ -113,10 +114,26 @@
         <label for="senha">Senha:</label>
         <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required>
 
+        <label for="confirmarSenha">Confirmar Senha:</label>
+        <input type="password" id="confirmarSenha" name="confirmarSenha" placeholder="Repita sua senha" required>
+
         <button type="submit">Cadastrar</button>
     </form>
 
     <a href="/login" class="voltar">Já tem uma conta? Faça login</a>
 </div>
+
+<script>
+    function validarSenhas() {
+        const senha = document.getElementById('senha').value;
+        const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+        if (senha !== confirmarSenha) {
+            alert('As senhas não coincidem!');
+            return false;
+        }
+        return true;
+    }
+</script>
 </body>
 </html>

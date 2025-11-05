@@ -1,6 +1,5 @@
 package br.com.agenda.controllers;
 
-import br.com.agenda.entities.Evento;
 import br.com.agenda.services.UsuarioService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Controller;

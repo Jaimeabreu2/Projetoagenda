@@ -21,14 +21,14 @@ public class CalendarioController {
     }
 
     @GetMapping
-    public ResponseEntity<String> mostrarTelaCalendario(Model model) {
-        String avisosHtml = service.getEventosHtml();
-
+    public String mostrarTelaCalendario(Model model) {
         if (EventoService.getIdAtual() < 0L)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Acesso não autorizado!");
+            return "erro401";
 
+        String avisosHtml = service.getEventosHtml();
         model.addAttribute("avisosHtml", avisosHtml);
-        return ResponseEntity.ok("calendario");
+
+        return "calendario";
     }
 
     @PostMapping

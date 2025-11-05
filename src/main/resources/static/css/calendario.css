@@ -8,10 +8,6 @@ body {
     font-family: "Segoe UI", Arial, sans-serif;
     background: #f0f2f5;
     color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
 
 .page-container {
@@ -113,8 +109,7 @@ footer button:hover {
     justify-content: space-between;
 }
 
-.calendar-container,
-.avisos-container {
+.calendar-container, .avisos-container {
     align-self: stretch;
 }
 
@@ -141,7 +136,7 @@ footer button:hover {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
 }
@@ -153,7 +148,7 @@ footer button:hover {
     border-radius: 12px;
     width: 300px;
     position: relative;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .modal-content h2 {
@@ -205,4 +200,36 @@ footer button:hover {
     box-sizing: border-box;
 }
 
+.main-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
+.page-container {
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+    position: relative;
+}
+
+.btn-profile {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-profile:hover {
+    background-color: #43a047;
+    transform: scale(1.05);
+}

@@ -7,41 +7,41 @@
     <link rel="stylesheet" th:href="@{/css/calendario.css}">
 </head>
 <body>
-<div class="page-container">
+<a th:href="@{/profile}" class="btn-profile">👤 Perfil</a>
 
-    <div class="calendar-container">
-        <header class="calendar-header">
-            <button id="prev">&lt;</button>
-            <h2 id="month-year"></h2>
-            <button id="next">&gt;</button>
-        </header>
-
-        <table class="calendar">
-            <thead>
-            <tr>
-                <th>Dom</th>
-                <th>Seg</th>
-                <th>Ter</th>
-                <th>Qua</th>
-                <th>Qui</th>
-                <th>Sex</th>
-                <th>Sáb</th>
-            </tr>
-            </thead>
-            <tbody id="calendar-body"></tbody>
-        </table>
-
-        <footer>
-            <button id="today">Hoje</button>
-            <button id="add-evento">Adicionar Evento</button>
-        </footer>
+<div class="main-wrapper">
+    <div class="page-container">
+        <div class="calendar-container">
+            <header class="calendar-header">
+                <button id="prev">&lt;</button>
+                <h2 id="month-year"></h2>
+                <button id="next">&gt;</button>
+            </header>
+            <table class="calendar">
+                <thead>
+                <tr>
+                    <th>Dom</th>
+                    <th>Seg</th>
+                    <th>Ter</th>
+                    <th>Qua</th>
+                    <th>Qui</th>
+                    <th>Sex</th>
+                    <th>Sáb</th>
+                </tr>
+                </thead>
+                <tbody id="calendar-body"></tbody>
+            </table>
+            <footer>
+                <button id="today">Hoje</button>
+                <button id="add-evento">Adicionar Evento</button>
+            </footer>
+        </div>
+        <aside class="avisos-container" id="avisos-container">
+            <h3>Eventos</h3>
+            <div th:if="${warning}" class="alert alert-warning" th:text="${warning}"></div>
+            <div class="avisos-conteudo" th:utext="${avisosHtml}"></div>
+        </aside>
     </div>
-
-    <aside class="avisos-container" id="avisos-container">
-        <h3>Eventos</h3>
-        <div th:if="${warning}" class="alert alert-warning" th:text="${warning}"></div>
-        <div class="avisos-conteudo" th:utext="${avisosHtml}"></div>
-    </aside>
 </div>
 
 <div id="event-modal" class="modal">
@@ -51,10 +51,8 @@
         <form th:action="@{/calendario}" method="post">
             <label for="titulo">Título:</label>
             <input type="text" id="titulo" name="titulo" placeholder="Digite o título do evento" required>
-
             <label for="data">Data:</label>
             <input type="date" id="data" name="data" placeholder="Selecione a data do evento" required>
-
             <button type="submit">Salvar</button>
         </form>
     </div>
