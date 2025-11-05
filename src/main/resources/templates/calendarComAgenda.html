@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agenda — Calendário com Eventos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- usa os estilos globais do projeto -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- ajustes locais: painel de compromissos e layout 2-colunas -->
+  <style>
+    /* pequenas adaptações específicas desta página, reutilizando variáveis do style.css */
+    .calendar-wrap{
+      display:grid;
+      grid-template-columns: 360px 1fr; /* painel esquerdo + calendário */
+      gap:18px;
+      max-width:980px;
+      margin:28px auto;
+      padding:14px;
+    }
+
+    /* painel de compromissos — mais contraste */
+    .agenda-panel{
+      background: linear-gradient(180deg,#f8fff9 0%, #eefbf0 100%); /* levemente mais marcado */
+      border-radius:12px;
+      padding:18px;
+      box-shadow: 0 12px 30px rgba(15,23,42,0.08); /* sombra mais forte */
+      min-height:360px;
+      display:flex;
+      flex-direction:column;
+      border: 1px solid rgba(46,125,50,0.06);
+    }
+    .agenda-header{
+      display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+    }
+    .agenda-header h3{margin:0;font-size:16px;color:var(--text);letter-spacing:0.6px;text-transform:uppercase}
+    .appointments{
+      display:flex;flex-direction:column;gap:10px;margin-top:6px;
+      max-height:calc(100vh - 260px);
+      overflow:auto;
+      padding-right:6px;
+    }
+
+    /* item de compromisso — mais nítido */
+    .appointment{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      background: #ffffff;
+      border-radius:10px;
+      padding:12px;
+      border:1px solid rgba(15,23,42,0.06);
+      transition:transform 160ms ease,box-shadow 160ms ease,background 160ms ease;
+    }
+    .appointment:hover{
+      transform:translateY(-4px);
+      box-shadow: 0 12px 28px rgba(15,23,42,0.08);
+      background: linear-gradient(180deg,#fcfff9,#f2fff2);
+    }
+
+    /* badge colorida para destaque do dia */
+    .badge{
+      min-width:46px;height:46px;border-radius:10px;
+      background: linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      color:#fff;
+      display:flex;align-items:center;justify-content:center;font-weight:700;
+      box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+      font-size:16px;
+    }
+    .appt-body strong{display:block;font-size:14px;color:var(--text)}
+    .appt-body small{
+      display:block;
+      color: rgba(15,23,42,0.6); /* mais escuro que antes */
+      font-size:12px;
+      margin-top:4px;
+    }
+
+    /* caso queira adicionar um marcador/color accent no item (opcional) */
+    .appointment::before{
+      content:"";
+      width:4px;
+      height:40px;
+      border-radius:4px;
+      background: linear-gradient(180deg,var(--brand-1),var(--brand-2));
+      margin-right:8px;
+      display:inline-block;
+      opacity:0.95;
+    }
+
+    /* make calendar column a bit more compact visually */
+    .calendar-main{background:transparent}
+    #calendarContent.calendar-grid{gap:10px;padding:12px}
+    .calendar-cell{min-height:68px;padding:8px}
+
+    /* destaque da célula selecionada */
+    .calendar-cell.selected{
+      outline: 2px solid rgba(102,187,106,0.16);
+      box-shadow: 0 6px 18px rgba(102,187,106,0.06);
+    }
+
+    /* estilos para dias que contém evento (mais escuros) */
+    .calendar-cell.has-event{
+      /* fundo mais saturado / escuro para fácil identificação */
+      background: linear-gradient(180deg,#bfecc0 0%, #9fd9a0 100%);
+      border:1px solid rgba(46,125,50,0.22);
+      box-shadow: 0 10px 22px rgba(46,125,50,0.08) inset;
+    }
+    .calendar-cell.has-event .day-num{
+      color: #154d2b; /* verde mais escuro para contraste */
+      font-weight:800;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+    }
+    /* torne o ponto de evento mais visível */
+    .calendar-cell.has-event .event-dot{
+      width:10px;
+      height:10px;
+      background: var(--brand-1);
+      box-shadow: 0 0 0 4px rgba(46,125,50,0.06);
+      display:inline-block;
+      border-radius:50%;
+    }
+    /* Esconde o texto "Sem eventos" se presente; deixamos apenas o ponto */
+    .event-info small{ display:none; }
+
+    /* responsivo: empilha colunas */
+    @media (max-width:880px){
+      .calendar-wrap{grid-template-columns:1fr;max-width:520px;padding:12px}
+      .agenda-panel{order:2}
+      .calendar-main{order:1}
+    }
+
+    /* Estilos para a barra lateral fixa */
+    .app-sidebar{
+      position:fixed;
+      top:0;
+      left:0;
+      bottom:0;
+      width:80px;
+      background:var(--bg);
+      border-right:1px solid rgba(15,23,42,0.1);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:16px 0;
+      box-shadow:var(--shadow-sm);
+    }
+    .icon-btn{
+      background:transparent;
+      border:none;
+      color:var(--text);
+      font-size:22px;
+      cursor:pointer;
+      transition:color 0.3s;
+    }
+    .icon-btn:hover{
+      color:var(--brand-1);
+    }
+    .sidebar-sep{
+      height:1px;
+      width:80%;
+      background:rgba(15,23,42,0.1);
+      margin:8px 0;
+    }
+    .create-btn{
+      background:var(--brand-1);
+      color:#fff;
+      border:none;
+      border-radius:50%;
+      width:56px;
+      height:56px;
+      font-size:28px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+      transition:background 0.3s;
+    }
+    .create-btn:hover{
+      background:var(--brand-2);
+    }
+
+    /* Estilos para o modal de evento */
+    .event-modal{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      background:rgba(0,0,0,0.6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:1000;
+    }
+    .event-modal-panel{
+      background:#fff;
+      border-radius:12px;
+      padding:24px;
+      max-width:400px;
+      width:100%;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+      display:flex;
+      flex-direction:column;
+    }
+    .event-modal h3{
+      margin:0 0 16px;
+      font-size:18px;
+      color:var(--text);
+    }
+    .event-modal label{
+      font-size:14px;
+      color:var(--text);
+      margin-bottom:4px;
+    }
+    .event-modal input{
+      border:1px solid rgba(15,23,42,0.1);
+      border-radius:8px;
+      padding:10px;
+      font-size:16px;
+      margin-bottom:16px;
+    }
+    .event-modal .btn{
+      margin-top:auto;
+    }
+    .event-modal-backdrop{
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      background:transparent;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body class="calendar-page">
+
+  <!-- Nova barra lateral fixa à esquerda -->
+  <!-- Barra lateral: use os botões para navegar entre views (ano, tarefas, contatos) -->
+  <nav class="app-sidebar" aria-label="Barra de navegação">
+-    <button class="icon-btn" title="Calendário" aria-label="Calendário">📅</button>
++    <!-- abre a tela do ano inteiro (nova página) -->
++    <a class="icon-btn" href="yearCalendar.html" title="Calendário do ano" aria-label="Calendário do ano">📅</a>
+    <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
+    <button class="icon-btn" title="Contatos" aria-label="Contatos">👥</button>
+    <div class="sidebar-sep" aria-hidden="true"></div>
+    <button id="openCreateBtn" class="create-btn" title="Adicionar evento" aria-label="Adicionar evento">+</button>
+  </nav>
+
+  <!-- Layout principal: painel de eventos (esquerda) e calendário (direita). -->
+  <div class="calendar-wrap">
+    <!-- coluna esquerda: painel de compromissos -->
+    <aside class="agenda-panel" aria-label="Eventos">
+      <div class="agenda-header">
+        <h3>EVENTOS</h3>
+        <div class="small" id="agendaMonthLabel" aria-hidden="true"></div>
+      </div>
+
+      <div class="appointments" id="eventsList">
+        <!-- itens de exemplo; substitua dinamicamente com backend -->
+        <div class="appointment">
+          <div class="badge">2</div>
+          <div class="appt-body">
+            <strong>Disciplina A</strong>
+            <small>Prova (9:30 - 11:00)</small>
+          </div>
+        </div>
+
+        <div class="appointment">
+          <div class="badge">16</div>
+          <div class="appt-body">
+            <strong>Disciplina B</strong>
+            <small>Trabalho (7:30 - 9:10)</small>
+          </div>
+        </div>
+
+        <div class="appointment">
+          <div class="badge">22</div>
+          <div class="appt-body">
+            <strong>Disciplina C</strong>
+            <small>Lista de Exercícios (13:30 - 15:00)</small>
+          </div>
+        </div>
+
+        <!-- Observação: para popular dinamicamente, selecione #appointmentsList e injete nodes com badge/detais -->
+      </div>
+    </aside>
+
+    <!-- coluna direita: calendário (mesma estrutura do calendar.html) -->
+    <div class="calendar-main">
+      <div class="calendar-header">
+        <div id="calendarTitle" class="calendar-title"></div>
+
+        <div class="calendar-controls">
+          <button id="prevBtn" class="btn" aria-label="Anterior">◀</button>
+          <button id="nextBtn" class="btn" aria-label="Próximo">▶</button>
+        </div>
+
+        <div class="view-toggle">
+          <button class="btn primary" data-view="month">Mês</button>
+          <button class="btn" data-view="week">Semana</button>
+          <button class="btn" data-view="day">Dia</button>
+        </div>
+      </div>
+
+      <div class="calendar-grid weekday-labels" id="weekdayLabels">
+        <div class="calendar-weekday">Dom</div>
+        <div class="calendar-weekday">Seg</div>
+        <div class="calendar-weekday">Ter</div>
+        <div class="calendar-weekday">Qua</div>
+        <div class="calendar-weekday">Qui</div>
+        <div class="calendar-weekday">Sex</div>
+        <div class="calendar-weekday">Sáb</div>
+      </div>
+
+      <div id="calendarContent" class="calendar-grid" role="grid" aria-label="Calendário"></div>
+    </div>
+  </div>
+
+  <!-- Modal simples para criar evento -->
+  <!-- Modal de evento: formulário simples. Preencha título e dia para criar evento localmente. -->
+  <div id="eventModal" class="event-modal" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle" style="display:none">
+    <div class="event-modal-panel" role="document">
+      <h3 id="eventModalTitle">Adicionar evento</h3>
+      <form id="eventForm">
+        <label for="evtTitle">Título</label>
+        <input id="evtTitle" name="title" type="text" required />
+        <label for="evtDay">Dia (número)</label>
+        <input id="evtDay" name="day" type="number" min="1" max="31" required />
+        <label for="evtTime">Horário (ex: 09:30)</label>
+        <input id="evtTime" name="time" type="text" placeholder="09:30" />
+        <label for="evtNote">Descrição</label>
+        <input id="evtNote" name="note" type="text" />
+        <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+          <button type="button" class="btn secondary" id="cancelEvent">Cancelar</button>
+          <button type="submit" class="btn" id="saveEvent">Salvar</button>
+        </div>
+      </form>
+    </div>
+    <button class="event-modal-backdrop" id="closeModal" aria-label="Fechar"></button>
+  </div>
+
+  <script>
+    // Script: funções para renderizar mês/semana/dia e gerenciar modal.
+    // Comentários no código explicam pontos de extensão (onde integrar backend).
+    (function () {
+      const content = document.getElementById('calendarContent');
+      const title = document.getElementById('calendarTitle');
+      const weekdayLabels = document.getElementById('weekdayLabels');
+      const eventsList = document.getElementById('eventsList');
+      const agendaMonthLabel = document.getElementById('agendaMonthLabel');
+
+      // lista de dias do mês que têm evento (ajuste conforme necessário)
+      const eventDays = [2, 16, 22];
+
+      let view = 'month';
+      let current = new Date();
+      let selectedCell = null;
+
+      function clearContent(){ content.innerHTML = '' }
+
+      function renderMonth(){
+        clearContent();
+        content.classList.remove('week-view','day-view');
+        weekdayLabels.style.display = 'grid';
+        const first = new Date(current.getFullYear(), current.getMonth(), 1);
+        const last = new Date(current.getFullYear(), current.getMonth() + 1, 0);
+        const startDay = first.getDay();
+        const daysInMonth = last.getDate();
+
+        title.textContent = first.toLocaleString('pt-BR',{ month:'long', year:'numeric' });
+        agendaMonthLabel.textContent = first.toLocaleString('pt-BR',{ month:'long' });
+
+        for(let i=0;i<startDay;i++){
+          const empty = document.createElement('div'); empty.className='calendar-cell empty'; content.appendChild(empty);
+        }
+
+        for(let day=1; day<=daysInMonth; day++){
+          const cell = document.createElement('div'); cell.className='calendar-cell';
+          const dayNum = document.createElement('div'); dayNum.className='day-num'; dayNum.textContent = day;
+          cell.appendChild(dayNum);
+
+          const today = new Date();
+          const cellDate = new Date(current.getFullYear(), current.getMonth(), day);
+          if(cellDate.toDateString() === today.toDateString()) cell.classList.add('today');
+
+          // marca como dia com evento se estiver na lista eventDays
+          if (eventDays.includes(day)) {
+            cell.classList.add('has-event');
+          }
+
+          // placeholder de evento: apenas o ponto, sem texto "Sem eventos"
+          const ev = document.createElement('div'); ev.className='event-info';
+          ev.innerHTML = '<span class="event-dot"></span>';
+          cell.appendChild(ev);
+
+          cell.addEventListener('click', function(){
+            if(selectedCell) selectedCell.classList.remove('selected');
+            cell.classList.add('selected');
+            selectedCell = cell;
+            // FUTURO: aqui você pode atualizar #appointmentsList com eventos do dia clicado
+          });
+
+          content.appendChild(cell);
+        }
+
+        const totalCells = startDay + daysInMonth;
+        const trailing = (7 - (totalCells % 7)) % 7;
+        for(let i=0;i<trailing;i++){
+          const empty = document.createElement('div'); empty.className='calendar-cell empty'; content.appendChild(empty);
+        }
+      }
+
+      function renderWeek(){
+        clearContent();
+        content.classList.add('week-view'); content.classList.remove('day-view'); weekdayLabels.style.display='grid';
+        const cur = new Date(current); const dayOfWeek = cur.getDay();
+        const sunday = new Date(cur); sunday.setDate(cur.getDate() - dayOfWeek);
+        const endDate = new Date(sunday); endDate.setDate(sunday.getDate() + 6);
+        title.textContent = `${sunday.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+        agendaMonthLabel.textContent = sunday.toLocaleString('pt-BR',{ month:'long' });
+
+        for(let i=0;i<7;i++){
+          const d = new Date(sunday); d.setDate(sunday.getDate()+i);
+          const dayNumVal = d.getDate();
+          const cell = document.createElement('div'); cell.className='calendar-cell week';
+          const dayNum = document.createElement('div'); dayNum.className='day-num'; dayNum.textContent = dayNumVal;
+          cell.appendChild(dayNum);
+
+          // aplica destaque se este dia tiver evento
+          if (current.getMonth() === d.getMonth() && eventDays.includes(dayNumVal)) {
+            cell.classList.add('has-event');
+          }
+
+          const dayName = d.toLocaleDateString('pt-BR',{ weekday:'short' });
+          const ev = document.createElement('div'); ev.className='event-info'; ev.innerHTML = `<span class="event-dot"></span><small>${dayName}, ${d.toLocaleDateString()}</small>`;
+          // esconder texto "Sem eventos" já tratado via CSS (.event-info small { display:none })
+          cell.appendChild(ev);
+          content.appendChild(cell);
+        }
+      }
+
+      function renderDay(){
+        clearContent();
+        content.classList.add('day-view'); content.classList.remove('week-view'); weekdayLabels.style.display='none';
+        title.textContent = current.toLocaleDateString('pt-BR', { weekday: 'long', year:'numeric', month:'long', day:'numeric' });
+        const cell = document.createElement('div'); cell.className='calendar-cell day-focus';
+        const dayNumVal = current.getDate();
+        // aplica destaque no modo dia se houver evento
+        if (eventDays.includes(dayNumVal)) cell.classList.add('has-event');
+
+        cell.innerHTML = `<div class="day-num">${dayNumVal}</div>
+          <div style="margin-top:18px"><strong>Agenda do dia</strong></div>`;
+        content.appendChild(cell);
+      }
+
+      function render(){ if(view==='month') renderMonth(); else if(view==='week') renderWeek(); else renderDay(); }
+
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+
+      prevBtn.addEventListener('click', function(){
+        if(view==='month') current.setMonth(current.getMonth()-1);
+        else if(view==='week') current.setDate(current.getDate()-7);
+        else current.setDate(current.getDate()-1);
+        render();
+      });
+
+      nextBtn.addEventListener('click', function(){
+        if(view==='month') current.setMonth(current.getMonth()+1);
+        else if(view==='week') current.setDate(current.getDate()+7);
+        else current.setDate(current.getDate()+1);
+        render();
+      });
+
+      document.querySelectorAll('.view-toggle .btn').forEach(btn=>{
+        btn.addEventListener('click', function(){
+          view = this.getAttribute('data-view');
+          document.querySelectorAll('.view-toggle .btn').forEach(b=>b.classList.remove('primary'));
+          this.classList.add('primary');
+          render();
+        });
+      });
+
+      // === NOVO: Modal / criação de evento na agenda (front-end) ===
+      const openCreateBtn = document.getElementById('openCreateBtn');
+      const eventModal = document.getElementById('eventModal');
+      const closeModal = document.getElementById('closeModal');
+      const cancelEvent = document.getElementById('cancelEvent');
+      const eventForm = document.getElementById('eventForm');
+
+      // ajuste leve: garantir display flex ao abrir modal
+      function showModal(){ eventModal.style.display = 'flex'; document.getElementById('evtTitle').focus(); }
+      function hideModal(){ eventModal.style.display = 'none'; eventForm.reset(); }
+
+      openCreateBtn.addEventListener('click', showModal);
+      closeModal.addEventListener('click', hideModal);
+      cancelEvent.addEventListener('click', hideModal);
+
+      // Insere um item na lista de eventos (front-end)
+      function addEventToList({day, title, time, note}) {
+        const ap = document.createElement('div'); ap.className = 'appointment';
+        const badge = document.createElement('div'); badge.className = 'badge'; badge.textContent = String(day);
+        const body = document.createElement('div'); body.className = 'appt-body';
+        const strong = document.createElement('strong'); strong.textContent = title;
+        const small = document.createElement('small'); small.textContent = time ? `${time} • ${note || ''}` : (note || '');
+        body.appendChild(strong); body.appendChild(small);
+        ap.appendChild(badge); ap.appendChild(body);
+        // insere no topo
+        eventsList.insertBefore(ap, eventsList.firstChild);
+      }
+
+      // Submissão do formulário do modal -> cria compromisso localmente
+      eventForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        const titleVal = document.getElementById('evtTitle').value.trim();
+        const dayVal = parseInt(document.getElementById('evtDay').value,10);
+        const timeVal = document.getElementById('evtTime').value.trim();
+        const noteVal = document.getElementById('evtNote').value.trim();
+
+        if(!titleVal || !dayVal || isNaN(dayVal)) {
+          alert('Preencha título e dia (número).');
+          return;
+        }
+
+        // tenta enviar ao backend; se falhar, faz fallback local
+        const payload = { day: dayVal, title: titleVal, time: timeVal, note: noteVal };
+        fetch('/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(res => {
+          if (!res.ok) throw new Error('Erro ao criar evento');
+          return res.json();
+        }).then(created => {
+          addEventToList({ day: created.day || dayVal, title: created.title || titleVal, time: created.time || timeVal, note: created.note || noteVal });
+          if (!eventDays.includes(created.day || dayVal)) eventDays.push(created.day || dayVal);
+          hideModal();
+          render();
+        }).catch(err => {
+          console.warn('POST /events falhou, fallback local', err);
+          addEventToList({ day: dayVal, title: titleVal, time: timeVal, note: noteVal });
+          if (!eventDays.includes(dayVal)) eventDays.push(dayVal);
+          hideModal();
+          render();
+        });
+       });
+
+      // inicial
+      render();
+    })();
+  </script>
+
+  <script src="accessibility.js"></script>
+</body>
+</html>
