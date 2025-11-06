@@ -1,6 +1,7 @@
 package br.com.agenda.controllers;
 
 import br.com.agenda.services.EventoService;
+import br.com.agenda.services.UsuarioService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class CalendarioController {
 
     @GetMapping
     public String mostrarTelaCalendario(Model model) {
-        if (EventoService.getIdAtual() < 0L)
+        if (UsuarioService.getIdAtual() < 0L)
             return "erro401";
 
         String avisosHtml = service.getEventosHtml();

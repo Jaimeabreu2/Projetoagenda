@@ -11,27 +11,19 @@ import java.util.Objects;
 @Service
 public class EventoService {
     private final EventoRepository repository;
-    private static Long idAtual = -1L;
 
     public EventoService(EventoRepository repository) {
         this.repository = repository;
     }
 
-    public static void setIdAtual(Long idAtual) {
-        EventoService.idAtual = idAtual;
-    }
-
-    public static Long getIdAtual() {
-        return EventoService.idAtual;
-    }
-
     public void salvarEvento(String titulo, LocalDate data) {
-        repository.save(new Evento(idAtual, titulo, data));
+        repository.save(new Evento(UsuarioService.getIdAtual(), titulo, data));
     }
 
     public boolean verificarEventoExistente(String titulo, LocalDate data) {
         for (Evento e : repository.findAll()) {
-            if (Objects.equals(e.getIdUsuario(), idAtual) && e.getTitulo().equals(titulo) && e.getData().equals(data))
+            if (Objects.equals(e.getIdUsuario(), UsuarioService.getIdAtual()) &&
+                    e.getTitulo().equals(titulo) && e.getData().equals(data))
                 return true;
         }
         return false;
@@ -39,7 +31,7 @@ public class EventoService {
 
     public String getEventosHtml() {
         List<Evento> eventosUsuario = repository.findAll().stream().
-                filter(e -> Objects.equals(e.getIdUsuario(), idAtual)).toList();
+                filter(e -> Objects.equals(e.getIdUsuario(), UsuarioService.getIdAtual())).toList();
 
         int totalEventos = eventosUsuario.size();
         StringBuilder sb = new StringBuilder();
