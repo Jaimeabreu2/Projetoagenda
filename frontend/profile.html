@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Perfil — Projeto Agenda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ajustes locais: compactação máxima para evitar scroll vertical */
+    body.profile-page{ padding:10px; min-height:100vh; background:transparent }
+    .profile-wrap{
+      max-width:920px;
+      margin:10px auto;
+      display:grid;
+      grid-template-columns: 180px 1fr;
+      gap:12px;
+      align-items:start;
+      /* garante que todo o conteúdo caiba no viewport vertical sem scroll desnecessário */
+      min-height: calc(100vh - 20px);
+    }
+
+    /* avatar e card mais compactos */
+    .profile-card{
+      background: linear-gradient(180deg,#ffffff,#fbfff9);
+      border-radius:10px;
+      padding:10px;
+      box-shadow:var(--shadow-sm);
+      border:1px solid rgba(0,0,0,0.04);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+    }
+    .avatar{
+      width:84px;height:84px;border-radius:12px;
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto;
+      box-shadow:var(--shadow-lg);
+    }
+    .profile-actions{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+    .profile-actions .btn{padding:8px 10px;font-size:14px}
+
+    /* painel principal compacto */
+    .profile-main{
+      /* tom verde um pouco mais escuro para melhor contraste */
+      background: linear-gradient(180deg,#eefbf0,#e2f6e6);
+      border-radius:10px;
+      padding:12px;
+      box-shadow:var(--shadow-sm);
+      border:1px solid rgba(46,125,50,0.06);
+    }
+    /* avisos menores e mais discretos (e-mail institucional e dica de senha) */
+    .email-note, #pwdHint { font-size:12px; color: rgba(15,23,42,0.68); }
+
+    /* formulário em grid 2-colunas para economizar altura */
+    .profile-main form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px 12px; /* row-gap / column-gap */
+      align-items:start;
+    }
+    .field{ margin:0; display:flex; flex-direction:column; }
+    .field.full{ grid-column: 1 / -1; }
+
+    /* labels/inputs menores */
+    label{ font-size:13px; color:var(--muted); margin-bottom:6px; }
+    .profile-main .input{ background:#fbfff9; padding:8px 10px; border-radius:8px; border:1px solid transparent; }
+    .profile-main .input:focus-within{ box-shadow:0 8px 22px rgba(102,187,106,0.08); border-color: rgba(46,125,50,0.08); }
+    .profile-main select, .profile-main input { width:100%; border:0; background:transparent; padding:6px 0; font-size:14px; color:var(--text) }
+
+    /* títulos e separadores mais compactos */
+    .profile-main h3{ margin:0 0 8px 0; font-size:16px; color:var(--brand-1) }
+    .profile-main hr{ grid-column: 1 / -1; border:none; border-top:1px solid rgba(0,0,0,0.04); margin:8px 0; }
+
+    /* preferências alinhadas e compactas */
+    .pref-list{ display:flex;flex-direction:column;gap:6px; align-items:flex-start; }
+    .pref-list label{ display:flex; gap:8px; align-items:center; justify-content:flex-start; cursor:pointer; color:var(--muted); }
+    .pref-list input[type="checkbox"]{ width:16px; height:16px; flex-shrink:0; }
+
+    /* ações: alinhar à direita e reduzir tamanho */
+    .actions-row{ grid-column: 1 / -1; display:flex; gap:8px; justify-content:flex-end; align-items:center; margin-top:6px; }
+    .actions-row .btn{ padding:8px 10px; font-size:14px; }
+
+    /* mensagens pequenas */
+    .success-msg, .danger-msg{ font-size:13px; margin-top:6px; }
+
+    /* responsivo: em telas pequenas volta a uma coluna */
+    @media (max-width:880px){
+      .profile-wrap{ grid-template-columns: 1fr; max-width:520px; padding:10px; margin:8px; min-height: auto; }
+      .profile-main form{ grid-template-columns: 1fr; gap:10px; }
+      .profile-actions .btn{ width:100% }
+    }
+
+    /* reduz margens de botões e espaçamentos gerais para minimizar altura */
+    .btn{ padding:8px 10px; font-size:14px; border-radius:8px; }
+
+    /* toast de sucesso */
+    .toast {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(76, 175, 80, 0.9);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body class="profile-page">
+  <!-- Barra lateral: atalhos rápidos para navegar entre telas (use Tab para focar) -->
+  <nav class="app-sidebar" aria-label="Barra de navegação">
+    <a class="icon-btn" href="calendarComAgenda.html" title="Calendário" aria-label="Calendário">📅</a>
+    <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
+    <a class="icon-btn" href="profile.html" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
+    <div class="sidebar-sep" aria-hidden="true"></div>
+    <a class="create-btn" href="addEventScreen.html" title="Adicionar evento" aria-label="Adicionar evento">+</a>
+  </nav>
+
+  <!-- Conteúdo principal: área de edição do perfil.
+       Observações rápidas:
+       - Campos obrigatórios usam "required".
+       - O e-mail institucional é somente leitura por design. -->
+  <main class="profile-wrap" role="main" aria-labelledby="profileTitle">
+    <section class="profile-card" aria-labelledby="profileTitle">
+      <div class="avatar" aria-hidden="false" id="avatarInitials">JS</div>
+      <!-- upload de avatar (preview client-side) -->
+      <div style="text-align:center;margin-top:8px">
+        <input id="avatarInput" type="file" accept="image/*" aria-label="Enviar foto de perfil" style="display:none" />
+        <button id="changeAvatarBtn" class="btn secondary" type="button" style="font-size:13px;padding:8px 12px">Alterar foto</button>
+      </div>
+      <h2 id="profileTitle" style="text-align:center;margin:6px 0">Seu perfil</h2>
+      <div style="text-align:center" class="small">Gerencie suas informações básicas</div>
+
+      <div class="profile-actions" aria-hidden="false">
+        <a class="btn" id="goCalendar" href="calendarComAgenda.html">Ir ao calendário</a>
+        <button class="btn secondary" id="logoutBtn" type="button">Sair</button>
+      </div>
+    </section>
+
+    <section class="profile-main" aria-label="Editar informações">
+      <h3 style="margin-top:0">Informações básicas</h3>
+      <form id="profileForm" autocomplete="on" novalidate>
+        <div class="field full">
+          <label for="fullName">Nome completo</label>
+          <div class="input"><input id="fullName" name="name" type="text" placeholder="Seu nome completo" required /></div>
+        </div>
+
+        <div class="field full">
+          <label for="email">E-mail institucional</label>
+          <div class="input"><input id="email" name="email" type="email" readonly /></div>
+          <div class="small-note email-note">O e-mail institucional não pode ser alterado aqui.</div>
+        </div>
+
+        <!-- campos de curso, telefone e ano de ingresso removidos conforme solicitado -->
+
+        <hr />
+
+        <div class="field full">
+          <h4 style="margin:8px 0">Alterar senha</h4>
+        </div>
+        <div class="field">
+          <label for="pwd">Senha atual</label>
+          <div class="input"><input id="pwd" name="pwd" type="password" placeholder="Senha atual" /></div>
+        </div>
+        <div class="field">
+          <label for="newPwd">Nova senha</label>
+          <div class="input"><input id="newPwd" name="newPwd" type="password" placeholder="Nova senha" /></div>
+        </div>
+        <div class="field">
+          <label for="confirmPwd">Confirmar nova senha</label>
+          <div class="input"><input id="confirmPwd" name="confirmPwd" type="password" placeholder="Confirme a nova senha" /></div>
+          <div id="pwdHint" class="small-note">Deixe em branco se não quiser alterar a senha.</div>
+        </div>
+
+        <hr />
+        <div class="field full">
+          <h4 style="margin:8px 0">Preferências</h4>
+        </div>
+        <div class="pref-list field full" aria-labelledby="prefTitle">
+          <label for="notifyEmail"><input id="notifyEmail" type="checkbox" /> Receber notificações por e-mail</label>
+          <label for="notifyWeekly"><input id="notifyWeekly" type="checkbox" /> Resumo semanal</label>
+          <!-- 2FA removido conforme solicitado -->
+        </div>
+
+        <div class="field full" style="font-size:13px;color:var(--muted);margin-top:6px">
+          <div>Conta criada em: <span id="createdAt"></span></div>
+          <div>Último login: <span id="lastLogin"></span></div>
+        </div>
+
+        <div class="actions-row">
+          <button type="submit" class="btn" id="saveProfile">Salvar alterações</button>
+          <a class="btn secondary" href="calendarComAgenda.html">Voltar</a>
+          <button type="button" id="deleteAccountBtn" class="btn secondary" style="color:var(--danger);border-color:rgba(185,28,28,0.08)">Excluir conta</button>
+        </div>
+
+        <div id="error" class="danger-msg" role="alert"></div>
+      </form>
+    </section>
+
+    <!-- Toast de sucesso (perfil) -->
+    <div id="saveSuccess" class="toast" role="status" aria-live="polite">Alterações salvas</div>
+  </main>
+
+  <!-- Script: inicializa dados do usuário, trata upload de avatar e validação de senha.
+       Comentários no código explicam cada etapa de forma clara. -->
+  <script>
+    (function(){
+      // Carregamento simulado de dados do usuário (substituir por fetch ao integrar backend)
+      const user = {
+        name: 'João Silva',
+        email: 'joao.silva@aluno.uece.br', // institucional — NÃO editável
+        notifyEmail: true,
+        notifyWeekly: false,
+        createdAt: '2022-03-15T10:30:00Z',
+        lastLogin: new Date().toISOString(),
+        avatarData: null // base64 data URL (simulação)
+      };
+
+      const fullName = document.getElementById('fullName');
+      const email = document.getElementById('email');
+      const avatar = document.getElementById('avatarInitials');
+      const avatarInput = document.getElementById('avatarInput');
+      const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+      const createdAtEl = document.getElementById('createdAt');
+      const lastLoginEl = document.getElementById('lastLogin');
+      const notifyEmailEl = document.getElementById('notifyEmail');
+      const notifyWeeklyEl = document.getElementById('notifyWeekly');
+      const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+      const profileForm = document.getElementById('profileForm');
+      const error = document.getElementById('error');
+
+      // Inicializa campos
+      function initialsFromName(n){
+        return n.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+      }
+      function load(){
+        fullName.value = user.name;
+        email.value = user.email; // read-only
+        avatar.textContent = initialsFromName(user.name || 'US');
+        // avatar preview if available
+        if (user.avatarData) {
+          avatar.style.backgroundImage = `url(${user.avatarData})`;
+          avatar.textContent = '';
+          avatar.style.backgroundSize = 'cover';
+        } else {
+          avatar.style.backgroundImage = '';
+          avatar.style.backgroundSize = '';
+          avatar.textContent = initialsFromName(user.name || 'US');
+        }
+        notifyEmailEl.checked = !!user.notifyEmail;
+        notifyWeeklyEl.checked = !!user.notifyWeekly;
+        createdAtEl.textContent = new Date(user.createdAt).toLocaleString();
+        lastLoginEl.textContent = new Date(user.lastLogin).toLocaleString();
+      }
+      load();
+
+      // avatar upload preview
+      changeAvatarBtn.addEventListener('click', ()=> avatarInput.click());
+      avatarInput.addEventListener('change', (e)=>{
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = function(ev){
+          user.avatarData = ev.target.result; // base64 URL
+          load();
+        };
+        reader.readAsDataURL(f);
+      });
+
+      // Validação simples de senha (se informar nova senha, confirma deve bater)
+      profileForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        error.style.display='none';
+        const nameVal = fullName.value.trim();
+        // email institucional não pode ser alterado via UI
+        const emailVal = user.email;
+        const currentPwd = document.getElementById('pwd').value;
+        const newPwd = document.getElementById('newPwd').value;
+        const confirmPwd = document.getElementById('confirmPwd').value;
+
+        if(!nameVal || !emailVal){
+          error.textContent = 'Nome é obrigatório. O e-mail institucional não pode ser alterado aqui.';
+          error.style.display='';
+          return;
+        }
+        if (newPwd || confirmPwd || currentPwd){
+          if (!currentPwd) {
+            error.textContent = 'Informe a senha atual para alterar a senha.';
+            error.style.display=''; return;
+          }
+          if (newPwd.length < 6) {
+            error.textContent = 'A nova senha deve ter ao menos 6 caracteres.';
+            error.style.display=''; return;
+          }
+          if (newPwd !== confirmPwd) {
+            error.textContent = 'A confirmação da nova senha não corresponde.';
+            error.style.display=''; return;
+          }
+          // Aqui você chamaria API para alterar a senha junto com verificação do currentPwd
+        }
+
+        // BACKEND: atualizar perfil
+        // PUT /users/:id  OR PATCH /users/:id
+        // - body (JSON): { name: String, notifyEmail: Boolean, notifyWeekly: Boolean, ... }
+        // - Se alterar senha: envie também { currentPwd, newPwd } em um request protegido.
+        // - Resposta: { success: true, user: { ...updated fields... } } ou erros 4xx/5xx.
+        // Exemplo (pseudo):
+        // fetch(`/users/${userId}`, { method: 'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...}) })
+        //   .then(r => r.json()).then(updated => { /* atualizar UI */ })
+
+        // Simulação de gravação local (substituir por fetch ao integrar)
+        user.name = nameVal;
+        // não alterar user.email
+        user.notifyEmail = !!notifyEmailEl.checked;
+        user.notifyWeekly = !!notifyWeeklyEl.checked;
+        user.lastLogin = new Date().toISOString();
+
+        load();
+
+        // mostra toast de sucesso por 2s
+        const t = document.getElementById('saveSuccess'); t.textContent = 'Alterações salvas'; t.style.display='block';
+        setTimeout(()=> t.style.display='none', 2000);
+      });
+
+      // avatar upload
+      // BACKEND: upload de avatar
+      // POST /users/:id/avatar
+      // - body: FormData { file: Blob }
+      // - resposta: { success: true, avatarUrl: '/static/avatars/123.png' }
+      // Dica: usar fetch(..., { method:'POST', body: formData, credentials:'include' })
+
+      // excluir conta (simulação): confirma e redireciona
+      deleteAccountBtn.addEventListener('click', ()=> {
+        if (!confirm('Tem certeza que deseja excluir sua conta? Esta ação é irreversível (simulação).')) return;
+        // simulamos remoção local e redirecionamento para index
+        alert('Conta excluída (simulação). Você será redirecionado.');
+        window.location.href = 'index.html';
+      });
+
+      // logout simples (navega para index)
+      document.getElementById('logoutBtn').addEventListener('click', ()=> {
+        // limpar sessões, tokens etc. quando integrar; por enquanto redireciona
+        window.location.href = 'index.html';
+      });
+    })();
+  </script>
+
+  <script src="accessibility.js"></script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!doctype html>
+
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Agenda — Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <!-- favicon e meta para apresentação mais profissional -->
+  <link rel="icon" href="favicon.ico" />
+  <meta name="description" content="Agenda acadêmica — organize aulas, provas e compromissos." />
+</head>
+<body class="login-page">
+  <!-- Topbar compartilhado -->
+  <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
+    <div class="brand"><div class="logo">Ag</div><div style="font-weight:700">Projeto Agenda</div></div>
+    <div class="top-actions">
+      <a class="btn secondary" href="signup.html" title="Criar conta">Criar conta</a>
+      <a class="btn" href="calendarComAgenda.html" title="Ir para o calendário (offline)">Abrir calendário</a>
+    </div>
+  </header>
+
+  <div class="app-container">
+  <main class="login-wrap" aria-labelledby="login-title">
+    <!-- Hero: informação introdutória sobre o app -->
+    <section class="hero" aria-hidden="false">
+      <div class="brand">
+        <div class="logo" aria-hidden="false">Ag</div>
+        <div>
+          <div style="font-weight:700">Projeto Agenda</div>
+          <div class="small">Agenda acadêmica — organize suas aulas e compromissos</div>
+        </div>
+      </div>
+
+  <h1 id="login-title">Bem-vindo de volta</h1>
+  <p>Faça login para acessar seu calendário. Caso ainda não tenha conta, cadastre-se.</p>
+  <div class="small" style="margin-top:18px">Dica: use seu e-mail institucional.</div>
+</section>
+
+<!-- Formulários: login principal e formulário de cadastro alternativo.
+     Use os botões abaixo para alternar entre telas sem recarregar. -->
+<section class="card" aria-labelledby="form-title">
+  <h2 id="form-title"><i class="fa-solid fa-wheelchair"></i> Acesse sua conta</h2>
+
+  <!-- Login form: REMOVIDO atributo action para evitar dupla submissão -->
+  <form id="loginForm" method="post" autocomplete="on" novalidate>
+    <div>
+      <label for="usuario">Usuário</label>
+      <div class="input">
+        <input id="usuario" name="user" type="text" inputmode="email" placeholder="seunome@aluno.uece.br" required aria-required="true" />
+      </div>
+    </div>
+
+    <div>
+      <label for="senha">Senha</label>
+      <div class="input">
+        <input id="senha" name="pass" type="password" placeholder="••••••••" required aria-required="true" />
+        <button type="button" class="eye" id="togglePwd" aria-label="Mostrar senha"><i class="fa-solid fa-eye"></i></button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="remember" name="remember" type="checkbox" />
+        <label for="remember" class="small">Lembrar-me</label>
+      </div>
+
+      <a href="#" class="small" id="forgot">Esqueci a senha</a>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button type="submit" class="btn" id="submitBtn">Entrar</button>
+      <button type="button" class="btn secondary" id="signupBtn">Criar conta</button>
+    </div>
+
+    <div class="error" id="errorMsg" role="alert"></div>
+    <div class="help">Ao entrar, você será redirecionado para o seu calendário.</div>
+  </form>
+
+  <!-- Signup form: REMOVIDO atributo action para evitar dupla submissão -->
+  <form id="signupForm" method="post" autocomplete="on" novalidate style="display:none">
+    <div>
+      <label for="nomeCompleto">Nome completo</label>
+      <div class="input">
+        <input id="nomeCompleto" name="name" type="text" placeholder="Seu nome completo" required aria-required="true" />
+      </div>
+    </div>
+
+    <div>
+      <label for="signupEmail">E-mail</label>
+      <div class="input">
+        <input id="signupEmail" name="user" type="email" inputmode="email" placeholder="seunome@aluno.uece.br" required aria-required="true" />
+      </div>
+    </div>
+
+    <div>
+      <label for="signupSenha">Senha</label>
+      <div class="input">
+        <input id="signupSenha" name="pass" type="password" placeholder="••••••••" required aria-required="true" />
+        <button type="button" class="eye" aria-label="Mostrar senha"><i class="fa-solid fa-eye"></i></button>
+      </div>
+    </div>
+
+    <div>
+      <label for="signupSenha2">Confirmar senha</label>
+      <div class="input">
+        <input id="signupSenha2" name="pass2" type="password" placeholder="••••••••" required aria-required="true" />
+        <button type="button" class="eye" aria-label="Mostrar senha"><i class="fa-solid fa-eye"></i></button>
+      </div>
+      <!-- Indicador em tempo real se as senhas coincidem -->
+      <div id="pwdMatch" class="small" aria-live="polite" style="margin-top:6px;color:#666"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button type="submit" class="btn" id="signupSubmit">Criar conta</button>
+      <button type="button" class="btn secondary" id="backToLogin">Já tenho conta</button>
+    </div>
+
+    <div class="error" id="signupError" role="alert"></div>
+    <div class="help">Ao criar a conta, você poderá acessar seu calendário acadêmico.</div>
+  </form>
+</section>
+
+  </main>
+  </div>
+
+  <script>
+    // Script: controla login, cadastro e validação de senhas.
+    // Comentários internos mostram onde integrar chamadas ao backend.
+    (function(){
+      // Elementos de login
+      const loginForm = document.getElementById('loginForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const errorMsg = document.getElementById('errorMsg');
+
+      // Elementos de cadastro
+      const signupBtn = document.getElementById('signupBtn');
+      const signupForm = document.getElementById('signupForm');
+      const signupSubmit = document.getElementById('signupSubmit');
+      const signupError = document.getElementById('signupError');
+      const backToLogin = document.getElementById('backToLogin');
+
+      const formTitle = document.getElementById('form-title');
+
+      // ------------------------------------
+      // Funções que coletam os dados dos forms
+      // Use estas funções para montar o payload enviado ao backend.
+      // ------------------------------------
+      function getLoginData() {
+        // coleta os campos do formulário de login
+        return {
+          user: document.getElementById('usuario').value.trim(),
+          pass: document.getElementById('senha').value,
+          remember: document.getElementById('remember').checked
+        };
+      }
+
+      function getSignupData() {
+        // coleta os campos do formulário de cadastro
+        return {
+          name: document.getElementById('nomeCompleto').value.trim(),
+          user: document.getElementById('signupEmail').value.trim(),
+          pass: document.getElementById('signupSenha').value,
+          pass2: document.getElementById('signupSenha2').value
+        };
+      }
+
+      // ------------------------------------
+      // Stubs para envio ao backend
+      // Substitua o conteúdo por chamadas reais quando o backend estiver disponível.
+      // Exemplos de uso (comentados) mostram como usar fetch/JSON.
+      // ------------------------------------
+      function sendLogin(data) {
+        // Exemplo (descomente e ajuste a URL/headers quando tiver backend):
+        /*
+        return fetch('/login/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+          credentials: 'include' // se precisar enviar cookies
+        }).then(res => res.json());
+        */
+        // Atualmente, mantenha fallback para comportamento existente (form.submit).
+        return null;
+      }
+
+      function sendSignup(data) {
+        // Exemplo (descomente e ajuste a URL/headers quando tiver backend):
+        /*
+        return fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        }).then(res => res.json());
+        */
+        return null;
+      }
+
+      // Delegated listener para todos os botões "eye" (mostra/oculta senha)
+      document.addEventListener('click', function(e){
+        const eye = e.target.closest('.eye');
+        if (!eye) return;
+        const parent = eye.parentElement;
+        const input = parent.querySelector('input');
+        if (!input) return;
+        const type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
+        eye.innerHTML = type === 'password' 
+          ? '<i class="fa-solid fa-eye"></i>' 
+          : '<i class="fa-solid fa-eye-slash"></i>';
+        eye.setAttribute('aria-pressed', type !== 'password');
+      });
+
+      // Mostrar tela de cadastro
+      signupBtn.addEventListener('click', ()=> {
+        loginForm.style.display = 'none';
+        signupForm.style.display = '';
+        formTitle.textContent = 'Criar conta';
+        // limpe mensagens
+        errorMsg.style.display = 'none';
+        signupError.style.display = 'none';
+      });
+
+      // Voltar para login
+      backToLogin.addEventListener('click', ()=> {
+        signupForm.style.display = 'none';
+        loginForm.style.display = '';
+        formTitle.textContent = 'Acesse sua conta';
+        signupError.style.display = 'none';
+        errorMsg.style.display = 'none';
+      });
+
+      // Envio do formulário de login via fetch (evita dupla submissão)
+      loginForm.addEventListener('submit', function(e){
+        e.preventDefault(); // controlamos o envio
+        errorMsg.style.display = 'none';
+
+        const formData = new FormData(loginForm);
+        const body = new URLSearchParams();
+        for (const [k,v] of formData.entries()) body.append(k, v);
+
+        // UX
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+        submitBtn.textContent = 'Entrando...';
+
+        // BACKEND: endpoint esperado
+        // POST /login/auth
+        // - Content-Type: application/x-www-form-urlencoded
+        // - body: user=...&pass=...
+        // - comportamento recomendado do backend:
+        //    * Em caso de sucesso: preferencialmente fazer um redirect (HTTP 302) para a página do calendário,
+        //      ou retornar 200 com JSON { success: true, redirect: '/calendarComAgenda.html' }.
+        //    * Em caso de credenciais inválidas: retornar 401/403 com mensagem de erro no body.
+        //    * Em caso de erro do servidor: retornar 5xx.
+        // - Dica: se o backend usa session/cookie, no fetch use `credentials: 'include'`.
+        fetch('/login/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString(),
+          redirect: 'follow'
+        }).then(response => {
+          // Se o backend redirecionou (sendRedirect) -> seguir
+          if (response.redirected) {
+            window.location.href = response.url;
+            return;
+          }
+          // Se o backend respondeu OK (200) -> assumimos sucesso e redirecionamos localmente
+          if (response.ok) {
+            window.location.href = 'calendarComAgenda.html';
+            return;
+          }
+          // Erros 4xx: provável falha de autenticação -> exibir mensagem
+          if (response.status >= 400 && response.status < 500) {
+            return response.text().then(txt => { throw new Error(txt || 'Credenciais inválidas'); });
+          }
+          // Erros 5xx ou outros: fallback para a navegação local (sem backend)
+          window.location.href = 'calendarComAgenda.html';
+        }).catch(err => {
+          // Se o fetch falhar por rede/CORS/etc, assumimos ambiente sem backend e navegamos localmente
+          console.warn('Auth fetch failed, fallback to local redirect', err);
+          window.location.href = 'calendarComAgenda.html';
+        }).finally(() => {
+          // reset UX apenas se ainda estivermos na página (não executará se já redirecionamos)
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('loading');
+          submitBtn.textContent = 'Entrar';
+        });
+      });
+
+      // Elementos do formulário de cadastro
+      const signupPwd = document.getElementById('signupSenha');
+      const signupPwd2 = document.getElementById('signupSenha2');
+      const pwdMatch = document.getElementById('pwdMatch');
+
+      // Validação em tempo real das senhas do cadastro
+      function checkPasswordsMatch() {
+        const a = signupPwd.value;
+        const b = signupPwd2.value;
+
+        // Se ambos vazios, limpa mensagem e mantém botão habilitado (ou siga política desejada)
+        if (!a && !b) {
+          pwdMatch.textContent = '';
+          signupSubmit.disabled = false;
+          return;
+        }
+
+        // Se ambos preenchidos e iguais
+        if (a && b && a === b) {
+          pwdMatch.textContent = 'As senhas coincidem.';
+          pwdMatch.style.color = '#0a0'; // verde
+          signupSubmit.disabled = false;
+          return;
+        }
+
+        // Caso contrário (diferentes)
+        if (b) { // só mostrar quando usuário já digitou confirm
+          pwdMatch.textContent = 'As senhas não conferem.';
+          pwdMatch.style.color = '#c00'; // vermelho
+        } else {
+          pwdMatch.textContent = '';
+        }
+        signupSubmit.disabled = true;
+      }
+
+      // Ouça alterações em ambos os campos
+      signupPwd.addEventListener('input', checkPasswordsMatch);
+      signupPwd2.addEventListener('input', checkPasswordsMatch);
+
+      // Envio do formulário de cadastro via fetch (evita dupla submissão)
+      signupForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        signupError.style.display = 'none';
+
+        const payload = getSignupData();
+        if (!payload.pass || !payload.pass2 || payload.pass !== payload.pass2) {
+          signupError.textContent = 'As senhas não conferem.';
+          signupError.style.display = '';
+          return;
+        }
+
+        signupSubmit.disabled = true;
+        signupSubmit.classList.add('loading');
+        signupSubmit.textContent = 'Criando conta...';
+
+        // envia como form-urlencoded para compatibilidade com @RequestParam no backend
+        const formBody = new URLSearchParams({
+          name: payload.name || '',
+          user: payload.user || '',
+          pass: payload.pass || ''
+        });
+
+        fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formBody.toString(),
+          redirect: 'follow'
+        }).then(response => {
+          if (response.redirected) {
+            window.location.href = response.url;
+            return;
+          }
+          return response.text().then(txt => { throw new Error(txt || 'Erro ao criar conta'); });
+        }).catch(err => {
+          signupError.textContent = 'Erro ao criar conta. ' + (err.message || '');
+          signupError.style.display = '';
+        }).finally(()=> {
+          signupSubmit.disabled = false;
+          signupSubmit.classList.remove('loading');
+          signupSubmit.textContent = 'Criar conta';
+        });
+      });
+
+      // Rode uma checagem inicial (caso haja valores pré-preenchidos)
+      checkPasswordsMatch();
+
+    })();
+  </script>
+
+  <script>
+  (function(){
+    // seleciona o formulário de login (por action ou por id se existente)
+    const form = document.querySelector('form[action="/login/auth"], form#loginForm');
+    if (!form) return; // nada a fazer se form não existir
+
+    // procura o botão de submit dentro do form
+    const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+
+    // cria/obtém elemento de erro dentro do form para mostrar mensagens
+    let errEl = form.querySelector('#loginError');
+    if(!errEl){
+      errEl = document.createElement('div');
+      errEl.id = 'loginError';
+      errEl.className = 'error';
+      errEl.style.display = 'none';
+      // insere no fim do form
+      form.appendChild(errEl);
+    }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      errEl.style.display = 'none';
+
+      // coleta dados do formulário (compatible com name attributes do seu form)
+      const formData = new FormData(form);
+      const body = new URLSearchParams();
+      for (const [k,v] of formData.entries()) body.append(k, v);
+
+      // UX: bloquear botão e mostrar loading
+      if(submitBtn){
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+      }
+
+      // BACKEND (handler genérico)
+      // Mesma contract acima: POST /login/auth
+      // - Exemplo de implementação backend (pseudo):
+      //   if (validCredentials) { redisSessionCreate(); return sendRedirect('/calendarComAgenda.html') }
+      //   else { res.status(401).send('Credenciais inválidas') }
+      fetch('/login/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+        redirect: 'follow'
+      }).then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+        if (response.ok) {
+          // backend respondeu OK — navegue para a página de calendário localmente
+          window.location.href = 'calendarComAgenda.html';
+          return;
+        }
+        if (response.status >= 400 && response.status < 500) {
+          return response.text().then(txt => { throw new Error(txt || 'Erro na autenticação'); });
+        }
+        // 5xx ou outros: fallback para a navegação local
+        window.location.href = 'calendarComAgenda.html';
+      }).catch(err => {
+        // fallback local quando não há backend
+        console.warn('Auth fetch failed (generic handler), fallback to local redirect', err);
+        window.location.href = 'calendarComAgenda.html';
+      }).finally(() => {
+        if(submitBtn){
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('loading');
+        }
+      });
+    });
+  })();
+  </script>
+
+  <script src="accessibility.js"></script>
+
+</body>
+</html>
