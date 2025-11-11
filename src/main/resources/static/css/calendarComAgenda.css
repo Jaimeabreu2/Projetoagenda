@@ -1,0 +1,345 @@
+.calendar-wrap {
+    display: grid;
+    grid-template-columns:360px 1fr;
+    gap: 18px;
+    max-width: 980px;
+    margin: 28px auto;
+    padding: 14px;
+}
+
+:root {
+    --topbar-height: 60px;
+    --bg: #ffffff;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.agenda-panel {
+    background: linear-gradient(180deg, #f8fff9 0%, #eefbf0 100%);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(46, 125, 50, 0.06);
+}
+
+.agenda-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.agenda-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.appointments {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 6px;
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+    padding-right: 6px;
+}
+
+.appointment {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.appointment:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    background: linear-gradient(180deg, #fcfff9, #f2fff2);
+}
+
+.badge {
+    min-width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    font-size: 16px;
+}
+
+.appt-body strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.appt-body small {
+    display: block;
+    color: rgba(15, 23, 42, 0.6);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.appointment::before {
+    content: "";
+    width: 4px;
+    height: 40px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--brand-1), var(--brand-2));
+    margin-right: 8px;
+    display: inline-block;
+    opacity: 0.95;
+}
+
+.calendar-main {
+    background: transparent;
+}
+
+#calendarContent.calendar-grid {
+    gap: 10px;
+    padding: 12px;
+}
+
+.calendar-cell {
+    min-height: 68px;
+    padding: 8px;
+}
+
+.calendar-cell.selected {
+    outline: 2px solid rgba(102, 187, 106, 0.16);
+    box-shadow: 0 6px 18px rgba(102, 187, 106, 0.06);
+}
+
+.calendar-cell.has-event {
+    background: linear-gradient(180deg, #bfecc0 0%, #9fd9a0 100%);
+    border: 1px solid rgba(46, 125, 50, 0.22);
+    box-shadow: 0 10px 22px rgba(46, 125, 50, 0.08) inset;
+}
+
+.calendar-cell.has-event .day-num {
+    color: #154d2b;
+    font-weight: 800;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.calendar-cell.has-event .event-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--brand-1);
+    box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.06);
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.event-info small {
+    display: none;
+}
+
+@media (max-width: 880px) {
+    .calendar-wrap {
+        grid-template-columns:1fr;
+        max-width: 520px;
+        padding: 12px;
+    }
+
+    .agenda-panel {
+        order: 2;
+    }
+
+    .calendar-main {
+        order: 1;
+    }
+}
+
+.app-sidebar {
+    position: fixed;
+    top: var(--topbar-height);
+    left: 0;
+    bottom: 0;
+    width: 80px;
+    background: var(--bg);
+    border-right: 1px solid rgba(15, 23, 42, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 22px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.icon-btn:hover {
+    color: var(--brand-1);
+}
+
+.sidebar-sep {
+    height: 1px;
+    width: 80%;
+    background: rgba(15, 23, 42, 0.1);
+    margin: 8px 0;
+}
+
+.create-btn {
+    background: var(--brand-1);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s;
+}
+
+.create-btn:hover {
+    background: var(--brand-2);
+}
+
+.event-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.event-modal-panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.event-modal h3 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    color: var(--text);
+}
+
+.event-modal label {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.event-modal input {
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.event-modal .btn {
+    margin-top: auto;
+}
+
+.event-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.skip-link {
+    position: absolute;
+    left: -999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.skip-link:focus {
+    left: 0;
+    top: 0;
+    width: auto;
+    height: auto;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    z-index: 1001;
+}
+
+.app-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    background: var(--bg);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 60px;
+}
+
+.app-topbar .brand {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    color: var(--text);
+}
+
+.app-topbar .logo {
+    font-weight: 700;
+    margin-right: 8px;
+    font-size: 22px;
+}
+
+.app-topbar .top-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.app-topbar .btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.app-topbar .btn.secondary {
+    background: rgba(15, 23, 42, 0.05);
+    color: var(--text);
+}
+
+.app-topbar .btn.primary {
+    background: var(--brand-1);
+    color: #fff;
+}

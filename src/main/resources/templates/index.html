@@ -29,6 +29,11 @@
         <section class="card" aria-labelledby="form-title">
             <h2 id="form-title"><i class="fa-solid fa-wheelchair"></i>Acesse sua conta</h2>
 
+            <span th:if="${warning}" th:text="${warning}" role="alert"
+                  style="display:block;background:#fff3cd;color:#856404;border:1px solid #ffeeba;
+                  padding:10px;border-radius:6px;margin-bottom:12px;text-align:center;">
+            </span>
+
             <form id="loginForm" th:action="@{/}" method="post" autocomplete="on" novalidate>
                 <div>
                     <label for="usuario">Usuário</label>
@@ -59,49 +64,9 @@
 
                 <div style="display:flex;gap:10px;margin-top:8px">
                     <button type="submit" class="btn" id="submitBtn">Entrar</button>
-                    <button type="button" class="btn secondary" id="signupBtn">Criar conta</button>
-                </div>
-
-                <div class="error" th:if="${warning}" th:text="${warning}" role="alert"></div>
-            </form>
-
-            <form id="signupForm" th:action="@{/signup}" method="post" autocomplete="on" novalidate
-                  style="display:none">
-                <div>
-                    <label for="nomeCompleto">Nome completo</label>
-                    <div class="input">
-                        <input id="nomeCompleto" name="name" type="text" placeholder="Seu nome completo" required/>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="signupEmail">E-mail</label>
-                    <div class="input">
-                        <input id="signupEmail" name="user" type="email"
-                               placeholder="seunome@aluno.uece.br" required/>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="signupSenha">Senha</label>
-                    <div class="input">
-                        <input id="signupSenha" name="pass" type="password" placeholder="••••••••" required/>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="signupSenha2">Confirmar senha</label>
-                    <div class="input">
-                        <input id="signupSenha2" name="pass2" type="password" placeholder="••••••••" required/>
-                    </div>
-                </div>
-
-                <div style="display:flex;gap:10px;margin-top:8px">
-                    <button type="submit" class="btn" id="signupSubmit">Criar conta</button>
-                    <button type="button" class="btn secondary" id="backToLogin">Já tenho conta</button>
+                    <a th:href="@{/signup}" class="btn secondary" id="signupBtn">Criar conta</a>
                 </div>
             </form>
-
         </section>
     </main>
 </div>
