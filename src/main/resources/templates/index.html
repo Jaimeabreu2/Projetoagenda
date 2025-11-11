@@ -11,8 +11,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
+  <!-- favicon e meta para apresentação mais profissional -->
+  <link rel="icon" href="favicon.ico" />
+  <meta name="description" content="Agenda acadêmica — organize aulas, provas e compromissos." />
 </head>
 <body class="login-page">
+  <!-- Topbar compartilhado -->
+  <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
+    <div class="brand"><div class="logo">Ag</div><div style="font-weight:700">Projeto Agenda</div></div>
+    <div class="top-actions">
+      <a class="btn secondary" href="signup.html" title="Criar conta">Criar conta</a>
+      <a class="btn" href="calendarComAgenda.html" title="Ir para o calendário (offline)">Abrir calendário</a>
+    </div>
+  </header>
+
+  <div class="app-container">
   <main class="login-wrap" aria-labelledby="login-title">
     <!-- Hero: informação introdutória sobre o app -->
     <section class="hero" aria-hidden="false">
@@ -114,6 +127,7 @@
 </section>
 
   </main>
+  </div>
 
   <script>
     // Script: controla login, cadastro e validação de senhas.
@@ -235,22 +249,44 @@
         submitBtn.classList.add('loading');
         submitBtn.textContent = 'Entrando...';
 
+        // BACKEND: endpoint esperado
+        // POST /login/auth
+        // - Content-Type: application/x-www-form-urlencoded
+        // - body: user=...&pass=...
+        // - comportamento recomendado do backend:
+        //    * Em caso de sucesso: preferencialmente fazer um redirect (HTTP 302) para a página do calendário,
+        //      ou retornar 200 com JSON { success: true, redirect: '/calendarComAgenda.html' }.
+        //    * Em caso de credenciais inválidas: retornar 401/403 com mensagem de erro no body.
+        //    * Em caso de erro do servidor: retornar 5xx.
+        // - Dica: se o backend usa session/cookie, no fetch use `credentials: 'include'`.
         fetch('/login/auth', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: body.toString(),
           redirect: 'follow'
         }).then(response => {
+          // Se o backend redirecionou (sendRedirect) -> seguir
           if (response.redirected) {
-            // backend redirecionou (sendRedirect) -> seguir
             window.location.href = response.url;
             return;
           }
-          return response.text().then(txt => { throw new Error(txt || 'Erro na autenticação'); });
+          // Se o backend respondeu OK (200) -> assumimos sucesso e redirecionamos localmente
+          if (response.ok) {
+            window.location.href = 'calendarComAgenda.html';
+            return;
+          }
+          // Erros 4xx: provável falha de autenticação -> exibir mensagem
+          if (response.status >= 400 && response.status < 500) {
+            return response.text().then(txt => { throw new Error(txt || 'Credenciais inválidas'); });
+          }
+          // Erros 5xx ou outros: fallback para a navegação local (sem backend)
+          window.location.href = 'calendarComAgenda.html';
         }).catch(err => {
-          errorMsg.textContent = err && err.message ? err.message : 'Erro ao autenticar. Tente novamente.';
-          errorMsg.style.display = '';
+          // Se o fetch falhar por rede/CORS/etc, assumimos ambiente sem backend e navegamos localmente
+          console.warn('Auth fetch failed, fallback to local redirect', err);
+          window.location.href = 'calendarComAgenda.html';
         }).finally(() => {
+          // reset UX apenas se ainda estivermos na página (não executará se já redirecionamos)
           submitBtn.disabled = false;
           submitBtn.classList.remove('loading');
           submitBtn.textContent = 'Entrar';
@@ -381,23 +417,35 @@
         submitBtn.classList.add('loading');
       }
 
+      // BACKEND (handler genérico)
+      // Mesma contract acima: POST /login/auth
+      // - Exemplo de implementação backend (pseudo):
+      //   if (validCredentials) { redisSessionCreate(); return sendRedirect('/calendarComAgenda.html') }
+      //   else { res.status(401).send('Credenciais inválidas') }
       fetch('/login/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: body.toString(),
         redirect: 'follow'
       }).then(response => {
-        // se o backend fez sendRedirect, fetch com redirect:'follow' fará a navegação
         if (response.redirected) {
           window.location.href = response.url;
           return;
         }
-        // caso contrário, ler texto para mensagem de erro
-        return response.text().then(txt => { throw new Error(txt || 'Erro na autenticação'); });
+        if (response.ok) {
+          // backend respondeu OK — navegue para a página de calendário localmente
+          window.location.href = 'calendarComAgenda.html';
+          return;
+        }
+        if (response.status >= 400 && response.status < 500) {
+          return response.text().then(txt => { throw new Error(txt || 'Erro na autenticação'); });
+        }
+        // 5xx ou outros: fallback para a navegação local
+        window.location.href = 'calendarComAgenda.html';
       }).catch(err => {
-        // mostra mensagem de erro (fallback amigável)
-        errEl.textContent = err && err.message ? err.message : 'Erro ao autenticar. Tente novamente.';
-        errEl.style.display = '';
+        // fallback local quando não há backend
+        console.warn('Auth fetch failed (generic handler), fallback to local redirect', err);
+        window.location.href = 'calendarComAgenda.html';
       }).finally(() => {
         if(submitBtn){
           submitBtn.disabled = false;

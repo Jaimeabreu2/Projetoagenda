@@ -137,7 +137,7 @@
     /* Estilos para a barra lateral fixa */
     .app-sidebar{
       position:fixed;
-      top:0;
+      top: var(--topbar-height); /* empurra abaixo do topbar para não ficar coberto */
       left:0;
       bottom:0;
       width:80px;
@@ -237,18 +237,96 @@
       background:transparent;
       cursor:pointer;
     }
+
+    /* Acessibilidade: foco e leitura de mudanças */
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    .skip-link:focus {
+      left: 0;
+      top: 0;
+      width: auto;
+      height: auto;
+      padding: 8px;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      z-index: 1001;
+    }
+
+    /* Estilos para o cabeçalho da aplicação */
+    .app-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      background: var(--bg);
+      border-bottom: 1px solid rgba(15,23,42,0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      height: 60px;
+    }
+    .app-topbar .brand {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      color: var(--text);
+    }
+    .app-topbar .logo {
+      font-weight: 700;
+      margin-right: 8px;
+      font-size: 22px;
+    }
+    .app-topbar .top-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .app-topbar .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .app-topbar .btn.secondary {
+      background: rgba(15,23,42,0.05);
+      color: var(--text);
+    }
+    .app-topbar .btn.primary {
+      background: var(--brand-1);
+      color: #fff;
+    }
   </style>
 </head>
 <body class="calendar-page">
+  <!-- Topbar com usuário (simulação) -->
+  <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
+    <div class="brand"><div class="logo">Ag</div><div style="font-weight:700">Projeto Agenda</div></div>
+    <div class="top-actions">
+      <a class="btn secondary" href="profile.html" title="Meu Perfil">Meu Perfil</a>
+      <button id="goTodayBtn" class="btn" title="Hoje" aria-label="Ir para hoje">Hoje</button>
+      <button id="exportBtn" class="btn" title="Exportar eventos" aria-label="Exportar eventos">Exportar</button>
+      <a class="btn primary" href="addEventScreen.html" title="Adicionar evento">Adicionar evento</a>
+    </div>
+  </header>
+
+  <div class="app-container">
+   <!-- Skip link para acessibilidade de teclado -->
+   <a class="skip-link" href="#calendarContent" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden"
+     onfocus="this.style.left='16px';this.style.top='16px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-999px'">
+    Ir para o calendário
+  </a>
 
   <!-- Nova barra lateral fixa à esquerda -->
-  <!-- Barra lateral: use os botões para navegar entre views (ano, tarefas, contatos) -->
   <nav class="app-sidebar" aria-label="Barra de navegação">
--    <button class="icon-btn" title="Calendário" aria-label="Calendário">📅</button>
-+    <!-- abre a tela do ano inteiro (nova página) -->
-+    <a class="icon-btn" href="yearCalendar.html" title="Calendário do ano" aria-label="Calendário do ano">📅</a>
+    <!-- abre a tela do ano inteiro (nova página) -->
+    <a class="icon-btn" href="yearCalendar.html" title="Calendário do ano" aria-label="Calendário do ano">📅</a>
     <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
-    <button class="icon-btn" title="Contatos" aria-label="Contatos">👥</button>
+    <!-- Meu Perfil: abriu a página de perfil do usuário -->
+    <a class="icon-btn" href="profile.html" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
     <div class="sidebar-sep" aria-hidden="true"></div>
     <button id="openCreateBtn" class="create-btn" title="Adicionar evento" aria-label="Adicionar evento">+</button>
   </nav>
@@ -260,6 +338,12 @@
       <div class="agenda-header">
         <h3>EVENTOS</h3>
         <div class="small" id="agendaMonthLabel" aria-hidden="true"></div>
+      </div>
+
+      <!-- Busca rápida por título/descrição -->
+      <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
+        <input id="eventSearch" type="search" placeholder="Buscar eventos (título, nota)" aria-label="Buscar eventos" class="filter" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff">
+        <button id="exportListBtn" class="btn secondary" title="Exportar lista" style="padding:8px 10px">Exportar</button>
       </div>
 
       <div class="appointments" id="eventsList">
@@ -322,6 +406,7 @@
       <div id="calendarContent" class="calendar-grid" role="grid" aria-label="Calendário"></div>
     </div>
   </div>
+  </div> <!-- .app-container -->
 
   <!-- Modal simples para criar evento -->
   <!-- Modal de evento: formulário simples. Preencha título e dia para criar evento localmente. -->
@@ -350,25 +435,129 @@
     // Script: funções para renderizar mês/semana/dia e gerenciar modal.
     // Comentários no código explicam pontos de extensão (onde integrar backend).
     (function () {
+      // ...existing variable declarations...
       const content = document.getElementById('calendarContent');
       const title = document.getElementById('calendarTitle');
       const weekdayLabels = document.getElementById('weekdayLabels');
-      const eventsList = document.getElementById('eventsList');
       const agendaMonthLabel = document.getElementById('agendaMonthLabel');
 
-      // lista de dias do mês que têm evento (ajuste conforme necessário)
+      // novos elementos úteis
+      const goTodayBtn = document.getElementById('goTodayBtn');
+      const exportBtn = document.getElementById('exportBtn');
+      const eventSearch = document.getElementById('eventSearch');
+      const exportListBtn = document.getElementById('exportListBtn');
+      const eventsListEl = document.getElementById('eventsList');
+
       const eventDays = [2, 16, 22];
-
       let view = 'month';
-      let current = new Date();
-      let selectedCell = null;
+      // permite inicializar via querystring ?y=YYYY&m=MM&d=DD
+      const qs = new URLSearchParams(window.location.search);
+      const startY = qs.has('y') ? parseInt(qs.get('y'),10) : null;
+      const startM = qs.has('m') ? parseInt(qs.get('m'),10) : null;
+      const startD = qs.has('d') ? parseInt(qs.get('d'),10) : null;
+      let current = startY || startM !== null ? new Date(startY || new Date().getFullYear(), startM || 0, startD || 1) : new Date();
 
-      function clearContent(){ content.innerHTML = '' }
+      // armazenamento local de eventos para permitir export/filter (preenche a partir do DOM sample ao carregar)
+      const storedEvents = [];
+      function parseInitialAppointments(){
+        // converte as .appointment existentes no HTML para storedEvents
+        if(!eventsListEl) return;
+        const nodes = Array.from(eventsListEl.querySelectorAll('.appointment'));
+        nodes.forEach(n => {
+          const badge = n.querySelector('.badge')?.textContent?.trim();
+          const title = n.querySelector('.appt-body strong')?.textContent?.trim();
+          const note = n.querySelector('.appt-body small')?.textContent?.trim();
+          const day = badge ? parseInt(badge,10) : null;
+          if(title && day) storedEvents.push({ day, title, note });
+        });
+      }
+      parseInitialAppointments();
+
+      // util para criar novo item de evento na lista (usado pelo fallback e pelo POST success)
+      function addEventToList(evt){
+        // evt: { day, title, time?, note? }
+        storedEvents.push(evt);
+        const item = document.createElement('div'); item.className = 'appointment';
+        const b = document.createElement('div'); b.className = 'badge'; b.textContent = evt.day;
+        const body = document.createElement('div'); body.className = 'appt-body';
+        const strong = document.createElement('strong'); strong.textContent = evt.title;
+        const small = document.createElement('small'); small.style.display='block'; small.style.color='rgba(15,23,42,0.6)';
+        small.textContent = (evt.time ? evt.time + ' • ' : '') + (evt.note || '');
+        body.appendChild(strong); body.appendChild(small);
+        item.appendChild(b); item.appendChild(body);
+        eventsListEl.appendChild(item);
+      }
+
+      // filtro da lista de eventos
+      function filterEvents(q){
+        const ql = (q||'').trim().toLowerCase();
+        Array.from(eventsListEl.children).forEach(item => {
+          const text = (item.innerText || '').toLowerCase();
+          item.style.display = ql ? (text.includes(ql) ? '' : 'none') : '';
+        });
+      }
+      if(eventSearch) eventSearch.addEventListener('input', (e)=> filterEvents(e.target.value));
+
+      // exporta storedEvents como arquivo JSON
+      function downloadJSON(filename, data){
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+        a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+      }
+      if(exportBtn) exportBtn.addEventListener('click', ()=> downloadJSON('agenda-events.json', storedEvents));
+      if(exportListBtn) exportListBtn.addEventListener('click', ()=> downloadJSON('agenda-events.json', storedEvents));
+
+      // Today button handler (leva o calendário à data atual)
+      if(goTodayBtn) goTodayBtn.addEventListener('click', ()=> { current = new Date(); render(); });
+
+      function clearContent(){ content.innerHTML = ''; selectedIndex = null; }
+
+      function announce(text){
+        // cria/usa um elemento aria-live para anunciar mudanças a leitores de tela
+        let live = document.getElementById('a11yAnnounce');
+        if(!live){ live = document.createElement('div'); live.id='a11yAnnounce'; live.setAttribute('aria-live','polite'); live.style.position='absolute'; live.style.left='-9999px'; document.body.appendChild(live); }
+        live.textContent = text;
+      }
+
+      function makeCell(day){
+        const cell = document.createElement('div');
+        cell.className = 'calendar-cell';
+        cell.setAttribute('role','gridcell');
+        cell.tabIndex = -1; // somente selected terá tabindex=0
+        const dayNum = document.createElement('div'); dayNum.className = 'day-num'; dayNum.textContent = day;
+        cell.appendChild(dayNum);
+
+        const ev = document.createElement('div'); ev.className = 'event-info';
+        ev.innerHTML = '<span class="event-dot"></span>';
+        cell.appendChild(ev);
+
+        if (eventDays.includes(day)) cell.classList.add('has-event');
+        return cell;
+      }
+
+      function focusCellByIndex(idx){
+        const cells = Array.from(content.querySelectorAll('.calendar-cell:not(.empty)'));
+        if (!cells[idx]) return;
+        // remove tabindex do anterior
+        cells.forEach(c => c.tabIndex = -1);
+        const c = cells[idx];
+        c.tabIndex = 0;
+        c.focus();
+        // visual
+        content.querySelectorAll('.calendar-cell.selected').forEach(x=>x.classList.remove('selected'));
+        c.classList.add('selected');
+        selectedIndex = idx;
+        // informar usuário via SR
+        const num = c.querySelector('.day-num')?.textContent || '';
+        announce(`${num} de ${current.toLocaleString('pt-BR',{ month:'long', year:'numeric' })}`);
+      }
 
       function renderMonth(){
         clearContent();
         content.classList.remove('week-view','day-view');
         weekdayLabels.style.display = 'grid';
+
         const first = new Date(current.getFullYear(), current.getMonth(), 1);
         const last = new Date(current.getFullYear(), current.getMonth() + 1, 0);
         const startDay = first.getDay();
@@ -376,45 +565,46 @@
 
         title.textContent = first.toLocaleString('pt-BR',{ month:'long', year:'numeric' });
         agendaMonthLabel.textContent = first.toLocaleString('pt-BR',{ month:'long' });
+        announce(title.textContent);
 
         for(let i=0;i<startDay;i++){
-          const empty = document.createElement('div'); empty.className='calendar-cell empty'; content.appendChild(empty);
+          const empty = document.createElement('div'); empty.className='calendar-cell empty'; empty.setAttribute('aria-hidden','true');
+          content.appendChild(empty);
         }
 
+        // cria lista de células legíveis e focusáveis
         for(let day=1; day<=daysInMonth; day++){
           const cell = document.createElement('div'); cell.className='calendar-cell';
-          const dayNum = document.createElement('div'); dayNum.className='day-num'; dayNum.textContent = day;
-          cell.appendChild(dayNum);
+          const num = document.createElement('div'); num.className = 'day-num'; num.textContent = day;
+          cell.appendChild(num);
 
-          const today = new Date();
-          const cellDate = new Date(current.getFullYear(), current.getMonth(), day);
-          if(cellDate.toDateString() === today.toDateString()) cell.classList.add('today');
-
-          // marca como dia com evento se estiver na lista eventDays
-          if (eventDays.includes(day)) {
+          if(eventDays.includes(day)){
             cell.classList.add('has-event');
+            const dot = document.createElement('div'); dot.className='event-dot'; cell.appendChild(dot);
           }
-
-          // placeholder de evento: apenas o ponto, sem texto "Sem eventos"
-          const ev = document.createElement('div'); ev.className='event-info';
-          ev.innerHTML = '<span class="event-dot"></span>';
-          cell.appendChild(ev);
-
-          cell.addEventListener('click', function(){
-            if(selectedCell) selectedCell.classList.remove('selected');
-            cell.classList.add('selected');
-            selectedCell = cell;
-            // FUTURO: aqui você pode atualizar #appointmentsList com eventos do dia clicado
+          // clique: navegar para a tela de criação (pré-preenche com ano/mês/dia)
+          cell.addEventListener('click', ()=> {
+            const y = current.getFullYear();
+            const m = current.getMonth(); // zero-based (compatível com leitura em addEventScreen.html)
+            window.location.href = `addEventScreen.html?y=${y}&m=${m}&d=${day}`;
           });
-
+ 
           content.appendChild(cell);
         }
 
-        const totalCells = startDay + daysInMonth;
-        const trailing = (7 - (totalCells % 7)) % 7;
-        for(let i=0;i<trailing;i++){
-          const empty = document.createElement('div'); empty.className='calendar-cell empty'; content.appendChild(empty);
+        const total = startDay + daysInMonth;
+        const trailing = (7 - (total % 7)) % 7;
+        for(let i=0;i<trailing;i++){ const empty=document.createElement('div'); empty.className='calendar-cell empty'; empty.setAttribute('aria-hidden','true'); content.appendChild(empty); }
+
+        // set primeiro foco no dia atual, se visível; senão no primeiro dia
+        const nonEmpty = Array.from(content.querySelectorAll('.calendar-cell:not(.empty)'));
+        const today = new Date();
+        let initialIdx = 0;
+        if (today.getMonth() === current.getMonth() && today.getFullYear() === current.getFullYear()){
+          const idx = today.getDate() - 1; // 0-based
+          initialIdx = idx;
         }
+        focusCellByIndex(initialIdx);
       }
 
       function renderWeek(){
@@ -425,60 +615,77 @@
         const endDate = new Date(sunday); endDate.setDate(sunday.getDate() + 6);
         title.textContent = `${sunday.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
         agendaMonthLabel.textContent = sunday.toLocaleString('pt-BR',{ month:'long' });
+        announce(title.textContent);
 
         for(let i=0;i<7;i++){
           const d = new Date(sunday); d.setDate(sunday.getDate()+i);
           const dayNumVal = d.getDate();
-          const cell = document.createElement('div'); cell.className='calendar-cell week';
-          const dayNum = document.createElement('div'); dayNum.className='day-num'; dayNum.textContent = dayNumVal;
-          cell.appendChild(dayNum);
-
-          // aplica destaque se este dia tiver evento
-          if (current.getMonth() === d.getMonth() && eventDays.includes(dayNumVal)) {
-            cell.classList.add('has-event');
-          }
-
-          const dayName = d.toLocaleDateString('pt-BR',{ weekday:'short' });
-          const ev = document.createElement('div'); ev.className='event-info'; ev.innerHTML = `<span class="event-dot"></span><small>${dayName}, ${d.toLocaleDateString()}</small>`;
-          // esconder texto "Sem eventos" já tratado via CSS (.event-info small { display:none })
-          cell.appendChild(ev);
+          const cell = makeCell(dayNumVal);
+          cell.classList.add('week');
+          // marca evento apenas para dias do mês atual
+          if (current.getMonth() === d.getMonth() && eventDays.includes(dayNumVal)) cell.classList.add('has-event');
           content.appendChild(cell);
         }
+        // set focus no primeiro dia da semana
+        focusCellByIndex(0);
       }
 
       function renderDay(){
         clearContent();
         content.classList.add('day-view'); content.classList.remove('week-view'); weekdayLabels.style.display='none';
         title.textContent = current.toLocaleDateString('pt-BR', { weekday: 'long', year:'numeric', month:'long', day:'numeric' });
-        const cell = document.createElement('div'); cell.className='calendar-cell day-focus';
-        const dayNumVal = current.getDate();
-        // aplica destaque no modo dia se houver evento
-        if (eventDays.includes(dayNumVal)) cell.classList.add('has-event');
-
-        cell.innerHTML = `<div class="day-num">${dayNumVal}</div>
-          <div style="margin-top:18px"><strong>Agenda do dia</strong></div>`;
+        announce(title.textContent);
+        const cell = makeCell(current.getDate()); cell.classList.add('day-focus');
+        if (eventDays.includes(current.getDate())) cell.classList.add('has-event');
         content.appendChild(cell);
+        focusCellByIndex(0);
       }
 
       function render(){ if(view==='month') renderMonth(); else if(view==='week') renderWeek(); else renderDay(); }
 
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
+      // navegação e atalho por teclado (fica global à página)
+      document.addEventListener('keydown', (e)=>{
+        // abrir novo evento: tecla N
+        if (e.key.toLowerCase() === 'n') { document.getElementById('openCreateBtn').click(); return; }
+        // mover seleção dentro das células (setas) quando um cell tem foco ou quando calendar tem foco
+        const cells = Array.from(content.querySelectorAll('.calendar-cell:not(.empty)'));
+        if (!cells.length) return;
+        if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter'].includes(e.key)) {
+          e.preventDefault();
+          if (selectedIndex === null) selectedIndex = 0;
+          let idx = selectedIndex;
+          if (e.key === 'ArrowLeft') idx = Math.max(0, idx - 1);
+          if (e.key === 'ArrowRight') idx = Math.min(cells.length -1, idx + 1);
+          if (e.key === 'ArrowUp') idx = Math.max(0, idx - 7);
+          if (e.key === 'ArrowDown') idx = Math.min(cells.length -1, idx + 7);
+          if (e.key === 'Enter') {
+            // Enter: abre a tela de adicionar evento para o dia selecionado
+            const cell = cells[selectedIndex];
+            const day = parseInt(cell.querySelector('.day-num').textContent,10);
+            const y = current.getFullYear();
+            const m = current.getMonth();
+            window.location.href = `addEventScreen.html?y=${y}&m=${m}&d=${day}`;
+            return;
+          }
+          focusCellByIndex(idx);
+        }
+      });
 
-      prevBtn.addEventListener('click', function(){
+      // Prev/Next handlers (mantém comportamento anterior)
+      document.getElementById('prevBtn').addEventListener('click', function(){
         if(view==='month') current.setMonth(current.getMonth()-1);
         else if(view==='week') current.setDate(current.getDate()-7);
         else current.setDate(current.getDate()-1);
         render();
       });
-
-      nextBtn.addEventListener('click', function(){
+      document.getElementById('nextBtn').addEventListener('click', function(){
         if(view==='month') current.setMonth(current.getMonth()+1);
         else if(view==='week') current.setDate(current.getDate()+7);
         else current.setDate(current.getDate()+1);
         render();
       });
 
+      // view-toggle buttons (mantém)
       document.querySelectorAll('.view-toggle .btn').forEach(btn=>{
         btn.addEventListener('click', function(){
           view = this.getAttribute('data-view');
@@ -488,35 +695,31 @@
         });
       });
 
-      // === NOVO: Modal / criação de evento na agenda (front-end) ===
+      // modal: reutiliza event modal já presente no HTML
       const openCreateBtn = document.getElementById('openCreateBtn');
       const eventModal = document.getElementById('eventModal');
       const closeModal = document.getElementById('closeModal');
       const cancelEvent = document.getElementById('cancelEvent');
       const eventForm = document.getElementById('eventForm');
-
-      // ajuste leve: garantir display flex ao abrir modal
-      function showModal(){ eventModal.style.display = 'flex'; document.getElementById('evtTitle').focus(); }
-      function hideModal(){ eventModal.style.display = 'none'; eventForm.reset(); }
-
-      openCreateBtn.addEventListener('click', showModal);
-      closeModal.addEventListener('click', hideModal);
-      cancelEvent.addEventListener('click', hideModal);
-
-      // Insere um item na lista de eventos (front-end)
-      function addEventToList({day, title, time, note}) {
-        const ap = document.createElement('div'); ap.className = 'appointment';
-        const badge = document.createElement('div'); badge.className = 'badge'; badge.textContent = String(day);
-        const body = document.createElement('div'); body.className = 'appt-body';
-        const strong = document.createElement('strong'); strong.textContent = title;
-        const small = document.createElement('small'); small.textContent = time ? `${time} • ${note || ''}` : (note || '');
-        body.appendChild(strong); body.appendChild(small);
-        ap.appendChild(badge); ap.appendChild(body);
-        // insere no topo
-        eventsList.insertBefore(ap, eventsList.firstChild);
+ 
+      // Ao clicar no "+" abrimos a tela de adicionar evento (sem dia pré-selecionado).
+      openCreateBtn.addEventListener('click', ()=> {
+        const y = current.getFullYear();
+        const m = current.getMonth();
+        window.location.href = `addEventScreen.html?y=${y}&m=${m}`;
+      });
+      function openModalPrefill(day){
+        eventModal.style.display = 'flex';
+        const dayInput = document.getElementById('evtDay');
+        if(dayInput && day) dayInput.value = day;
+        const titleInput = document.getElementById('evtTitle');
+        if(titleInput) titleInput.focus();
       }
+      function hideModal(){ eventModal.style.display = 'none'; eventForm.reset(); }
+       closeModal.addEventListener('click', hideModal);
+       cancelEvent.addEventListener('click', hideModal);
 
-      // Submissão do formulário do modal -> cria compromisso localmente
+      // submissão do modal (mantém lógica de envio/fallback)
       eventForm.addEventListener('submit', function(e){
         e.preventDefault();
         const titleVal = document.getElementById('evtTitle').value.trim();
@@ -531,6 +734,14 @@
 
         // tenta enviar ao backend; se falhar, faz fallback local
         const payload = { day: dayVal, title: titleVal, time: timeVal, note: noteVal };
+
+        // BACKEND: endpoint para criar evento
+        // POST /events
+        // - Content-Type: application/json
+        // - body: { day: Number, title: String, time?: String, note?: String, month?: Number, year?: Number }
+        // - resposta esperada (200/201): JSON com o evento criado, por exemplo:
+        //    { id: 42, day: 10, title: 'Prova', time: '09:30', note: 'Sala A' }
+        // - Dica: se backend retornar o novo dia/ID, usamos esses valores para atualizar UI local.
         fetch('/events', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -552,8 +763,11 @@
         });
        });
 
+      // Inicializa filtro / parsing
+      parseInitialAppointments();
       // inicial
       render();
+
     })();
   </script>
 

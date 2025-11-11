@@ -20,7 +20,7 @@ public class LoginController {
     public String processarLogin(@RequestParam String email, @RequestParam String senha,
                                  RedirectAttributes redirectAttributes) {
         if (service.verificarLoginValido(email, senha)) {
-            return "redirect:/calendario";
+            return "redirect:/calendar";
         } else {
             redirectAttributes.addFlashAttribute("warning", "E-MAIL E/OU SENHA INVÁLIDOS!");
             return "redirect:/login";

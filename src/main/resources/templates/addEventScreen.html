@@ -36,7 +36,7 @@
     .modal .input{margin-bottom:10px}
     .modal .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}
     /* sidebar (pequena) */
-    .mini-sidebar{position:fixed;left:16px;top:16px;display:flex;flex-direction:column;gap:10px;width:56px;z-index:1300}
+    .mini-sidebar{position:fixed;left:16px;top:calc(var(--topbar-height) + 16px);display:flex;flex-direction:column;gap:10px;width:56px;z-index:1300}
     .mini-sidebar .btn{width:44px;height:44px;border-radius:10px;border:0;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
 
     /* esconder o calendário pequeno à direita para ver só o fundo (prototipagem) */
@@ -157,70 +157,82 @@
   </style>
 </head>
 <body class="add-event-page">
-  <!-- fundo idêntico ao calendarComAgenda (reproduzido inline) -->
-  <div id="bgCalendarLarge" class="bg-calendar-large" aria-hidden="true"></div>
-
-  <!-- mini sidebar -->
-  <nav class="mini-sidebar" aria-label="Navegação">
-    <button class="btn" title="Calendário">📅</button>
-    <button class="btn" title="Tarefas">✅</button>
-    <button class="btn" title="Pessoas">👥</button>
-    <button class="btn" title="Adicionar">＋</button>
-  </nav>
-
-  <!-- Área principal: painel de eventos (esquerda) e calendário de visualização (direita).
-       O calendário à direita está oculto para focar no fundo e no modal do protótipo. -->
-  <div class="wrap" role="main" aria-label="Tela de eventos">
-    <aside class="events-panel" aria-label="Eventos">
-      <h3>EVENTOS</h3>
-      <div class="events-list" id="eventsList">
-        <!-- exemplo inicial (vai ser povoado por JS) -->
-      </div>
-    </aside>
-
-    <div class="calendar-box" aria-label="Calendário">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div id="titleMonthSmall" class="calendar-title"></div>
-        <div style="display:flex;gap:8px">
-          <button id="prevSmall" class="btn">◀</button>
-          <button id="nextSmall" class="btn">▶</button>
-        </div>
-      </div>
-
-      <div class="calendar-grid weekday-row" id="weekdayRowSmall" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:8px">
-        <div class="calendar-weekday">Dom</div><div class="calendar-weekday">Seg</div><div class="calendar-weekday">Ter</div>
-        <div class="calendar-weekday">Qua</div><div class="calendar-weekday">Qui</div><div class="calendar-weekday">Sex</div><div class="calendar-weekday">Sáb</div>
-      </div>
-
-      <div id="calendarContentSmall" class="calendar-grid" aria-hidden="false"></div>
+  <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
+    <div class="brand"><div class="logo">Ag</div><div style="font-weight:700">Projeto Agenda</div></div>
+    <div class="top-actions">
+      <a class="btn secondary" href="profile.html">Meu Perfil</a>
+      <a class="btn" href="calendarComAgenda.html">Calendário</a>
     </div>
-  </div>
+  </header>
+  <div class="app-container">
+    <!-- fundo idêntico ao calendarComAgenda (reproduzido inline) -->
+    <div id="bgCalendarLarge" class="bg-calendar-large" aria-hidden="true"></div>
 
-  <!-- Modal: formulário para criar um evento. 
-       Dica: campo "Título" recebe foco automaticamente para testar fluxo de teclado. -->
-  <div class="overlay" id="overlay">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h3 id="modalTitle">Adicionar evento</h3>
+    <!-- mini sidebar -->
+    <nav class="mini-sidebar" aria-label="Navegação">
+      <a class="btn" href="calendarComAgenda.html" title="Calendário" aria-label="Calendário">📅</a>
+      <a class="btn" href="calendarComAgenda.html" title="Tarefas" aria-label="Tarefas">✅</a>
+      <a class="btn" href="profile.html" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
+      <a class="btn" href="addEventScreen.html" title="Adicionar" aria-label="Adicionar">＋</a>
+    </nav>
 
-      <form id="modalForm">
-        <label for="mTitle">Título</label>
-        <div class="input"><input id="mTitle" type="text" placeholder="Ex: Prova de Matemática" required /></div>
-
-        <label for="mDay">Dia (número)</label>
-        <div class="input"><input id="mDay" type="number" min="1" max="31" placeholder="2" required /></div>
-
-        <label for="mTime">Horário (ex: 09:30)</label>
-        <div class="input"><input id="mTime" type="time" /></div>
-
-        <label for="mNote">Descrição</label>
-        <div class="input"><input id="mNote" type="text" placeholder="Descrição breve" /></div>
-
-        <div class="actions">
-          <button type="button" id="cancelBtn" class="btn secondary">Cancelar</button>
-          <button type="submit" id="saveBtnModal" class="btn">Salvar</button>
+    <!-- Área principal: painel de eventos (esquerda) e calendário de visualização (direita).
+         O calendário à direita está oculto para focar no fundo e no modal do protótipo. -->
+    <div class="wrap" role="main" aria-label="Tela de eventos">
+      <aside class="events-panel" aria-label="Eventos">
+        <h3>EVENTOS</h3>
+        <div class="events-list" id="eventsList">
+          <!-- exemplo inicial (vai ser povoado por JS) -->
         </div>
-      </form>
+      </aside>
+
+      <div class="calendar-box" aria-label="Calendário">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div id="titleMonthSmall" class="calendar-title"></div>
+          <div style="display:flex;gap:8px">
+            <button id="prevSmall" class="btn">◀</button>
+            <button id="nextSmall" class="btn">▶</button>
+          </div>
+        </div>
+
+        <div class="calendar-grid weekday-row" id="weekdayRowSmall" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:8px">
+          <div class="calendar-weekday">Dom</div><div class="calendar-weekday">Seg</div><div class="calendar-weekday">Ter</div>
+          <div class="calendar-weekday">Qua</div><div class="calendar-weekday">Qui</div><div class="calendar-weekday">Sex</div><div class="calendar-weekday">Sáb</div>
+        </div>
+
+        <div id="calendarContentSmall" class="calendar-grid" aria-hidden="false"></div>
+      </div>
     </div>
+
+    <!-- Modal: formulário para criar um evento. 
+         Dica: campo "Título" recebe foco automaticamente para testar fluxo de teclado. -->
+    <div class="overlay" id="overlay">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <h3 id="modalTitle">Adicionar evento</h3>
+
+        <form id="modalForm">
+          <label for="mTitle">Título</label>
+          <div class="input"><input id="mTitle" type="text" placeholder="Ex: Prova de Matemática" required /></div>
+
+          <label for="mDate">Data</label>
+          <div class="input"><input id="mDate" type="date" required /></div>
+
+          <label for="mTime">Horário (ex: 09:30)</label>
+          <div class="input"><input id="mTime" type="time" /></div>
+
+          <label for="mNote">Descrição</label>
+          <div class="input"><input id="mNote" type="text" placeholder="Descrição breve" /></div>
+
+          <div class="actions">
+            <button type="button" id="cancelBtn" class="btn secondary">Cancelar</button>
+            <button type="submit" id="saveBtnModal" class="btn">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast de confirmação -->
+    <div id="toastSuccess" class="toast" role="status" aria-live="polite">Evento criado</div>
   </div>
 
   <script>
@@ -354,19 +366,61 @@
       const modalForm = document.getElementById('modalForm');
       const cancelBtn = document.getElementById('cancelBtn');
 
-      cancelBtn.addEventListener('click', ()=>{ overlay.style.display='none'; });
+      // cancelar: voltar para o calendário mensal. Se a URL traz y/m, preserva esses valores.
+      cancelBtn.addEventListener('click', ()=> {
+        const params = new URLSearchParams(window.location.search);
+        const y = params.get('y');
+        const m = params.get('m');
+        const target = (y && m) ? `calendarComAgenda.html?y=${y}&m=${m}` : 'calendarComAgenda.html';
+        window.location.href = target;
+      });
       overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.style.display='none'; });
+
+      // Se a página recebeu ?y=YYYY&m=MM&d=DD, pré-preenche o modal (YYYY-MM-DD) e abre (foco no título).
+      (function prefillFromQuery(){
+        const params = new URLSearchParams(window.location.search);
+        const y = params.get('y');
+        const m = params.get('m');
+        const d = params.get('d');
+        if (y && m) {
+          current = new Date(parseInt(y,10), parseInt(m,10), 1);
+          renderCalendar();
+          renderBgLarge();
+        }
+        if (d) {
+          const dateInput = document.getElementById('mDate');
+          if (dateInput) {
+            const mm = String(parseInt(m,10) + 1).padStart(2,'0');
+            const dd = String(parseInt(d,10)).padStart(2,'0');
+            dateInput.value = `${y}-${mm}-${dd}`;
+          }
+          overlay.style.display = 'flex';
+          const titleInput = document.getElementById('mTitle');
+          if (titleInput) titleInput.focus();
+        }
+      })();
 
       modalForm.addEventListener('submit', (e)=>{
         e.preventDefault();
         const title = document.getElementById('mTitle').value.trim();
-        const day = parseInt(document.getElementById('mDay').value,10);
+        const dateVal = document.getElementById('mDate')?.value;
         const time = document.getElementById('mTime').value;
         const note = document.getElementById('mNote').value.trim();
-        if(!title || !day || isNaN(day)) { alert('Preencha título e dia (número).'); return; }
+        if(!title || !dateVal) { alert('Preencha o título e a data.'); return; }
+        const parsed = new Date(dateVal);
+        if (!parsed || isNaN(parsed)) { alert('Data inválida'); return; }
+        const day = parsed.getDate();
+        const month = parsed.getMonth() + 1;
+        const year = parsed.getFullYear();
 
         // envia ao backend (JSON). O endpoint /events aceita JSON.
-        const payload = { day, title, time, note };
+        const payload = { day, month, year, title, time, note };
+        // BACKEND: criar evento (mesma contract usada nas outras páginas)
+        // POST /events
+        // - Content-Type: application/json
+        // - body: { day: Number, title: String, time?: String, note?: String, month?: Number, year?: Number }
+        // - resposta: JSON com o evento criado
+        // - recomenda-se também um endpoint GET /events?year=YYYY&month=MM para popular a UI ao entrar na página
         fetch('/events', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -376,21 +430,27 @@
           return res.json();
         }).then(created => {
           // atualizar UI localmente
-          events.unshift({ day: created.day, title: created.title, note: created.time ? `${created.time} • ${created.note || ''}` : created.note });
-          if (!eventDays.includes(created.day)) eventDays.push(created.day);
-          renderEventsList();
-          renderCalendar();
-          overlay.style.display = 'none';
-        }).catch(err => {
-          // fallback local caso backend indisponível
-          console.warn('Falha fetch /events, fallback local:', err);
-          events.unshift({ day, title, note: time ? `${time} • ${note}` : note });
-          if (!eventDays.includes(day)) eventDays.push(day);
-          renderEventsList();
-          renderCalendar();
-          overlay.style.display = 'none';
+          const createdDay = created.day || day;
+          events.unshift({ day: createdDay, title: created.title || title, note: created.time ? `${created.time} • ${created.note || ''}` : created.note || note });
+          if (!eventDays.includes(createdDay)) eventDays.push(createdDay);
+           renderEventsList();
+           renderCalendar();
+           overlay.style.display = 'none';
+           // mostrar toast breve
+           const t = document.getElementById('toastSuccess'); t.textContent = 'Evento criado com sucesso'; t.style.display='block';
+           setTimeout(()=> t.style.display='none', 2200);
+         }).catch(err => {
+           // fallback local caso backend indisponível
+           console.warn('Falha fetch /events, fallback local:', err);
+           events.unshift({ day, title, note: time ? `${time} • ${note}` : note });
+           if (!eventDays.includes(day)) eventDays.push(day);
+           renderEventsList();
+           renderCalendar();
+           overlay.style.display = 'none';
+           const t = document.getElementById('toastSuccess'); t.textContent = 'Evento criado (offline)'; t.style.display='block';
+           setTimeout(()=> t.style.display='none', 2200);
+         });
         });
-       });
 
       // inicial render
       renderEventsList();

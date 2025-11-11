@@ -94,44 +94,52 @@
   </style>
 </head>
 <body class="year-page">
-
-  <!-- Barra lateral fixa (reutiliza classes do style.css) -->
-  <nav class="app-sidebar" aria-label="Barra de navegação">
+  <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
+    <div class="brand"><div class="logo">Ag</div><div style="font-weight:700">Projeto Agenda</div></div>
+    <div class="top-actions">
+      <a class="btn secondary" href="profile.html">Meu Perfil</a>
+      <a class="btn primary" href="addEventScreen.html">Adicionar evento</a>
+    </div>
+  </header>
+  <div class="app-container">
+   <!-- Barra lateral fixa (reutiliza classes do style.css) -->
+   <nav class="app-sidebar" aria-label="Barra de navegação">
     <a class="icon-btn" href="calendarComAgenda.html" title="Calendário" aria-label="Calendário">📅</a>
     <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
-    <button class="icon-btn" title="Contatos" aria-label="Contatos">👥</button>
+    <a class="icon-btn" href="profile.html" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
     <div class="sidebar-sep" aria-hidden="true"></div>
     <a class="create-btn" href="addEventScreen.html" title="Adicionar evento" aria-label="Adicionar evento">+</a>
   </nav>
+ 
+   <div class="year-wrap">
+     <!-- Cabeçalho do ano: controles de navegação e ferramentas (pesquisa/Hoje).
+          Dica: use ← e → para trocar de ano, tecla "T" para ir ao ano atual. -->
+     <div class="year-header" role="banner">
+       <div>
+         <div class="year-title" id="yearLabel">Calendário anual</div>
+         <div class="small" id="yearSubtitle">Visualização por ano</div>
+       </div>
 
-  <div class="year-wrap">
-    <!-- Cabeçalho do ano: controles de navegação e ferramentas (pesquisa/Hoje).
-         Dica: use ← e → para trocar de ano, tecla "T" para ir ao ano atual. -->
-    <div class="year-header" role="banner">
-      <div>
-        <div class="year-title" id="yearLabel">Calendário anual</div>
-        <div class="small" id="yearSubtitle">Visualização por ano</div>
-      </div>
+       <div style="display:flex;align-items:center;gap:12px">
+         <div class="year-controls" role="group" aria-label="Controles do ano">
+           <button id="prevYear" class="btn" aria-label="Ano anterior">◀</button>
+           <div style="min-width:120px;text-align:center;font-weight:700" id="yearValue" aria-live="polite"></div>
+           <button id="nextYear" class="btn" aria-label="Próximo ano">▶</button>
+         </div>
+         <div class="year-toolbar" role="search" aria-label="Ferramentas do ano">
+           <!-- pesquisa e hoje estão ocultos por enquanto -->
+           <input id="filterInput" class="filter" type="search" placeholder="Filtrar mês (ex: jan, mar)" aria-label="Filtrar meses" />
+           <button id="todayBtn" class="today-btn" title="Ir para o ano atual">Hoje</button>
+           <a class="back-link" href="calendarComAgenda.html" title="Voltar ao calendário mensal">Voltar</a>
+         </div>
+       </div>
+     </div>
 
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="year-controls" role="group" aria-label="Controles do ano">
-          <button id="prevYear" class="btn" aria-label="Ano anterior">◀</button>
-          <div style="min-width:120px;text-align:center;font-weight:700" id="yearValue" aria-live="polite"></div>
-          <button id="nextYear" class="btn" aria-label="Próximo ano">▶</button>
-        </div>
-        <div class="year-toolbar" role="search" aria-label="Ferramentas do ano">
-          <!-- pesquisa e hoje estão ocultos por enquanto -->
-          <input id="filterInput" class="filter" type="search" placeholder="Filtrar mês (ex: jan, mar)" aria-label="Filtrar meses" />
-          <button id="todayBtn" class="today-btn" title="Ir para o ano atual">Hoje</button>
-          <a class="back-link" href="calendarComAgenda.html" title="Voltar ao calendário mensal">Voltar</a>
-        </div>
-      </div>
-    </div>
-
-    <main>
-      <!-- Grid anual: 12 cartões de mês. Cada cartão é clicável para abrir o mês correspondente. -->
-      <div id="yearGrid" class="year-grid" aria-live="polite"></div>
-    </main>
+     <main>
+       <!-- Grid anual: 12 cartões de mês. Cada cartão é clicável para abrir o mês correspondente. -->
+       <div id="yearGrid" class="year-grid" aria-live="polite"></div>
+     </main>
+   </div>
   </div>
 
   <script>

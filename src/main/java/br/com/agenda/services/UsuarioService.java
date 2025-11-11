@@ -48,11 +48,18 @@ public class UsuarioService {
 
     public boolean verificarAlterarSenha(String senha_atual, String nova_senha, String confirmar_senha) {
         Usuario usuario = getUsuarioAtual();
-        return usuario.getSenha().equals(senha_atual) && nova_senha.equals(confirmar_senha);
+
+        if (usuario.getSenha().equals(senha_atual) && nova_senha.equals(confirmar_senha)) {
+            alterarSenha(usuario, nova_senha);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void alterarSenha(String nova_senha) {
-        getUsuarioAtual().setSenha(nova_senha);
+    private void alterarSenha(Usuario usuario, String nova_senha) {
+        usuario.setSenha(nova_senha);
+        repository.save(usuario);
     }
 
     public static Long getIdAtual() {

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Perfil — Projeto Agenda</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/profile.css"/>
+</head>
+<body class="profile-page">
+<nav class="app-sidebar" aria-label="Barra de navegação">
+    <a class="icon-btn" href="calendarComAgenda.html" title="Calendário" aria-label="Calendário">📅</a>
+    <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
+    <a class="icon-btn" href="profile.html" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
+    <div class="sidebar-sep" aria-hidden="true"></div>
+    <a class="create-btn" href="addEventScreen.html" title="Adicionar evento" aria-label="Adicionar evento">+</a>
+</nav>
+
+<main class="profile-wrap" role="main" aria-labelledby="profileTitle">
+    <section class="profile-card" aria-labelledby="profileTitle">
+        <div class="avatar" aria-hidden="false" id="avatarInitials">JS</div>
+        <div style="text-align:center;margin-top:8px">
+            <input id="avatarInput" type="file" accept="image/*" aria-label="Enviar foto de perfil"
+                   style="display:none"/>
+            <button id="changeAvatarBtn" class="btn secondary" type="button" style="font-size:13px;padding:8px 12px">
+                Alterar foto
+            </button>
+        </div>
+        <h2 id="profileTitle" style="text-align:center;margin:6px 0">Seu perfil</h2>
+        <div style="text-align:center" class="small">Gerencie suas informações básicas</div>
+
+        <div class="profile-actions" aria-hidden="false">
+            <a class="btn" id="goCalendar" href="calendarComAgenda.html">Ir ao calendário</a>
+            <button class="btn secondary" id="logoutBtn" type="button">Sair</button>
+        </div>
+    </section>
+
+    <section class="profile-main" aria-label="Editar informações">
+        <h3 style="margin-top:0">Informações básicas</h3>
+        <span th:if="${warning}"
+              th:text="${warning}"
+              role="alert"
+              style="display:block;background:#fff3cd;color:#856404;
+                 border:1px solid #ffeeba;padding:8px 10px;
+                 border-radius:6px;margin-bottom:10px;
+                 text-align:center;font-size:13px;">
+        </span>
+
+        <form th:action="@{/profile}" method="post" id="profileForm">
+            <div class="field full">
+                <label for="fullName">Nome completo</label>
+                <div class="input">
+                    <input id="fullName" name="name" type="text" placeholder="Seu nome completo" required/>
+                </div>
+            </div>
+
+            <div class="field full">
+                <label for="email">E-mail institucional</label>
+                <div class="input">
+                    <input id="email" name="email" type="email" readonly/>
+                </div>
+                <div class="small-note email-note">
+                    O e-mail institucional não pode ser alterado aqui.
+                </div>
+            </div>
+
+            <hr/>
+
+            <div class="field full">
+                <h4 style="margin:8px 0">Alterar senha</h4>
+            </div>
+
+            <div class="field">
+                <label for="pwd">Senha atual</label>
+                <div class="input">
+                    <input id="pwd" name="pwd" type="password" placeholder="Senha atual"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="newPwd">Nova senha</label>
+                <div class="input">
+                    <input id="newPwd" name="newPwd" type="password" placeholder="Nova senha"/>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="confirmPwd">Confirmar nova senha</label>
+                <div class="input">
+                    <input id="confirmPwd" name="confirmPwd" type="password" placeholder="Confirme a nova senha"/>
+                </div>
+                <div id="pwdHint" class="small-note">
+                    Deixe em branco se não quiser alterar a senha.
+                </div>
+            </div>
+
+            <button type="submit" class="btn">Salvar alterações</button>
+        </form>
+
+        <hr/>
+
+        <div class="field full">
+            <h4 style="margin:8px 0">Preferências</h4>
+        </div>
+        <div class="pref-list field full" aria-labelledby="prefTitle">
+            <label for="notifyEmail"><input id="notifyEmail" type="checkbox"/> Receber notificações por e-mail</label>
+            <label for="notifyWeekly"><input id="notifyWeekly" type="checkbox"/> Resumo semanal</label>
+        </div>
+
+        <div class="field full" style="font-size:13px;color:var(--muted);margin-top:6px">
+            <div>Conta criada em: <span id="createdAt"></span></div>
+            <div>Último login: <span id="lastLogin"></span></div>
+        </div>
+
+        <div class="actions-row">
+            <a class="btn secondary" href="calendarComAgenda.html">Voltar</a>
+            <button type="button" id="deleteAccountBtn" class="btn secondary"
+                    style="color:var(--danger);border-color:rgba(185,28,28,0.08)">Excluir conta
+            </button>
+        </div>
+    </section>
+
+    <div id="saveSuccess" class="toast" role="status" aria-live="polite">Alterações salvas</div>
+</main>
+
+<script src="js/profile.js"></script>
+<script src="js/accessibility.js"></script>
+</body>
+</html>

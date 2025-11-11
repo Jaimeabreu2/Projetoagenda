@@ -13,7 +13,7 @@ import org.springframework.ui.Model;
 import java.time.LocalDate;
 
 @Controller
-@RequestMapping("/calendario")
+@RequestMapping("/calendar")
 public class CalendarioController {
     private final EventoService service;
 
@@ -29,7 +29,7 @@ public class CalendarioController {
         String avisosHtml = service.getEventosHtml();
         model.addAttribute("avisosHtml", avisosHtml);
 
-        return "calendario";
+        return "calendar";
     }
 
     @PostMapping
@@ -40,6 +40,6 @@ public class CalendarioController {
         else
             service.salvarEvento(titulo, data);
 
-        return "redirect:/calendario";
+        return "redirect:/calendar";
     }
 }
