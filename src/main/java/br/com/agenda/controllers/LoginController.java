@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/login")
+@RequestMapping("/")
 public class LoginController {
     private final UsuarioService service;
 
@@ -17,18 +17,17 @@ public class LoginController {
 
     @PostMapping
     @Transactional
-    public String processarLogin(@RequestParam String email, @RequestParam String senha,
-                                 RedirectAttributes redirectAttributes) {
+    public String processarLogin(@RequestParam String email, @RequestParam String senha, RedirectAttributes redirectAttributes) {
         if (service.verificarLoginValido(email, senha)) {
-            return "redirect:/calendar";
+            return "redirect:/calendarComAgenda";
         } else {
             redirectAttributes.addFlashAttribute("warning", "E-MAIL E/OU SENHA INVÁLIDOS!");
-            return "redirect:/login";
+            return "redirect:/";
         }
     }
 
     @GetMapping
     public String mostrarTelaLogin() {
-        return "login";
+        return "index";
     }
 }
