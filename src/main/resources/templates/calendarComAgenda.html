@@ -1,131 +1,141 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Agenda — Calendário com Eventos</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Agenda — Calendário com Eventos</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/calendarComAgenda.css" />
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/calendarComAgenda.css"/>
 </head>
 <body class="calendar-page">
 <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
-  <div class="brand"><div class="logo">Ag</div><div style="font-weight:700">Projeto Agenda</div></div>
-  <div class="top-actions">
-    <a class="btn secondary" href="profile.html" title="Meu Perfil">Meu Perfil</a>
-    <button id="goTodayBtn" class="btn" title="Hoje" aria-label="Ir para hoje">Hoje</button>
-    <button id="exportBtn" class="btn" title="Exportar eventos" aria-label="Exportar eventos">Exportar</button>
-    <a class="btn primary" href="addEventScreen.html" title="Adicionar evento">Adicionar evento</a>
-  </div>
+    <div class="brand">
+        <div class="logo">Ag</div>
+        <div style="font-weight:700">Projeto Agenda</div>
+    </div>
+    <div class="top-actions">
+        <a class="btn secondary" th:href="@{/profile}" title="Meu Perfil">Meu Perfil</a>
+        <button id="goTodayBtn" class="btn" title="Hoje" aria-label="Ir para hoje">Hoje</button>
+        <button id="exportBtn" class="btn" title="Exportar eventos" aria-label="Exportar eventos">Exportar</button>
+        <a class="btn primary" th:href="@{/addEventScreen}" title="Adicionar evento">Adicionar evento</a>
+    </div>
 </header>
 
 <div class="app-container">
-  <a class="skip-link" href="#calendarContent" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden"
-     onfocus="this.style.left='16px';this.style.top='16px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-999px'">
-    Ir para o calendário
-  </a>
+    <a class="skip-link" href="#calendarContent"
+       style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden"
+       onfocus="this.style.left='16px';this.style.top='16px';this.style.width='auto';this.style.height='auto';"
+       onblur="this.style.left='-999px'">
+        Ir para o calendário
+    </a>
 
-  <nav class="app-sidebar" aria-label="Barra de navegação">
-    <a class="icon-btn" href="yearCalendar.html" title="Calendário do ano" aria-label="Calendário do ano">📅</a>
-    <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
-    <a class="icon-btn" href="profile.html" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
-    <div class="sidebar-sep" aria-hidden="true"></div>
-    <button id="openCreateBtn" class="create-btn" title="Adicionar evento" aria-label="Adicionar evento">+</button>
-  </nav>
+    <nav class="app-sidebar" aria-label="Barra de navegação">
+        <a class="icon-btn" th:href="@{/calendar}" title="Calendário do ano" aria-label="Calendário do ano">📅</a>
+        <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
+        <a class="icon-btn" th:href="@{/profile}" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
+        <div class="sidebar-sep" aria-hidden="true"></div>
+        <button id="openCreateBtn" class="create-btn" title="Adicionar evento" aria-label="Adicionar evento">+</button>
+    </nav>
 
-  <div class="calendar-wrap">
-    <aside class="agenda-panel" aria-label="Eventos">
-      <div class="agenda-header">
-        <h3>EVENTOS</h3>
-        <div class="small" id="agendaMonthLabel" aria-hidden="true"></div>
-      </div>
+    <div class="calendar-wrap">
+        <aside class="agenda-panel" aria-label="Eventos">
+            <div class="agenda-header">
+                <h3>EVENTOS</h3>
+                <div class="small" id="agendaMonthLabel" aria-hidden="true"></div>
+            </div>
 
-      <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
-        <input id="eventSearch" type="search" placeholder="Buscar eventos (título, nota)" aria-label="Buscar eventos" class="filter" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff">
-        <button id="exportListBtn" class="btn secondary" title="Exportar lista" style="padding:8px 10px">Exportar</button>
-      </div>
+            <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
+                <input id="eventSearch" type="search" placeholder="Buscar eventos (título, nota)"
+                       aria-label="Buscar eventos" class="filter"
+                       style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff">
+                <button id="exportListBtn" class="btn secondary" title="Exportar lista" style="padding:8px 10px">
+                    Exportar
+                </button>
+            </div>
 
-      <div class="appointments" id="eventsList">
-        <div class="appointment">
-          <div class="badge">2</div>
-          <div class="appt-body">
-            <strong>Disciplina A</strong>
-            <small>Prova (9:30 - 11:00)</small>
-          </div>
+            <div class="appointments" id="eventsList">
+                <div class="appointment">
+                    <div class="badge">2</div>
+                    <div class="appt-body">
+                        <strong>Disciplina A</strong>
+                        <small>Prova (9:30 - 11:00)</small>
+                    </div>
+                </div>
+
+                <div class="appointment">
+                    <div class="badge">16</div>
+                    <div class="appt-body">
+                        <strong>Disciplina B</strong>
+                        <small>Trabalho (7:30 - 9:10)</small>
+                    </div>
+                </div>
+
+                <div class="appointment">
+                    <div class="badge">22</div>
+                    <div class="appt-body">
+                        <strong>Disciplina C</strong>
+                        <small>Lista de Exercícios (13:30 - 15:00)</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="calendar-main">
+            <div class="calendar-header">
+                <div id="calendarTitle" class="calendar-title"></div>
+
+                <div class="calendar-controls">
+                    <button id="prevBtn" class="btn" aria-label="Anterior">◀</button>
+                    <button id="nextBtn" class="btn" aria-label="Próximo">▶</button>
+                </div>
+
+                <div class="view-toggle">
+                    <button class="btn primary" data-view="month">Mês</button>
+                    <button class="btn" data-view="week">Semana</button>
+                    <button class="btn" data-view="day">Dia</button>
+                </div>
+            </div>
+
+            <div class="calendar-grid weekday-labels" id="weekdayLabels">
+                <div class="calendar-weekday">Dom</div>
+                <div class="calendar-weekday">Seg</div>
+                <div class="calendar-weekday">Ter</div>
+                <div class="calendar-weekday">Qua</div>
+                <div class="calendar-weekday">Qui</div>
+                <div class="calendar-weekday">Sex</div>
+                <div class="calendar-weekday">Sáb</div>
+            </div>
+
+            <div id="calendarContent" class="calendar-grid" role="grid" aria-label="Calendário"></div>
         </div>
-
-        <div class="appointment">
-          <div class="badge">16</div>
-          <div class="appt-body">
-            <strong>Disciplina B</strong>
-            <small>Trabalho (7:30 - 9:10)</small>
-          </div>
-        </div>
-
-        <div class="appointment">
-          <div class="badge">22</div>
-          <div class="appt-body">
-            <strong>Disciplina C</strong>
-            <small>Lista de Exercícios (13:30 - 15:00)</small>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <div class="calendar-main">
-      <div class="calendar-header">
-        <div id="calendarTitle" class="calendar-title"></div>
-
-        <div class="calendar-controls">
-          <button id="prevBtn" class="btn" aria-label="Anterior">◀</button>
-          <button id="nextBtn" class="btn" aria-label="Próximo">▶</button>
-        </div>
-
-        <div class="view-toggle">
-          <button class="btn primary" data-view="month">Mês</button>
-          <button class="btn" data-view="week">Semana</button>
-          <button class="btn" data-view="day">Dia</button>
-        </div>
-      </div>
-
-      <div class="calendar-grid weekday-labels" id="weekdayLabels">
-        <div class="calendar-weekday">Dom</div>
-        <div class="calendar-weekday">Seg</div>
-        <div class="calendar-weekday">Ter</div>
-        <div class="calendar-weekday">Qua</div>
-        <div class="calendar-weekday">Qui</div>
-        <div class="calendar-weekday">Sex</div>
-        <div class="calendar-weekday">Sáb</div>
-      </div>
-
-      <div id="calendarContent" class="calendar-grid" role="grid" aria-label="Calendário"></div>
     </div>
-  </div>
 </div>
 
-<div id="eventModal" class="event-modal" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle" style="display:none">
-  <div class="event-modal-panel" role="document">
-    <h3 id="eventModalTitle">Adicionar evento</h3>
-    <form id="eventForm">
-      <label for="evtTitle">Título</label>
-      <input id="evtTitle" name="title" type="text" required />
-      <label for="evtDay">Dia (número)</label>
-      <input id="evtDay" name="day" type="number" min="1" max="31" required />
-      <label for="evtTime">Horário (ex: 09:30)</label>
-      <input id="evtTime" name="time" type="text" placeholder="09:30" />
-      <label for="evtNote">Descrição</label>
-      <input id="evtNote" name="note" type="text" />
-      <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
-        <button type="button" class="btn secondary" id="cancelEvent">Cancelar</button>
-        <button type="submit" class="btn" id="saveEvent">Salvar</button>
-      </div>
-    </form>
-  </div>
-  <button class="event-modal-backdrop" id="closeModal" aria-label="Fechar"></button>
+<div id="eventModal" class="event-modal" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle"
+     style="display:none">
+    <div class="event-modal-panel" role="document">
+        <h3 id="eventModalTitle">Adicionar evento</h3>
+        <form id="eventForm">
+            <label for="evtTitle">Título</label>
+            <input id="evtTitle" name="title" type="text" required/>
+            <label for="evtDay">Dia (número)</label>
+            <input id="evtDay" name="day" type="number" min="1" max="31" required/>
+            <label for="evtTime">Horário (ex: 09:30)</label>
+            <input id="evtTime" name="time" type="text" placeholder="09:30"/>
+            <label for="evtNote">Descrição</label>
+            <input id="evtNote" name="note" type="text"/>
+            <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+                <button type="button" class="btn secondary" id="cancelEvent">Cancelar</button>
+                <button type="submit" class="btn" id="saveEvent">Salvar</button>
+            </div>
+        </form>
+    </div>
+    <button class="event-modal-backdrop" id="closeModal" aria-label="Fechar"></button>
 </div>
 
 <script src="js/calendarComAgenda.js"></script>

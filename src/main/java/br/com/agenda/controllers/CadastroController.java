@@ -29,7 +29,7 @@ public class CadastroController {
             return "redirect:/signup";
         } else {
             service.cadastrar(new Usuario(nome, email, senha));
-            return "redirect:/login";
+            return "redirect:/";
         }
     }
 
