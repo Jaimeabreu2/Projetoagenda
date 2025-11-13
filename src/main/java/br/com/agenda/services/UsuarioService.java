@@ -4,6 +4,7 @@ import br.com.agenda.entities.Usuario;
 import br.com.agenda.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -11,6 +12,8 @@ public class UsuarioService {
     private static Long idAtual = -1L;
     private final UsuarioRepository repository;
     private final EventoService eventoService;
+    private boolean podeAlterarSenha;
+    private Usuario usuario;
 
     public UsuarioService(UsuarioRepository repository, EventoService eventoService) {
         this.repository = repository;
@@ -39,11 +42,15 @@ public class UsuarioService {
     }
 
     public boolean verificarLoginValido(String email, String senha) {
-        for (Usuario usuario : repository.findAll()) {
-            if (usuario.getEmail().equals(email) && usuario.getSenha().equals(senha)) {
-                idAtual = usuario.getId();
-                EventoService.setIdUsuario(idAtual);
+        for (Usuario usuarioAtual : repository.findAll()) {
+            if (usuarioAtual.getEmail().equals(email) && usuarioAtual.getSenha().equals(senha)) {
+                idAtual = usuarioAtual.getId();
+                usuario = usuarioAtual;
+                usuario.setUltimoLogin(LocalDate.now());
+                eventoService.setIdUsuario(idAtual);
                 eventoService.listarEventos();
+
+                reajustarUsuario();
                 return true;
             }
         }
@@ -51,18 +58,23 @@ public class UsuarioService {
     }
 
     public boolean verificarAlterarSenha(String senha_atual, String nova_senha, String confirmar_senha) {
-        Usuario usuario = getUsuarioAtual();
-
-        if (usuario.getSenha().equals(senha_atual) && nova_senha.equals(confirmar_senha)) {
-            alterarSenha(usuario, nova_senha);
-            return true;
-        } else {
-            return false;
-        }
+        podeAlterarSenha = usuario.getSenha().equals(senha_atual) && nova_senha.equals(confirmar_senha);
+        return podeAlterarSenha;
     }
 
-    private void alterarSenha(Usuario usuario, String nova_senha) {
-        usuario.setSenha(nova_senha);
+    public void alterarInformacoes(boolean notificacaoEmail, boolean resumoSemanal, String nome, String email, String novaSenha) {
+        usuario.setNotificacaoEmail(notificacaoEmail);
+        usuario.setResumoSemanal(resumoSemanal);
+        usuario.setEmail(email);
+        usuario.setNome(nome);
+
+        if (podeAlterarSenha)
+            usuario.setSenha(novaSenha);
+
+        podeAlterarSenha = false;
+    }
+
+    public void reajustarUsuario() {
         repository.save(usuario);
     }
 

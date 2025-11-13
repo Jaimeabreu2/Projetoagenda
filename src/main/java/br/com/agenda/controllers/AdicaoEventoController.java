@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 
@@ -32,8 +31,8 @@ public class AdicaoEventoController {
 
     @PostMapping
     @Transactional
-    public String salvarEvento(@RequestParam String disciplina, @RequestParam String descricao, @RequestParam String horario,
-                               @RequestParam String dia, RedirectAttributes redirectAttributes) {
+    public String salvarEvento(@RequestParam String disciplina, @RequestParam String descricao,
+                               @RequestParam String horario, @RequestParam String dia) {
         service.salvarEvento(disciplina, descricao, horario, dia);
 
         return "redirect:/calendarComAgenda";

@@ -4,19 +4,17 @@ import br.com.agenda.entities.Evento;
 import br.com.agenda.repositories.EventoRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
 @Service
 public class EventoService {
-    private final static ArrayList<Evento> eventos = new ArrayList<>();
-    private static EventoRepository repository;
-    private static Long idUsuario;
+    private final ArrayList<Evento> eventos = new ArrayList<>();
+    private final EventoRepository repository;
+    private Long idUsuario;
 
     public EventoService(EventoRepository repository) {
-        EventoService.repository = repository;
+        this.repository = repository;
     }
 
     public void salvarEvento(String disciplina, String descricao, String horario, String dia) {
@@ -26,16 +24,9 @@ public class EventoService {
         eventos.add(evento);
     }
 
-    public boolean verificarEventoExistente(String disciplina, String descricao, String horario, String dia) {
-        for (Evento e : eventos) {
-            if (e.getDisciplina().equalsIgnoreCase(disciplina) && e.getDescricao().equalsIgnoreCase(descricao) &&
-                    e.getHorario().equals(LocalTime.parse(horario)) && e.getDia().equals(LocalDate.parse(dia)))
-                return true;
-        }
-        return false;
-    }
-
     public void listarEventos() {
+        eventos.clear();
+
         for (Evento evento : repository.findAll()) {
             if (Objects.equals(evento.getIdUsuario(), idUsuario))
                 eventos.add(evento);
@@ -46,7 +37,7 @@ public class EventoService {
         return eventos;
     }
 
-    public static void setIdUsuario(Long idUsuario) {
-        EventoService.idUsuario = idUsuario;
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
 }
