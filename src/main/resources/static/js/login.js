@@ -2,14 +2,10 @@
     const loginForm = document.getElementById('loginForm');
     const submitBtn = document.getElementById('submitBtn');
     const errorMsg = document.getElementById('errorMsg');
-    const signupBtn = document.getElementById('signupBtn');
     const signupForm = document.getElementById('signupForm');
     const signupSubmit = document.getElementById('signupSubmit');
     const signupError = document.getElementById('signupError');
-    const backToLogin = document.getElementById('backToLogin');
-    const formTitle = document.getElementById('form-title');
 
-    // pega a URL do Thymeleaf
     const calendarUrl = submitBtn.dataset.calendarUrl;
 
     loginForm.addEventListener('submit', function(e){

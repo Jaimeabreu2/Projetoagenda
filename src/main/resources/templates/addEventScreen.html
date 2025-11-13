@@ -56,25 +56,50 @@
             <div id="calendarContentSmall" class="calendar-grid" aria-hidden="false"></div>
         </div>
     </div>
+    <div th:each="evento : ${eventos}" class="event-item">
+        <div class="event-date" th:text="${#temporals.format(evento.dia, 'dd/MM/yyyy')}">01/01/2025</div>
+        <div class="event-info">
+            <strong th:text="${evento.disciplina}">Disciplina</strong> -
+            <span th:text="${evento.descricao}">Descrição</span> às
+            <span th:text="${evento.horario}">Horário</span>
+        </div>
+    </div>
+
     <div class="overlay" id="overlay">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h3 id="modalTitle">Adicionar evento</h3>
-            <form id="modalForm">
+
+            <form id="modalForm" th:action="@{/addEventScreen}" method="post">
                 <label for="mTitle">Título</label>
-                <div class="input"><input id="mTitle" type="text" placeholder="Ex: Prova de Matemática" required/></div>
+                <div class="input">
+                    <input id="mTitle" name="disciplina" type="text" placeholder="Ex: Prova de Matemática" required/>
+                </div>
+
                 <label for="mDate">Data</label>
-                <div class="input"><input id="mDate" type="date" required/></div>
+                <div class="input">
+                    <input id="mDate" name="dia" type="date" required/>
+                </div>
+
                 <label for="mTime">Horário (ex: 09:30)</label>
-                <div class="input"><input id="mTime" type="time"/></div>
+                <div class="input">
+                    <input id="mTime" name="horario" type="time"/>
+                </div>
+
                 <label for="mNote">Descrição</label>
-                <div class="input"><input id="mNote" type="text" placeholder="Descrição breve"/></div>
+                <div class="input">
+                    <input id="mNote" name="descricao" type="text" placeholder="Descrição breve"/>
+                </div>
+
                 <div class="actions">
-                    <button type="button" id="cancelBtn" class="btn secondary">Cancelar</button>
+                    <a th:href="@{/calendarComAgenda}">
+                        <button type="button" class="btn secondary">Cancelar</button>
+                    </a>
                     <button type="submit" id="saveBtnModal" class="btn">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
+
     <div id="toastSuccess" class="toast" role="status" aria-live="polite">Evento criado</div>
 </div>
 <script src="js/addEventScreen.js"></script>

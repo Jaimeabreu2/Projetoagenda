@@ -10,9 +10,11 @@ import java.util.Optional;
 public class UsuarioService {
     private static Long idAtual = -1L;
     private final UsuarioRepository repository;
+    private final EventoService eventoService;
 
-    public UsuarioService(UsuarioRepository repository) {
+    public UsuarioService(UsuarioRepository repository, EventoService eventoService) {
         this.repository = repository;
+        this.eventoService = eventoService;
     }
 
     public void cadastrar(Usuario usuario) {
@@ -40,6 +42,8 @@ public class UsuarioService {
         for (Usuario usuario : repository.findAll()) {
             if (usuario.getEmail().equals(email) && usuario.getSenha().equals(senha)) {
                 idAtual = usuario.getId();
+                EventoService.setIdUsuario(idAtual);
+                eventoService.listarEventos();
                 return true;
             }
         }

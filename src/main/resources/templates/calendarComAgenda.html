@@ -59,27 +59,11 @@
             </div>
 
             <div class="appointments" id="eventsList">
-                <div class="appointment">
-                    <div class="badge">2</div>
+                <div class="appointment" th:each="evento : ${eventos}">
+                    <div class="badge" th:text="${evento.dia}"></div>
                     <div class="appt-body">
-                        <strong>Disciplina A</strong>
-                        <small>Prova (9:30 - 11:00)</small>
-                    </div>
-                </div>
-
-                <div class="appointment">
-                    <div class="badge">16</div>
-                    <div class="appt-body">
-                        <strong>Disciplina B</strong>
-                        <small>Trabalho (7:30 - 9:10)</small>
-                    </div>
-                </div>
-
-                <div class="appointment">
-                    <div class="badge">22</div>
-                    <div class="appt-body">
-                        <strong>Disciplina C</strong>
-                        <small>Lista de Exercícios (13:30 - 15:00)</small>
+                        <strong th:text="${evento.disciplina}"></strong>
+                        <small th:text="${evento.descricao + ' (' + evento.horario + ')'}"></small>
                     </div>
                 </div>
             </div>

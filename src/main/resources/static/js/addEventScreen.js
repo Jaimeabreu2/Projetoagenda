@@ -1,3 +1,4 @@
+
 (function () {
     const eventsListEl = document.getElementById('eventsList');
     const calendarEl = document.getElementById('calendarContentSmall');
@@ -5,12 +6,6 @@
     const titleMonthEl = document.getElementById('titleMonthSmall');
     const prevBtn = document.getElementById('prevSmall');
     const nextBtn = document.getElementById('nextSmall');
-    const eventDays = [2, 16, 22];
-    const events = [
-        {day: 2, title: 'Disciplina A', note: 'Prova (9:30 - 11:00)'},
-        {day: 16, title: 'Disciplina B', note: 'Trabalho (7:30 - 9:10)'},
-        {day: 22, title: 'Disciplina C', note: 'Lista de Exercícios (13:30 - 15:00)'}
-    ];
     let current = new Date();
 
     function renderBgLarge() {
