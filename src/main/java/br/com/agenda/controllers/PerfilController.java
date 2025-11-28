@@ -22,7 +22,8 @@ public class PerfilController {
 
     @GetMapping
     public String mostrarTelaPerfil(Model model) {
-        Usuario usuario = service.getUsuarioAtual();
+        //Usuario usuario = service.getUsuarioAtual();
+        Usuario usuario = service.getUsuarioPrimario();
 
         model.addAttribute("usuario", usuario);
         return "profile";
@@ -40,12 +41,16 @@ public class PerfilController {
             @RequestParam(required = false) String confirmPwd,
             RedirectAttributes r) {
 
-        if (!service.verificarAlterarSenha(pwd, newPwd, confirmPwd))
+        if (!service.verificarAlterarSenha(pwd, newPwd, confirmPwd)) {
             r.addFlashAttribute("warning", "As senhas não coincidem!");
-        else if (pwd.equals(newPwd))
+            return "redirect:/profile";
+        } else if (pwd.equals(newPwd)) {
             r.addFlashAttribute("warning", "A nova senha dever ser diferente da anterior!");
-        else if (pwd.length() < 6)
+            return "redirect:/profile";
+        } else if (pwd.length() < 6) {
             r.addFlashAttribute("warning", "A nova senha dever ter, pelo menos, 6 caracteres!");
+            return "redirect:/profile";
+        }
 
         service.alterarInformacoes(notificacaoEmail, resumoSemanal, nome, email, newPwd);
         service.reajustarUsuario();

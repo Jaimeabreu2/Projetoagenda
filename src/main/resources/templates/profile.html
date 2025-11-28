@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -9,19 +9,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="css/style.css"/>
     <link rel="stylesheet" href="css/profile.css"/>
+    <style>
+
+    </style>
 </head>
 <body class="profile-page">
+<!-- Barra lateral: atalhos rápidos para navegar entre telas (use Tab para focar) -->
 <nav class="app-sidebar" aria-label="Barra de navegação">
-    <a class="icon-btn" href="calendarComAgenda.html" title="Calendário" aria-label="Calendário">📅</a>
+    <a class="icon-btn" th:href="@{/calendarComAgenda}" title="Calendário" aria-label="Calendário">📅</a>
     <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
-    <a class="icon-btn" href="profile.html" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
+    <a class="icon-btn" th:href="@{/profile}" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
     <div class="sidebar-sep" aria-hidden="true"></div>
-    <a class="create-btn" href="addEventScreen.html" title="Adicionar evento" aria-label="Adicionar evento">+</a>
+    <a class="create-btn" th:href="@{/addEventScreen}" title="Adicionar evento" aria-label="Adicionar evento">+</a>
+
 </nav>
 
+<!-- Conteúdo principal: área de edição do perfil.
+     Observações rápidas:
+     - Campos obrigatórios usam "required".
+     - O e-mail institucional é somente leitura por design. -->
 <main class="profile-wrap" role="main" aria-labelledby="profileTitle">
     <section class="profile-card" aria-labelledby="profileTitle">
         <div class="avatar" aria-hidden="false" id="avatarInitials">JS</div>
+        <!-- upload de avatar (preview client-side) -->
         <div style="text-align:center;margin-top:8px">
             <input id="avatarInput" type="file" accept="image/*" aria-label="Enviar foto de perfil"
                    style="display:none"/>
@@ -33,41 +43,41 @@
         <div style="text-align:center" class="small">Gerencie suas informações básicas</div>
 
         <div class="profile-actions" aria-hidden="false">
-            <a class="btn" id="goCalendar" href="calendarComAgenda.html">Ir ao calendário</a>
+            <a class="btn" id="goCalendar" th:href="@{/calendarComAgenda}">Ir ao calendário</a>
             <button class="btn secondary" id="logoutBtn" type="button">Sair</button>
         </div>
     </section>
 
     <section class="profile-main" aria-label="Editar informações">
         <h3 style="margin-top:0">Informações básicas</h3>
-        <span th:if="${warning}"
-              th:text="${warning}"
-              role="alert"
-              style="display:block;background:#fff3cd;color:#856404;
-                 border:1px solid #ffeeba;padding:8px 10px;
-                 border-radius:6px;margin-bottom:10px;
-                 text-align:center;font-size:13px;">
-        </span>
 
-        <form th:action="@{/profile}" method="post" id="profileForm">
+        <!-- O FORMULÁRIO, CHATGPT -->
+        <div id="profileForm" autocomplete="on" novalidate th:action="@{/profile}" method="post">
+
+            <span th:if="${warning}" th:text="${warning}" role="alert"
+                  style="display:block;background:#fff3cd;color:#856404;border:1px solid #ffeeba;
+                  padding:10px;border-radius:6px;margin-bottom:12px;text-align:center;">
+            </span>
+
             <div class="field full">
                 <label for="fullName">Nome completo</label>
                 <div class="input">
-                    <input id="fullName" name="nome" th:value="${usuario.nome}" type="text"
-                           placeholder="Teu nome completo" required/>
+                    <input id="fullName" name="name" type="text"
+                           th:value="${usuario.nome}" required/>
                 </div>
             </div>
 
             <div class="field full">
                 <label for="email">E-mail institucional</label>
                 <div class="input">
-                    <input id="email" name="email" th:value="${usuario.email}" type="email"
-                           placeholder="Teu email" readonly/>
+                    <input id="email" name="email" type="email"
+                           th:value="${usuario.email}" readonly/>
                 </div>
-                <div class="small-note email-note">
-                    O e-mail institucional não pode ser alterado aqui.
-                </div>
+
+                <div class="small-note email-note">O e-mail institucional não pode ser alterado aqui.</div>
             </div>
+
+            <!-- campos de curso, telefone e ano de ingresso removidos conforme solicitado -->
 
             <hr/>
 
@@ -75,70 +85,71 @@
                 <h4 style="margin:8px 0">Alterar senha</h4>
             </div>
 
-            <div class="field">
-                <label for="pwd">Senha atual</label>
-                <div class="input">
-                    <input id="pwd" name="pwd" type="password" placeholder="Senha atual"/>
-                </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <input type="password" name="pwd" placeholder="Senha atual" required
+                       style="background-color:#FBFFF9;">
+
+                <input type="password" name="new_pwd" placeholder="Nova senha" required
+                       style="background-color:#FBFFF9;">
+
+                <input type="password" name="confirm_pwd" placeholder="Confirmar nova senha" required
+                       style="background-color:#FBFFF9;">
             </div>
 
-            <div class="field">
-                <label for="newPwd">Nova senha</label>
-                <div class="input">
-                    <input id="newPwd" name="newPwd" type="password" placeholder="Nova senha"/>
-                </div>
-            </div>
-
-            <div class="field">
-                <label for="confirmPwd">Confirmar nova senha</label>
-                <div class="input">
-                    <input id="confirmPwd" name="confirmPwd" type="password" placeholder="Confirme a nova senha"/>
-                </div>
-                <div id="pwdHint" class="small-note">
-                    Deixe em branco se não quiser alterar a senha.
-                </div>
+            <div id="pwdHint" class="small-note">Deixe em branco se não quiser alterar a senha.</div>
             </div>
 
             <hr/>
-
             <div class="field full">
                 <h4 style="margin:8px 0">Preferências</h4>
             </div>
 
             <div class="pref-list field full" aria-labelledby="prefTitle">
-                <label for="notifyEmail">
-                    <input id="notifyEmail" name="notificacaoEmail" type="checkbox"
-                           th:checked="${usuario.notificacaoEmail}"/>
+                <label>
+                    <input id="notifyEmail" type="checkbox"
+                           th:checked="${usuario.notificacaoEmail}">
                     Receber notificações por e-mail
                 </label>
 
-                <label for="notifyWeekly">
-                    <input id="notifyWeekly" name="resumoSemanal" type="checkbox"
-                           th:checked="${usuario.resumoSemanal}"/>
+                <label>
+                    <input id="notifyWeekly" type="checkbox"
+                           th:checked="${usuario.resumoSemanal}">
                     Resumo semanal
                 </label>
             </div>
 
             <div class="field full" style="font-size:13px;color:var(--muted);margin-top:6px">
-                <div>Conta criada em:
-                    <span th:text="${#temporals.format(usuario.dataCadastro, 'dd/MM/yyyy')}"></span>
+                <div style="display:flex; align-items:center; gap:5px; white-space:nowrap;">
+                    Conta criada em:
+                    <input style="font-size:12px;"
+                           th:value="${#temporals.format(usuario.dataCadastro, 'dd/MM/yyyy')}">
                 </div>
-                <div>Último login:
-                    <span th:text="${#temporals.format(usuario.ultimoLogin, 'dd/MM/yyyy')}"></span>
+
+                <div style="display:flex; align-items:center; gap:10px; margin-top:6px; white-space:nowrap;">
+                    Último login:
+                    <input style="font-size:12px;"
+                           th:value="${#temporals.format(usuario.ultimoLogin, 'dd/MM/yyyy')}">
                 </div>
             </div>
 
             <div class="actions-row">
-                <button type="submit" class="btn">Salvar alterações</button>
-                <a class="btn secondary" href="calendarComAgenda.html">Voltar</a>
+
+                <!-- O BOTÃO, CHATGPT -->
+                <button type="submit" class="btn" id="saveProfile">Salvar alterações</button>
+                <!-- FIM DO BOTÃO, CHATGPT -->
+
+                <a class="btn secondary" th:href="@{/calendarComAgenda}">Voltar</a>
                 <button type="button" id="deleteAccountBtn" class="btn secondary"
                         style="color:var(--danger);border-color:rgba(185,28,28,0.08)">Excluir conta
                 </button>
             </div>
 
+            <div id="error" class="danger-msg" role="alert"></div>
         </form>
+        <!-- FIM DO FORMULÁRIO, CHATGPT -->
     </section>
 
+    <!-- Toast de sucesso (perfil) -->
     <div id="saveSuccess" class="toast" role="status" aria-live="polite">Alterações salvas</div>
 </main>
 

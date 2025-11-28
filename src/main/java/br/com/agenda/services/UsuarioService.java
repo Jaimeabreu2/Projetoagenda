@@ -25,8 +25,11 @@ public class UsuarioService {
     }
 
     public Usuario getUsuarioAtual() {
-        Optional<Usuario> usuario = repository.findById(idAtual);
-        return usuario.orElse(null);
+        return usuario;
+    }
+
+    public Usuario getUsuarioPrimario() {
+        return repository.findAll().getFirst();
     }
 
     public void deletarUsuario() {
