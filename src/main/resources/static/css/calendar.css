@@ -1,0 +1,73 @@
+/* pequenas adaptações para esta página (reaproveita variáveis do style.css) */
+    body.event-page { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:28px; }
+    .event-card {
+      width:100%; max-width:720px; display:grid; grid-template-columns:1fr 420px; gap:20px; align-items:start;
+    }
+    .event-hero{
+      padding:22px;border-radius:12px;background:transparent;
+    }
+    .event-card .card{
+      padding:20px; min-width:320px;
+    }
+    .form-row{display:flex;gap:12px}
+    .form-row .input{flex:1}
+    .note{font-size:13px;color:var(--muted);margin-top:10px}
+    .success{color:var(--brand-1);font-weight:600;margin-top:8px;display:none}
+
+    /* ===== calendar background styles ===== */
+    .bg-calendar{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none; /* não captura cliques */
+      z-index:0;
+    }
+    .bg-calendar .calendar-bg{
+      width:min(900px,90%);
+      max-width:1100px;
+      padding:18px;
+      border-radius:12px;
+      background:transparent;
+      opacity:0.20;             /* mais visível */
+      filter:grayscale(60%) blur(0.4px);
+      box-sizing:border-box;
+    }
+    .calendar-bg .weekday-row,
+    .calendar-bg .cells{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:6px;
+    }
+    .calendar-bg .weekday{
+      font-weight:700;
+      font-size:12px;
+      color:#08320f;
+      text-align:left;
+      padding:6px 8px;
+    }
+    .calendar-bg .cell{
+      height:36px;
+      border-radius:6px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:flex-start;
+      padding:6px 8px;
+      font-size:12px;
+      color:#08320f;
+      background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.45));
+      border:1px solid rgba(0,0,0,0.03);
+    }
+    .calendar-bg .cell.has-event{
+      background:linear-gradient(180deg, rgba(30,120,50,0.12), rgba(30,120,50,0.08));
+      color: #0b3f1d;
+      font-weight:700;
+    }
+
+    /* garantir que o conteúdo principal fique acima do background */
+    main.event-card { position:relative; z-index:2; }
+
+    @media (max-width:920px){
+      .event-card{grid-template-columns:1fr; max-width:520px}
+    }

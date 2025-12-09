@@ -22,8 +22,7 @@ public class PerfilController {
 
     @GetMapping
     public String mostrarTelaPerfil(Model model) {
-        //Usuario usuario = service.getUsuarioAtual();
-        Usuario usuario = service.getUsuarioPrimario();
+        Usuario usuario = service.getUsuarioAtual();
 
         model.addAttribute("usuario", usuario);
         return "profile";

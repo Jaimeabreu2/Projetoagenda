@@ -97,54 +97,54 @@
             </div>
 
             <div id="pwdHint" class="small-note">Deixe em branco se não quiser alterar a senha.</div>
+        </div>
+
+        <hr/>
+        <div class="field full">
+            <h4 style="margin:8px 0">Preferências</h4>
+        </div>
+
+        <div class="pref-list field full" aria-labelledby="prefTitle">
+            <label>
+                <input id="notifyEmail" type="checkbox"
+                       th:checked="${usuario.notificacaoEmail}">
+                Receber notificações por e-mail
+            </label>
+
+            <label>
+                <input id="notifyWeekly" type="checkbox"
+                       th:checked="${usuario.resumoSemanal}">
+                Resumo semanal
+            </label>
+        </div>
+
+        <div class="field full" style="font-size:13px;color:var(--muted);margin-top:6px">
+            <div style="display:flex; align-items:center; gap:5px; white-space:nowrap;">
+                Conta criada em:
+                <input style="font-size:12px;"
+                       th:value="${#temporals.format(usuario.dataCadastro, 'dd/MM/yyyy')}">
             </div>
 
-            <hr/>
-            <div class="field full">
-                <h4 style="margin:8px 0">Preferências</h4>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:6px; white-space:nowrap;">
+                Último login:
+                <input style="font-size:12px;"
+                       th:value="${#temporals.format(usuario.ultimoLogin, 'dd/MM/yyyy')}">
             </div>
+        </div>
 
-            <div class="pref-list field full" aria-labelledby="prefTitle">
-                <label>
-                    <input id="notifyEmail" type="checkbox"
-                           th:checked="${usuario.notificacaoEmail}">
-                    Receber notificações por e-mail
-                </label>
+        <div class="actions-row">
 
-                <label>
-                    <input id="notifyWeekly" type="checkbox"
-                           th:checked="${usuario.resumoSemanal}">
-                    Resumo semanal
-                </label>
-            </div>
+            <!-- O BOTÃO, CHATGPT -->
+            <button type="submit" class="btn" id="saveProfile">Salvar alterações</button>
+            <!-- FIM DO BOTÃO, CHATGPT -->
 
-            <div class="field full" style="font-size:13px;color:var(--muted);margin-top:6px">
-                <div style="display:flex; align-items:center; gap:5px; white-space:nowrap;">
-                    Conta criada em:
-                    <input style="font-size:12px;"
-                           th:value="${#temporals.format(usuario.dataCadastro, 'dd/MM/yyyy')}">
-                </div>
+            <a class="btn secondary" th:href="@{/calendarComAgenda}">Voltar</a>
+            <button type="button" id="deleteAccountBtn" class="btn secondary"
+                    style="color:var(--danger);border-color:rgba(185,28,28,0.08)">Excluir conta
+            </button>
+        </div>
 
-                <div style="display:flex; align-items:center; gap:10px; margin-top:6px; white-space:nowrap;">
-                    Último login:
-                    <input style="font-size:12px;"
-                           th:value="${#temporals.format(usuario.ultimoLogin, 'dd/MM/yyyy')}">
-                </div>
-            </div>
-
-            <div class="actions-row">
-
-                <!-- O BOTÃO, CHATGPT -->
-                <button type="submit" class="btn" id="saveProfile">Salvar alterações</button>
-                <!-- FIM DO BOTÃO, CHATGPT -->
-
-                <a class="btn secondary" th:href="@{/calendarComAgenda}">Voltar</a>
-                <button type="button" id="deleteAccountBtn" class="btn secondary"
-                        style="color:var(--danger);border-color:rgba(185,28,28,0.08)">Excluir conta
-                </button>
-            </div>
-
-            <div id="error" class="danger-msg" role="alert"></div>
+        <div id="error" class="danger-msg" role="alert"></div>
         </form>
         <!-- FIM DO FORMULÁRIO, CHATGPT -->
     </section>

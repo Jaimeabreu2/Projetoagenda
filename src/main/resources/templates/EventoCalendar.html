@@ -1,317 +1,96 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Evento — Criar</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Evento — Criar</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
-  <style>
-    /* pequenas adaptações para esta página (reaproveita variáveis do style.css) */
-    body.event-page { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:28px; }
-    .event-card {
-      width:100%; max-width:720px; display:grid; grid-template-columns:1fr 420px; gap:20px; align-items:start;
-    }
-    .event-hero{
-      padding:22px;border-radius:12px;background:transparent;
-    }
-    .event-card .card{
-      padding:20px; min-width:320px;
-    }
-    .form-row{display:flex;gap:12px}
-    .form-row .input{flex:1}
-    .note{font-size:13px;color:var(--muted);margin-top:10px}
-    .success{color:var(--brand-1);font-weight:600;margin-top:8px;display:none}
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css"/>
+    <style>
 
-    /* ===== calendar background styles ===== */
-    .bg-calendar{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      pointer-events:none; /* não captura cliques */
-      z-index:0;
-    }
-    .bg-calendar .calendar-bg{
-      width:min(900px,90%);
-      max-width:1100px;
-      padding:18px;
-      border-radius:12px;
-      background:transparent;
-      opacity:0.20;             /* mais visível */
-      filter:grayscale(60%) blur(0.4px);
-      box-sizing:border-box;
-    }
-    .calendar-bg .weekday-row,
-    .calendar-bg .cells{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-      gap:6px;
-    }
-    .calendar-bg .weekday{
-      font-weight:700;
-      font-size:12px;
-      color:#08320f;
-      text-align:left;
-      padding:6px 8px;
-    }
-    .calendar-bg .cell{
-      height:36px;
-      border-radius:6px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:flex-start;
-      padding:6px 8px;
-      font-size:12px;
-      color:#08320f;
-      background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.45));
-      border:1px solid rgba(0,0,0,0.03);
-    }
-    .calendar-bg .cell.has-event{
-      background:linear-gradient(180deg, rgba(30,120,50,0.12), rgba(30,120,50,0.08));
-      color: #0b3f1d;
-      font-weight:700;
-    }
-
-    /* garantir que o conteúdo principal fique acima do background */
-    main.event-card { position:relative; z-index:2; }
-
-    @media (max-width:920px){
-      .event-card{grid-template-columns:1fr; max-width:520px}
-    }
-  </style>
+    </style>
 </head>
 <body class="event-page">
-  <!-- adiciona o calendário de fundo -->
-  <div id="bgCalendar" class="bg-calendar" aria-hidden="true"></div>
+<!-- adiciona o calendário de fundo -->
+<div id="bgCalendar" class="bg-calendar" aria-hidden="true"></div>
 
-  <main class="event-card" aria-labelledby="pageTitle">
+<main class="event-card" aria-labelledby="pageTitle">
     <!-- Texto introdutório e instruções:
          - Campos obrigatórios: Título e Data.
          - Após salvar, o calendário de fundo é atualizado visualmente. -->
     <section class="event-hero" aria-hidden="false">
-      <div class="brand" style="margin-bottom:12px">
-        <div class="logo" aria-hidden="true">Ag</div>
-        <div>
-          <div style="font-weight:700">Projeto Agenda</div>
-          <div class="small">Criar novo evento — provas, trabalhos, reuniões etc.</div>
+        <div class="brand" style="margin-bottom:12px">
+            <div class="logo" aria-hidden="true">Ag</div>
+            <div>
+                <div style="font-weight:700">Projeto Agenda</div>
+                <div class="small">Criar novo evento — provas, trabalhos, reuniões etc.</div>
+            </div>
         </div>
-      </div>
 
-      <h1 id="pageTitle" style="margin:16px 0 8px 0">Adicionar evento</h1>
-      <p class="note">Preencha os dados abaixo para testar a criação de um evento. Os dados aparecem no console e podem ser enviados ao backend (stub incluso).</p>
-      <div class="small" style="margin-top:18px">Voltar: <a href="calendarComAgenda.html">Calendário</a></div>
+        <h1 id="pageTitle" style="margin:16px 0 8px 0">Adicionar evento</h1>
+        <p class="note">Preencha os dados abaixo para testar a criação de um evento. Os dados aparecem no console e
+            podem ser enviados ao backend (stub incluso).</p>
+        <div class="small" style="margin-top:18px">Voltar: <a href="calendarComAgenda.html">Calendário</a></div>
     </section>
 
     <!-- Formulário de evento: o campo Título recebe foco ao carregar para facilitar acesso por teclado -->
     <section class="card" aria-labelledby="formTitle">
-      <h2 id="formTitle">Detalhes do evento</h2>
+        <h2 id="formTitle">Detalhes do evento</h2>
 
-      <form id="eventForm" autocomplete="on" novalidate>
-        <div>
-          <label for="evtTitle">Título</label>
-          <div class="input">
-            <input id="evtTitle" name="title" type="text" placeholder="Ex: Prova de Matemática" required />
-          </div>
-        </div>
+        <form id="eventForm" autocomplete="on" novalidate>
+            <div>
+                <label for="evtTitle">Título</label>
+                <div class="input">
+                    <input id="evtTitle" name="title" type="text" placeholder="Ex: Prova de Matemática" required/>
+                </div>
+            </div>
 
-        <div class="form-row">
-          <div>
-            <label for="evtDate">Data</label>
-            <div class="input"><input id="evtDate" name="date" type="date" required /></div>
-          </div>
-          <div>
-            <label for="evtTime">Horário</label>
-            <div class="input"><input id="evtTime" name="time" type="time" placeholder="09:30" /></div>
-          </div>
-        </div>
+            <div class="form-row">
+                <div>
+                    <label for="evtDate">Data</label>
+                    <div class="input"><input id="evtDate" name="date" type="date" required/></div>
+                </div>
+                <div>
+                    <label for="evtTime">Horário</label>
+                    <div class="input"><input id="evtTime" name="time" type="time" placeholder="09:30"/></div>
+                </div>
+            </div>
 
-        <div>
-          <label for="evtType">Tipo</label>
-          <div class="input">
-            <select id="evtType" name="type">
-              <option value="aula">Aula</option>
-              <option value="prova">Prova</option>
-              <option value="trabalho">Trabalho</option>
-              <option value="reuniao">Reunião</option>
-              <option value="outro">Outro</option>
-            </select>
-          </div>
-        </div>
+            <div>
+                <label for="evtType">Tipo</label>
+                <div class="input">
+                    <select id="evtType" name="type">
+                        <option value="aula">Aula</option>
+                        <option value="prova">Prova</option>
+                        <option value="trabalho">Trabalho</option>
+                        <option value="reuniao">Reunião</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+            </div>
 
-        <div>
-          <label for="evtNote">Descrição</label>
-          <div class="input">
-            <input id="evtNote" name="note" type="text" placeholder="Notas rápidas (local, instrutor, observações)"/>
-          </div>
-        </div>
+            <div>
+                <label for="evtNote">Descrição</label>
+                <div class="input">
+                    <input id="evtNote" name="note" type="text"
+                           placeholder="Notas rápidas (local, instrutor, observações)"/>
+                </div>
+            </div>
 
-        <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
-          <button type="submit" class="btn" id="saveBtn">Salvar evento</button>
-          <a class="btn secondary" href="calendarComAgenda.html">Cancelar</a>
-          <div class="success" id="successMsg" role="status">Evento criado (teste).</div>
-        </div>
+            <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+                <button type="submit" class="btn" id="saveBtn">Salvar evento</button>
+                <a class="btn secondary" href="calendarComAgenda.html">Cancelar</a>
+                <div class="success" id="successMsg" role="status">Evento criado (teste).</div>
+            </div>
 
-        <div style="margin-top:10px" class="small">Os campos obrigatórios: Título e Data.</div>
-      </form>
+            <div style="margin-top:10px" class="small">Os campos obrigatórios: Título e Data.</div>
+        </form>
     </section>
-  </main>
+</main>
 
-  <script>
-    // Script: coleta dados do formulário, atualiza lista de dias com evento e re-renderiza o calendário de fundo.
-    // Use window.getEventData() no console para inspecionar os valores durante testes.
-    (function(){
-      const eventForm = document.getElementById('eventForm');
-      const saveBtn = document.getElementById('saveBtn');
-      const successMsg = document.getElementById('successMsg');
-
-      // lista compartilhada de dias com eventos (usada pelo bg calendar)
-      const eventDays = [2,16,22];
-
-      function getEventData(){
-        return {
-          title: document.getElementById('evtTitle').value.trim(),
-          date: document.getElementById('evtDate').value, // YYYY-MM-DD
-          time: document.getElementById('evtTime').value, // HH:MM
-          type: document.getElementById('evtType').value,
-          note: document.getElementById('evtNote').value.trim()
-        };
-      }
-
-      // stub para envio ao backend (descomente e ajuste quando tiver backend)
-      function sendEvent(data){
-        /*
-        return fetch('/api/events', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify(data),
-          credentials: 'include'
-        }).then(r => r.json());
-        */
-        return null;
-      }
-
-      eventForm.addEventListener('submit', function(e){
-        e.preventDefault();
-        successMsg.style.display = 'none';
-
-        const payload = getEventData();
-        if (!payload.title || !payload.date) {
-          alert('Preencha o título e a data.');
-          return;
-        }
-
-        // UX: bloquear botão
-        saveBtn.disabled = true;
-        saveBtn.classList.add('loading');
-
-        // envia ao backend via JSON
-        const parsedDate = new Date(payload.date);
-        const day = parsedDate && !isNaN(parsedDate) ? parsedDate.getDate() : null;
-        const body = { day, title: payload.title, time: payload.time, note: payload.note, type: payload.type };
-
-        // BACKEND: criar evento
-        // POST /events
-        // - Content-Type: application/json
-        // - body: { day: Number, title: String, time?: String, type?: String, note?: String }
-        // - resposta esperada: o objeto criado (id, day, title, ...)
-        // - se falhar, o front faz fallback local (já implementado)
-        fetch('/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        }).then(res => {
-          if (!res.ok) throw new Error('Erro ao criar evento');
-          return res.json();
-        }).then(created => {
-          // atualizar lista interna e bg
-          if (created.day && !eventDays.includes(created.day)) eventDays.push(created.day);
-          successMsg.style.display = '';
-          console.log('Evento criado:', created);
-          renderBgCalendar('bgCalendar'); // atualiza fundo visual
-        }).catch(err => {
-          console.warn('Falha no POST /events — fallback local', err);
-          // fallback: adiciona dia localmente
-          if (day && !eventDays.includes(day)) eventDays.push(day);
-          renderBgCalendar('bgCalendar');
-          successMsg.style.display = '';
-        }).finally(()=> {
-          saveBtn.disabled = false;
-          saveBtn.classList.remove('loading');
-        });
-      });
-
-      // acessibilidade: foco inicial
-      document.getElementById('evtTitle').focus();
-
-      // --- novo: render do calendário de fundo (visual apenas) ---
-      function renderBgCalendar(containerId){
-        const root = document.getElementById(containerId);
-        if (!root) return;
-        root.innerHTML = ''; // limpa
-
-        const box = document.createElement('div');
-        box.className = 'calendar-bg';
-
-        const weekdays = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-        const wkRow = document.createElement('div');
-        wkRow.className = 'weekday-row';
-        weekdays.forEach(d=>{
-          const el = document.createElement('div');
-          el.className = 'weekday';
-          el.textContent = d;
-          wkRow.appendChild(el);
-        });
-        box.appendChild(wkRow);
-
-        const cells = document.createElement('div');
-        cells.className = 'cells';
-
-        const today = new Date();
-        const first = new Date(today.getFullYear(), today.getMonth(), 1);
-        const last = new Date(today.getFullYear(), today.getMonth()+1, 0);
-        const startDay = first.getDay();
-        const daysInMonth = last.getDate();
-
-        // células vazias do mês anterior
-        for (let i=0;i<startDay;i++){
-          const empty = document.createElement('div');
-          empty.className = 'cell empty';
-          cells.appendChild(empty);
-        }
-        // dias do mês
-        for (let d=1; d<=daysInMonth; d++){
-          const c = document.createElement('div');
-          c.className = 'cell';
-          if (eventDays.includes(d)) c.classList.add('has-event');
-          c.textContent = d;
-          cells.appendChild(c);
-        }
-        // trailing
-        const total = startDay + daysInMonth;
-        const trailing = (7 - (total % 7)) % 7;
-        for (let i=0;i<trailing;i++){
-          const empty = document.createElement('div');
-          empty.className = 'cell empty';
-          cells.appendChild(empty);
-        }
-
-        box.appendChild(cells);
-        root.appendChild(box);
-      }
-
-      // chama render do bg ao carregar a página
-      document.addEventListener('DOMContentLoaded', function(){
-        renderBgCalendar('bgCalendar');
-      });
-
-      // expose util para console (opcional)
-      window.getEventData = getEventData;
-    })();
-  </script>
+<script src="js/accessibility.js"></script>
 </body>
 </html>
