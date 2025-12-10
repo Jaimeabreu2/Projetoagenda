@@ -12,20 +12,22 @@ import java.util.ArrayList;
 @Controller
 @RequestMapping("/calendarComAgenda")
 public class CalendarioController {
-    private final EventoService service;
+    private final UsuarioService usuarioService;
+    private final EventoService eventoService;
 
-    public CalendarioController(EventoService service) {
-        this.service = service;
+    public CalendarioController(UsuarioService usuarioService, EventoService service) {
+        this.usuarioService = usuarioService;
+        this.eventoService = service;
     }
 
     @GetMapping
     public String mostrarTelaCalendario(Model model) {
-        ArrayList<Evento> eventos = service.getEventos();
-
-        if (UsuarioService.getIdAtual() == -1L)
+        if (usuarioService.getIdAtual() == -1L)
             return "error401";
 
+        ArrayList<Evento> eventos = eventoService.getEventos();
         model.addAttribute("eventos", eventos);
+
         return "calendarComAgenda";
     }
 }

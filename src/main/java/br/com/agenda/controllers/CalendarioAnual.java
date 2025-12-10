@@ -8,10 +8,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/yearCalendar")
 public class CalendarioAnual {
+    UsuarioService usuarioService;
+
+    public CalendarioAnual(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
     public String mostrarTelaCalendario() {
-        if (UsuarioService.getIdAtual() == -1L)
+        if (usuarioService.getIdAtual() == -1L)
             return "error401";
 
         return "yearCalendar";

@@ -22,12 +22,12 @@ public class PerfilController {
 
     @GetMapping
     public String mostrarTelaPerfil(Model model) {
-        Usuario usuario = service.getUsuarioAtual();
-
-        if (UsuarioService.getIdAtual() == -1L)
+        if (service.getIdAtual() == -1L)
             return "error401";
 
+        Usuario usuario = service.getUsuarioAtual();
         model.addAttribute("usuario", usuario);
+
         return "profile";
     }
 

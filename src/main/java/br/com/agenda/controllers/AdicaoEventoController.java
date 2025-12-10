@@ -17,19 +17,21 @@ import java.util.ArrayList;
 @RequestMapping("/addEventScreen")
 public class AdicaoEventoController {
     private final EventoService eventoService;
+    private final UsuarioService usuarioService;
 
-    public AdicaoEventoController(EventoService eventoService) {
+    public AdicaoEventoController(EventoService eventoService, UsuarioService usuarioService) {
         this.eventoService = eventoService;
+        this.usuarioService = usuarioService;
     }
 
     @GetMapping
     public String mostrarTelaAdicaoEventos(Model model) {
-        ArrayList<Evento> eventos = eventoService.getEventos();
-
-        if (UsuarioService.getIdAtual() == -1L)
+        if (usuarioService.getIdAtual() == -1L)
             return "error401";
 
+        ArrayList<Evento> eventos = eventoService.getEventos();
         model.addAttribute("eventos", eventos);
+
         return "addEventScreen";
     }
 

@@ -5,19 +5,20 @@ import br.com.agenda.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 public class UsuarioService {
-    private static Long idAtual = -1L;
+    private Long idAtual = -1L;
     private final UsuarioRepository repository;
     private final EventoService eventoService;
+    private final JsonService jsonService;
     private boolean podeAlterarSenha;
     private Usuario usuario;
 
     public UsuarioService(UsuarioRepository repository, EventoService eventoService, JsonService jsonService) {
         this.repository = repository;
         this.eventoService = eventoService;
+        this.jsonService = jsonService;
     }
 
     public void cadastrar(Usuario usuario) {
@@ -78,7 +79,26 @@ public class UsuarioService {
         repository.save(usuario);
     }
 
-    public static Long getIdAtual() {
+    private void reajustarUsuarioNulo(Long novoID) {
+        if (novoID != -1L) {
+            idAtual = novoID;
+            eventoService.setIdUsuario(novoID);
+            eventoService.listarEventos();
+
+            for (Usuario usuarioAtual : repository.findAll()) {
+                if (usuarioAtual.getId().equals(novoID)) {
+                    usuario = usuarioAtual;
+                    usuario.setUltimoLogin(LocalDate.now());
+                    break;
+                }
+            }
+        }
+    }
+
+    public Long getIdAtual() {
+        if (idAtual == -1L)
+            reajustarUsuarioNulo(jsonService.getId());
+
         return idAtual;
     }
 }
