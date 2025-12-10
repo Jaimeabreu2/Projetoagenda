@@ -30,6 +30,7 @@ public class UsuarioService {
     }
 
     public void deletarUsuario() {
+        jsonService.salvarDados(-1L, "", "");
         repository.deleteById(idAtual);
     }
 
@@ -71,6 +72,8 @@ public class UsuarioService {
 
         if (podeAlterarSenha)
             usuario.setSenha(novaSenha);
+        if (jsonService.getId() != -1L)
+            jsonService.salvarDados(idAtual, email, novaSenha);
 
         podeAlterarSenha = false;
     }
@@ -88,10 +91,11 @@ public class UsuarioService {
             for (Usuario usuarioAtual : repository.findAll()) {
                 if (usuarioAtual.getId().equals(novoID)) {
                     usuario = usuarioAtual;
-                    usuario.setUltimoLogin(LocalDate.now());
                     break;
                 }
             }
+
+            usuario.setUltimoLogin(LocalDate.now());
         }
     }
 

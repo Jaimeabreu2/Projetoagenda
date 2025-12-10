@@ -51,8 +51,7 @@
     <section class="profile-main" aria-label="Editar informações">
         <h3 style="margin-top:0">Informações básicas</h3>
 
-        <!-- O FORMULÁRIO, CHATGPT -->
-        <div id="profileForm" autocomplete="on" novalidate th:action="@{/profile}" method="post">
+        <form id="profileForm" autocomplete="on" novalidate th:action="@{/profile}" method="post">
 
             <span th:if="${warning}" th:text="${warning}" role="alert"
                   style="display:block;background:#fff3cd;color:#856404;border:1px solid #ffeeba;
@@ -62,7 +61,7 @@
             <div class="field full">
                 <label for="fullName">Nome completo</label>
                 <div class="input">
-                    <input id="fullName" name="name" type="text"
+                    <input id="fullName" name="nome" type="text"
                            th:value="${usuario.nome}" required/>
                 </div>
             </div>
@@ -89,64 +88,62 @@
                 <input type="password" name="pwd" placeholder="Senha atual" required
                        style="background-color:#FBFFF9;">
 
-                <input type="password" name="new_pwd" placeholder="Nova senha" required
+                <input type="password" name="newPwd" placeholder="Nova senha" required
                        style="background-color:#FBFFF9;">
 
-                <input type="password" name="confirm_pwd" placeholder="Confirmar nova senha" required
+                <input type="password" name="confirmPwd" placeholder="Confirmar nova senha" required
                        style="background-color:#FBFFF9;">
             </div>
 
             <div id="pwdHint" class="small-note">Deixe em branco se não quiser alterar a senha.</div>
-        </div>
-
-        <hr/>
-        <div class="field full">
-            <h4 style="margin:8px 0">Preferências</h4>
-        </div>
-
-        <div class="pref-list field full" aria-labelledby="prefTitle">
-            <label>
-                <input id="notifyEmail" type="checkbox"
-                       th:checked="${usuario.notificacaoEmail}">
-                Receber notificações por e-mail
-            </label>
-
-            <label>
-                <input id="notifyWeekly" type="checkbox"
-                       th:checked="${usuario.resumoSemanal}">
-                Resumo semanal
-            </label>
-        </div>
-
-        <div class="field full" style="font-size:13px;color:var(--muted);margin-top:6px">
-            <div style="display:flex; align-items:center; gap:5px; white-space:nowrap;">
-                Conta criada em:
-                <input style="font-size:12px;"
-                       th:value="${#temporals.format(usuario.dataCadastro, 'dd/MM/yyyy')}">
             </div>
 
-            <div style="display:flex; align-items:center; gap:10px; margin-top:6px; white-space:nowrap;">
-                Último login:
-                <input style="font-size:12px;"
-                       th:value="${#temporals.format(usuario.ultimoLogin, 'dd/MM/yyyy')}">
+            <hr/>
+            <div class="field full">
+                <h4 style="margin:8px 0">Preferências</h4>
             </div>
-        </div>
 
-        <div class="actions-row">
+            <div class="pref-list field full" aria-labelledby="prefTitle">
+                <label>
+                    <input id="notifyEmail" type="checkbox"
+                           th:checked="${usuario.notificacaoEmail}">
+                    Receber notificações por e-mail
+                </label>
 
-            <!-- O BOTÃO, CHATGPT -->
-            <button type="submit" class="btn" id="saveProfile">Salvar alterações</button>
-            <!-- FIM DO BOTÃO, CHATGPT -->
+                <label>
+                    <input id="notifyWeekly" type="checkbox"
+                           th:checked="${usuario.resumoSemanal}">
+                    Resumo semanal
+                </label>
+            </div>
 
-            <a class="btn secondary" th:href="@{/calendarComAgenda}">Voltar</a>
-            <button type="button" id="deleteAccountBtn" class="btn secondary"
-                    style="color:var(--danger);border-color:rgba(185,28,28,0.08)">Excluir conta
-            </button>
-        </div>
+            <div class="field full" style="font-size:13px;color:var(--muted);margin-top:6px">
+                <div style="display:flex; align-items:center; gap:5px; white-space:nowrap;">
+                    Conta criada em:
+                    <input style="font-size:12px;"
+                           th:value="${#temporals.format(usuario.dataCadastro, 'dd/MM/yyyy')}">
+                </div>
 
-        <div id="error" class="danger-msg" role="alert"></div>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:6px; white-space:nowrap;">
+                    Último login:
+                    <input style="font-size:12px;"
+                           th:value="${#temporals.format(usuario.ultimoLogin, 'dd/MM/yyyy')}">
+                </div>
+            </div>
+
+            <div class="actions-row">
+                <button type="submit" class="btn" id="saveProfile">Salvar alterações</button>
+            </div>
+            <div id="error" class="danger-msg" role="alert"></div>
         </form>
-        <!-- FIM DO FORMULÁRIO, CHATGPT -->
+
+        <form th:action="@{/profile/excluir}" method="post"
+              onsubmit="return confirm('Tem certeza que deseja excluir a conta?');">
+            <button type="submit" id="deleteAccountBtn" class="btn secondary"
+                    style="color:var(--danger);border-color:rgba(185,28,28,0.08)">
+                Excluir conta
+            </button>
+        </form>
     </section>
 
     <!-- Toast de sucesso (perfil) -->

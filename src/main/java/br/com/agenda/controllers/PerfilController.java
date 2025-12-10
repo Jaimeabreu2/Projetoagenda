@@ -31,6 +31,13 @@ public class PerfilController {
         return "profile";
     }
 
+    @PostMapping("/excluir")
+    @Transactional
+    public String excluirConta(RedirectAttributes r) {
+        service.deletarUsuario();
+        return "redirect:/";
+    }
+
     @PostMapping
     @Transactional
     public String processarNovaSenha(
