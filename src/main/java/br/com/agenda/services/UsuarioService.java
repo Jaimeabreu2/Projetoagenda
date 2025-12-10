@@ -15,7 +15,7 @@ public class UsuarioService {
     private boolean podeAlterarSenha;
     private Usuario usuario;
 
-    public UsuarioService(UsuarioRepository repository, EventoService eventoService) {
+    public UsuarioService(UsuarioRepository repository, EventoService eventoService, JsonService jsonService) {
         this.repository = repository;
         this.eventoService = eventoService;
     }
@@ -58,6 +58,7 @@ public class UsuarioService {
 
     public boolean verificarAlterarSenha(String senha_atual, String nova_senha, String confirmar_senha) {
         podeAlterarSenha = usuario.getSenha().equals(senha_atual) && nova_senha.equals(confirmar_senha);
+
         return podeAlterarSenha;
     }
 

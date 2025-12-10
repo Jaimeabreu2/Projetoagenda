@@ -24,6 +24,9 @@ public class PerfilController {
     public String mostrarTelaPerfil(Model model) {
         Usuario usuario = service.getUsuarioAtual();
 
+        if (UsuarioService.getIdAtual() == -1L)
+            return "error401";
+
         model.addAttribute("usuario", usuario);
         return "profile";
     }
