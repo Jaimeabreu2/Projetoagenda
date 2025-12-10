@@ -28,10 +28,6 @@ public class UsuarioService {
         return usuario;
     }
 
-    public Usuario getUsuarioPrimario() {
-        return repository.findAll().getFirst();
-    }
-
     public void deletarUsuario() {
         repository.deleteById(idAtual);
     }

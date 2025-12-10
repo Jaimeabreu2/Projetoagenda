@@ -39,7 +39,7 @@
                     <label for="usuario">Usuário</label>
                     <div class="input">
                         <input id="usuario" name="email" type="text"
-                               placeholder="seunome@aluno.uece.br" required aria-required="true"/>
+                               placeholder="seunome@aluno.uece.br" required aria-required="true" th:value="${email}"/>
                     </div>
                 </div>
 
@@ -47,7 +47,7 @@
                     <label for="senha">Senha</label>
                     <div class="input">
                         <input id="senha" name="senha" type="password"
-                               placeholder="••••••••" required aria-required="true"/>
+                               placeholder="••••••••" required aria-required="true" th:value="${senha}"/>
                         <button type="button" class="eye" id="togglePwd" aria-label="Mostrar senha">
                             <i class="fa-solid fa-eye"></i>
                         </button>
@@ -56,7 +56,7 @@
 
                 <div class="actions">
                     <div style="display:flex;align-items:center;gap:8px">
-                        <input id="remember" name="remember" type="checkbox"/>
+                        <input id="remember" name="manterLogado" type="checkbox" th:checked="${senha}"/>
                         <label for="remember" class="small">Lembrar-me</label>
                     </div>
                     <a href="#" class="small" id="forgot">Esqueci a senha</a>
