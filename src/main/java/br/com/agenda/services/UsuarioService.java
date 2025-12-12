@@ -5,6 +5,7 @@ import br.com.agenda.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 @Service
 public class UsuarioService {
@@ -32,6 +33,10 @@ public class UsuarioService {
     public void deletarUsuario() {
         jsonService.salvarDados(-1L, "", "");
         repository.deleteById(idAtual);
+    }
+
+    public ArrayList<Usuario> listarUsuarios() {
+        return new ArrayList<>(repository.findAll());
     }
 
     public boolean verificarEmailExistente(String email) {
