@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -27,7 +27,7 @@
     <!-- Barra lateral fixa (reutiliza classes do style.css) -->
     <nav class="app-sidebar" aria-label="Barra de navegação">
         <a class="icon-btn" th:href="@{/calendarComAgenda}">📅</a>
-        <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
+        <a class="btn" th:href="@{/yearCalendar}" title="Tarefas" aria-label="Tarefas">✅</a>
         <a class="icon-btn" th:href="@{/profile}">👤</a>
         <div class="sidebar-sep" aria-hidden="true"></div>
         <a class="create-btn" th:href="@{/addEvent}">+</a>
@@ -65,6 +65,13 @@
         </main>
     </div>
 </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const eventDays = [[${dias}]];
+    console.log(eventDays);
+    /*]]>*/
+</script>
 
 <script src="js/yearCalendar.js"></script>
 </body>

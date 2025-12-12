@@ -10,7 +10,6 @@
     const exportListBtn = document.getElementById('exportListBtn');
     const eventsListEl = document.getElementById('eventsList');
 
-    const eventDays = [2, 16, 22];
     let view = 'month';
     const qs = new URLSearchParams(window.location.search);
     const startY = qs.has('y') ? parseInt(qs.get('y'), 10) : null;

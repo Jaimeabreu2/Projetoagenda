@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
     <style>
 
     </style>
@@ -33,7 +33,7 @@
         <h1 id="pageTitle" style="margin:16px 0 8px 0">Adicionar evento</h1>
         <p class="note">Preencha os dados abaixo para testar a criação de um evento. Os dados aparecem no console e
             podem ser enviados ao backend (stub incluso).</p>
-        <div class="small" style="margin-top:18px">Voltar: <a href="calendarComAgenda.html">Calendário</a></div>
+        <div class="small" style="margin-top:18px">Voltar: <a th:href="@{/calendarComAgenda}">Calendário</a></div>
     </section>
 
     <!-- Formulário de evento: o campo Título recebe foco ao carregar para facilitar acesso por teclado -->
@@ -82,7 +82,7 @@
 
             <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
                 <button type="submit" class="btn" id="saveBtn">Salvar evento</button>
-                <a class="btn secondary" href="calendarComAgenda.html">Cancelar</a>
+                <a class="btn secondary" th:href="@{/calendarComAgenda}">Cancelar</a>
                 <div class="success" id="successMsg" role="status">Evento criado (teste).</div>
             </div>
 

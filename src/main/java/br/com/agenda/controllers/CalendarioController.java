@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Controller
@@ -25,7 +26,10 @@ public class CalendarioController {
         if (usuarioService.getIdAtual() == -1L)
             return "error401";
 
+        LocalDate[] dias = eventoService.getDias();
         ArrayList<Evento> eventos = eventoService.getEventos();
+
+        model.addAttribute("dias", dias);
         model.addAttribute("eventos", eventos);
 
         return "calendarComAgenda";

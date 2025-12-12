@@ -4,6 +4,7 @@ import br.com.agenda.entities.Evento;
 import br.com.agenda.repositories.EventoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -35,6 +36,15 @@ public class EventoService {
 
     public ArrayList<Evento> getEventos() {
         return eventos;
+    }
+
+    public LocalDate[] getDias() {
+        LocalDate[] dias = new LocalDate[eventos.size()];
+
+        for (int i = 0; i < eventos.size(); i++)
+            dias[i] = eventos.get(i).getDia();
+
+        return dias;
     }
 
     public void setIdUsuario(Long idUsuario) {

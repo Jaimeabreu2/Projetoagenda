@@ -5,8 +5,6 @@
       const yearValue = document.getElementById('yearValue');
       const filterInput = document.getElementById('filterInput');
       const todayBtn = document.getElementById('todayBtn');
-      // exemplo de dias recorrentes do mês com evento (aplica-se a todos os meses)
-      const eventDays = [2,16,22];
       let year = new Date().getFullYear();
 
       function renderYear(y){
@@ -69,7 +67,7 @@
           if (y === now.getFullYear() && m === now.getMonth()) card.classList.add('current-month');
 
           // destaca Outubro especificamente (índice 9) com verde claro
-          if (m === 9) card.classList.add('october-highlight');
+          if (m === new Date().getMonth()) card.classList.add('october-highlight');
 
           yearGrid.appendChild(card);
         }

@@ -16,9 +16,9 @@
 <body class="profile-page">
 <!-- Barra lateral: atalhos rápidos para navegar entre telas (use Tab para focar) -->
 <nav class="app-sidebar" aria-label="Barra de navegação">
-    <a class="icon-btn" th:href="@{/calendarComAgenda}" title="Calendário" aria-label="Calendário">📅</a>
-    <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
-    <a class="icon-btn" th:href="@{/profile}" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
+    <a class="btn" th:href="@{/calendarComAgenda}" title="Calendário" aria-label="Calendário">📅</a>
+    <a class="btn" th:href="@{/yearCalendar}" title="Tarefas" aria-label="Tarefas">✅</a>
+    <a class="btn" th:href="@{/profile}" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
     <div class="sidebar-sep" aria-hidden="true"></div>
     <a class="create-btn" th:href="@{/addEventScreen}" title="Adicionar evento" aria-label="Adicionar evento">+</a>
 
@@ -30,15 +30,6 @@
      - O e-mail institucional é somente leitura por design. -->
 <main class="profile-wrap" role="main" aria-labelledby="profileTitle">
     <section class="profile-card" aria-labelledby="profileTitle">
-        <div class="avatar" aria-hidden="false" id="avatarInitials">JS</div>
-        <!-- upload de avatar (preview client-side) -->
-        <div style="text-align:center;margin-top:8px">
-            <input id="avatarInput" type="file" accept="image/*" aria-label="Enviar foto de perfil"
-                   style="display:none"/>
-            <button id="changeAvatarBtn" class="btn secondary" type="button" style="font-size:13px;padding:8px 12px">
-                Alterar foto
-            </button>
-        </div>
         <h2 id="profileTitle" style="text-align:center;margin:6px 0">Seu perfil</h2>
         <div style="text-align:center" class="small">Gerencie suas informações básicas</div>
 
@@ -54,8 +45,17 @@
         <form id="profileForm" autocomplete="on" novalidate th:action="@{/profile}" method="post">
 
             <span th:if="${warning}" th:text="${warning}" role="alert"
-                  style="display:block;background:#fff3cd;color:#856404;border:1px solid #ffeeba;
-                  padding:10px;border-radius:6px;margin-bottom:12px;text-align:center;">
+                  style="
+             display:block;
+             width: calc(100% - 20px); /* ou a largura que quiser */
+             margin: 0 auto 12px auto; /* centraliza horizontalmente */
+             box-sizing: border-box;
+             background:#fff3cd;
+             color:#856404;
+             border:1px solid #ffeeba;
+             padding:10px;
+             border-radius:6px;
+             text-align:center;">
             </span>
 
             <div class="field full">
