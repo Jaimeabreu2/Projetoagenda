@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Adicionar evento — Tela</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* ajustes locais para esta tela de teste */
+    /* tornar o body transparente para que o iframe (calendarComAgenda) seja o fundo único do protótipo */
+    body.add-event-page { min-height:100vh; background: transparent !important; background-image: none !important; }
+
+    /* garantir espaço para a sidebar */
+    .wrap{ max-width:1100px;margin:48px auto;padding:8px;display:grid;grid-template-columns:320px 1fr;gap:24px;position:relative; }
+    .events-panel{ border-radius:12px;padding:18px;background:linear-gradient(180deg,#f8fff9,#eefbf0);box-shadow:var(--shadow-sm); }
+    .events-panel h3{margin:0 0 12px 0;color:var(--brand-1);letter-spacing:0.6px}
+    .events-list{display:flex;flex-direction:column;gap:12px}
+    .events-list .appointment{background:#fff;border-radius:10px;padding:10px;border:1px solid rgba(0,0,0,0.04);display:flex;gap:12px;align-items:center}
+    .events-list .badge{min-width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--brand-1),var(--brand-2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+    /* calendário compacto */
+    .calendar-box{background:transparent;padding:16px;border-radius:12px;box-shadow:var(--shadow-sm);align-self:start}
+    #bgCalendarSmall{width:100%;max-width:720px}
+    #calendarContentSmall.calendar-grid{gap:10px;padding:12px}
+    .calendar-weekday{font-weight:700;color:var(--muted);padding:6px 8px}
+    .calendar-cell.small{min-height:60px;padding:8px;border-radius:8px;background:linear-gradient(180deg,#fbfff9,#f7fff8);border:1px solid rgba(0,0,0,0.04)}
+    .calendar-cell.small.has-event{background:linear-gradient(180deg,#bfecc0,#9fd9a0);border-color:rgba(46,125,50,0.22)}
+    /* modal central (igual à imagem) */
+    .overlay{position:fixed;inset:0;background:rgba(15,55,25,0.26);display:flex;align-items:center;justify-content:center;z-index:1200}
+    .modal{background:var(--panel);width:420px;border-radius:12px;padding:18px;box-shadow:0 30px 60px rgba(0,0,0,0.2)}
+    .modal h3{margin:0 0 12px;color:var(--text)}
+    .modal .input{margin-bottom:10px}
+    .modal .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}
+    /* sidebar (pequena) */
+    .mini-sidebar{position:fixed;left:16px;top:calc(var(--topbar-height) + 16px);display:flex;flex-direction:column;gap:10px;width:56px;z-index:1300}
+    .mini-sidebar .btn{width:44px;height:44px;border-radius:10px;border:0;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
+
+    /* esconder o calendário pequeno à direita para ver só o fundo (prototipagem) */
+    .calendar-box { display: none !important; }
+
+    /* calendário de fundo replicando calendarComAgenda (sem iframe) */
+    .bg-calendar-large{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      z-index:0;
+      padding:28px;
+      box-sizing:border-box;
+      opacity:0.34;            /* ajuste de visibilidade do protótipo */
+      filter:grayscale(6%) contrast(0.98);
+    }
+    .bg-calendar-large .calendar-bg{
+      width:min(1100px,94%);
+      background: transparent;
+      border-radius:12px;
+      box-sizing:border-box;
+      padding:8px;
+    }
+    /* reaproveita as classes já definidas em style.css (#calendarContent.calendar-grid, .calendar-cell, .calendar-header, .weekday-labels...) */
+
+    /* garante que o conteúdo principal fique acima do iframe */
+    .wrap { position: relative; z-index: 2; }
+    .mini-sidebar { z-index: 1300; } /* mantém a sidebar acima do iframe */
+    .overlay { z-index: 1400; } /* modal acima de tudo */
+
+    /* === Overrides para melhorar aparência do modal em modo Alto Contraste === */
+    /* modo A11Y: fundo escuro, acento verde — modal escuro com etiquetas claras */
+    html.a11y-high-contrast .overlay {
+      background: rgba(0,0,0,0.78) !important; /* mais escuro para destacar modal */
+    }
+    /* modal escuro, contorno e acento em verde da marca */
+    html.a11y-high-contrast .modal {
+      background: #071411 !important; /* tom muito escuro, quase preto com leve matiz */
+      color: #eaf7ea !important;      /* texto claro */
+      border: 2px solid rgba(46,125,50,0.18) !important; /* contorno verde suave */
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6) !important;
+    }
+
+    /* títulos e labels dentro do modal: forte e verde claro */
+    html.a11y-high-contrast .modal h3,
+    html.a11y-high-contrast .modal label {
+      color: #dff7dc !important;
+      font-weight: 700 !important;
+    }
+
+    /* inputs: fundo escuro levemente mais claro que o modal, borda verde clara, texto claro */
+    html.a11y-high-contrast .modal .input,
+    html.a11y-high-contrast .modal input,
+    html.a11y-high-contrast .modal select {
+      background: #0c2418 !important;
+      color: #eaf7ea !important;
+      border: 1px solid rgba(46,125,50,0.32) !important;
+      padding: 8px 10px !important;
+      border-radius: 8px !important;
+    }
+
+    /* placeholder legível sobre input escuro */
+    html.a11y-high-contrast .modal input::placeholder {
+      color: rgba(234,247,234,0.56) !important;
+      opacity: 1 !important;
+    }
+
+    /* foco: verde da marca com halo suave (menos agressivo que amarelo) */
+    html.a11y-high-contrast .modal input:focus,
+    html.a11y-high-contrast .modal select:focus,
+    html.a11y-high-contrast .modal button:focus {
+      outline: 3px solid rgba(46,125,50,0.98) !important;
+      box-shadow: 0 0 0 8px rgba(46,125,50,0.12) !important;
+      outline-offset: 2px !important;
+    }
+
+    /* botões: primário em verde da marca, secundário escuro com borda clara */
+    html.a11y-high-contrast .modal .actions .btn {
+      background: var(--brand-1) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.06) !important;
+    }
+    html.a11y-high-contrast .modal .actions .btn.secondary {
+      background: transparent !important;
+      color: #dff7dc !important;
+      border: 1px solid rgba(46,125,50,0.28) !important;
+    }
+
+    /* evento: painel lateral grande em tom verde suave, com cartões internos brancos para contraste */
+    html.a11y-high-contrast .events-panel {
+      background: linear-gradient(180deg,#0b2b1a 0%, #0f3b24 100%) !important; /* retângulo verde escuro */
+      color: #e6f6ea !important;
+      border: 2px solid rgba(46,125,50,0.26) !important;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
+    }
+    /* cartões dentro do painel permanecem claros para legibilidade */
+    html.a11y-high-contrast .events-list .appointment {
+      background: #ffffff !important;
+      color: #061017 !important;
+      border: 1px solid rgba(0,0,0,0.12) !important;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.24) !important;
+    }
+    html.a11y-high-contrast .events-list .badge {
+      background: linear-gradient(135deg,var(--brand-1),var(--brand-2)) !important;
+      color: #fff !important;
+      border: 1px solid rgba(0,0,0,0.12) !important;
+    }
+
+    /* fundo grande (calendar bg) mais escuro para combinar com modal; mantém pontos verdes visíveis */
+    html.a11y-high-contrast .bg-calendar-large { opacity: 0.28 !important; filter: none !important; }
+    html.a11y-high-contrast .bg-calendar-large .calendar-bg .calendar-cell.has-event { background: #2f662f !important; color: #eaf7ea !important; border-color: rgba(46,125,50,0.34) !important; }
+
+    /* evita contornos duplos */
+    html.a11y-high-contrast .modal .input:focus-within { box-shadow: none !important; }
+  </style>
+</head>
+<body class="add-event-page">
+  <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
+    <div class="brand"><div class="logo">Ag</div><div style="font-weight:700">Projeto Agenda</div></div>
+    <div class="top-actions">
+      <a class="btn secondary" href="profile.html">Meu Perfil</a>
+      <a class="btn" href="calendarComAgenda.html">Calendário</a>
+    </div>
+  </header>
+  <div class="app-container">
+    <!-- fundo idêntico ao calendarComAgenda (reproduzido inline) -->
+    <div id="bgCalendarLarge" class="bg-calendar-large" aria-hidden="true"></div>
+
+    <!-- mini sidebar -->
+    <nav class="mini-sidebar" aria-label="Navegação">
+      <a class="btn" href="calendarComAgenda.html" title="Calendário" aria-label="Calendário">📅</a>
+      <a class="btn" href="calendarComAgenda.html" title="Tarefas" aria-label="Tarefas">✅</a>
+      <a class="btn" href="profile.html" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
+      <a class="btn" href="addEventScreen.html" title="Adicionar" aria-label="Adicionar">＋</a>
+    </nav>
+
+    <!-- Área principal: painel de eventos (esquerda) e calendário de visualização (direita).
+         O calendário à direita está oculto para focar no fundo e no modal do protótipo. -->
+    <div class="wrap" role="main" aria-label="Tela de eventos">
+      <aside class="events-panel" aria-label="Eventos">
+        <h3>EVENTOS</h3>
+        <div class="events-list" id="eventsList">
+          <!-- exemplo inicial (vai ser povoado por JS) -->
+        </div>
+      </aside>
+
+      <div class="calendar-box" aria-label="Calendário">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div id="titleMonthSmall" class="calendar-title"></div>
+          <div style="display:flex;gap:8px">
+            <button id="prevSmall" class="btn">◀</button>
+            <button id="nextSmall" class="btn">▶</button>
+          </div>
+        </div>
+
+        <div class="calendar-grid weekday-row" id="weekdayRowSmall" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:8px">
+          <div class="calendar-weekday">Dom</div><div class="calendar-weekday">Seg</div><div class="calendar-weekday">Ter</div>
+          <div class="calendar-weekday">Qua</div><div class="calendar-weekday">Qui</div><div class="calendar-weekday">Sex</div><div class="calendar-weekday">Sáb</div>
+        </div>
+
+        <div id="calendarContentSmall" class="calendar-grid" aria-hidden="false"></div>
+      </div>
+    </div>
+
+    <!-- Modal: formulário para criar um evento. 
+         Dica: campo "Título" recebe foco automaticamente para testar fluxo de teclado. -->
+    <div class="overlay" id="overlay">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <h3 id="modalTitle">Adicionar evento</h3>
+
+        <form id="modalForm">
+          <label for="mTitle">Título</label>
+          <div class="input"><input id="mTitle" type="text" placeholder="Ex: Prova de Matemática" required /></div>
+
+          <label for="mDate">Data</label>
+          <div class="input"><input id="mDate" type="date" required /></div>
+
+          <label for="mTime">Horário (ex: 09:30)</label>
+          <div class="input"><input id="mTime" type="time" /></div>
+
+          <label for="mNote">Descrição</label>
+          <div class="input"><input id="mNote" type="text" placeholder="Descrição breve" /></div>
+
+          <div class="actions">
+            <button type="button" id="cancelBtn" class="btn secondary">Cancelar</button>
+            <button type="submit" id="saveBtnModal" class="btn">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast de confirmação -->
+    <div id="toastSuccess" class="toast" role="status" aria-live="polite">Evento criado</div>
+  </div>
+
+  <script>
+    // Script: popula lista de eventos e renderiza calendário de fundo.
+    // Comentários no JS explicam funções: renderBgLarge, renderCalendar, handlers do modal.
+    (function(){
+      const eventsListEl = document.getElementById('eventsList');
+      const calendarEl = document.getElementById('calendarContentSmall');
+      const bgContainer = document.getElementById('bgCalendarLarge');
+      const titleMonthEl = document.getElementById('titleMonthSmall');
+      const prevBtn = document.getElementById('prevSmall');
+      const nextBtn = document.getElementById('nextSmall');
+
+      // dias com evento iniciais
+      const eventDays = [2,16,22];
+      const events = [
+        { day:2, title:'Disciplina A', note:'Prova (9:30 - 11:00)' },
+        { day:16, title:'Disciplina B', note:'Trabalho (7:30 - 9:10)' },
+        { day:22, title:'Disciplina C', note:'Lista de Exercícios (13:30 - 15:00)' }
+      ];
+
+      let current = new Date();
+
+      // --- render do calendário de fundo (replica calendarComAgenda) ---
+      function renderBgLarge(){
+        if (!bgContainer) return;
+        bgContainer.innerHTML = '';
+
+        const wrap = document.createElement('div');
+        wrap.className = 'calendar-bg';
+
+        // header (título + simples controles visuais)
+        const first = new Date(current.getFullYear(), current.getMonth(), 1);
+        const header = document.createElement('div'); header.className = 'calendar-header';
+        const t = document.createElement('h2'); t.className = 'calendar-title'; t.textContent = first.toLocaleString('pt-BR',{ month:'long', year:'numeric' });
+        header.appendChild(t);
+        // visual controls (non-interactive)
+        const ctrls = document.createElement('div'); ctrls.className = 'calendar-controls';
+        const prev = document.createElement('div'); prev.className='bg-control'; prev.textContent='◀';
+        const next = document.createElement('div'); next.className='bg-control'; next.textContent='▶';
+        ctrls.appendChild(prev); ctrls.appendChild(next);
+        header.appendChild(ctrls);
+        // view toggles (visual)
+        const toggle = document.createElement('div'); toggle.className='view-toggle';
+        ['Mês','Semana','Dia'].forEach(txt=>{ const b = document.createElement('div'); b.className='bg-control'; b.textContent = txt; toggle.appendChild(b); });
+        header.appendChild(toggle);
+
+        wrap.appendChild(header);
+
+        // weekday labels
+        const weekdays = document.createElement('div'); weekdays.className = 'weekday-labels';
+        ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>{ const el = document.createElement('div'); el.className='calendar-weekday'; el.textContent = d; weekdays.appendChild(el); });
+        wrap.appendChild(weekdays);
+
+        // calendar content using same id/class as calendarComAgenda to reuse styles
+        const content = document.createElement('div'); content.id = 'calendarContent'; content.className = 'calendar-grid';
+        const last = new Date(current.getFullYear(), current.getMonth()+1, 0);
+        const startDay = first.getDay();
+        const daysInMonth = last.getDate();
+        for (let i=0;i<startDay;i++){ const e=document.createElement('div'); e.className='calendar-cell empty'; content.appendChild(e); }
+        for (let d=1; d<=daysInMonth; d++){
+          const cell = document.createElement('div'); cell.className='calendar-cell';
+          const num = document.createElement('div'); num.className='day-num'; num.textContent = d;
+          cell.appendChild(num);
+          if (eventDays.includes(d)){
+            cell.classList.add('has-event');
+            const dot = document.createElement('div'); dot.className='event-dot'; cell.appendChild(dot);
+          } else {
+            // keep placeholder dot minimal so visual matches original
+            const dot = document.createElement('div'); dot.className='event-dot'; dot.style.opacity='0.0'; cell.appendChild(dot);
+          }
+          content.appendChild(cell);
+        }
+        const total = startDay + daysInMonth; const trailing = (7 - (total % 7)) % 7;
+        for (let i=0;i<trailing;i++){ const e=document.createElement('div'); e.className='calendar-cell empty'; content.appendChild(e); }
+
+        wrap.appendChild(content);
+        bgContainer.appendChild(wrap);
+      }
+
+      function renderEventsList(){
+        eventsListEl.innerHTML = '';
+        events.forEach(ev=>{
+          const item = document.createElement('div');
+          item.className = 'appointment';
+          item.innerHTML = `<div class="badge">${ev.day}</div><div><strong>${ev.title}</strong><div class="small" style="color:var(--muted)">${ev.note||''}</div></div>`;
+          eventsListEl.appendChild(item);
+        });
+      }
+
+      function renderCalendar(){
+        calendarEl.innerHTML = '';
+        const first = new Date(current.getFullYear(), current.getMonth(), 1);
+        const last = new Date(current.getFullYear(), current.getMonth()+1, 0);
+        const startDay = first.getDay();
+        const days = last.getDate();
+        titleMonthEl.textContent = first.toLocaleString('pt-BR',{ month:'long', year:'numeric' });
+
+        // leading empty
+        for(let i=0;i<startDay;i++){
+          const e = document.createElement('div'); e.className='calendar-cell small empty'; calendarEl.appendChild(e);
+        }
+        // days
+        for(let d=1; d<=days; d++){
+          const c = document.createElement('div');
+          c.className = 'calendar-cell small';
+          if (eventDays.includes(d)) c.classList.add('has-event');
+          // add dot for event
+          const dot = document.createElement('span'); dot.className='event-dot';
+          dot.style.display = eventDays.includes(d) ? 'inline-block' : 'none';
+          dot.style.width='8px'; dot.style.height='8px'; dot.style.borderRadius='50%';
+          dot.style.background='var(--brand-1)'; dot.style.margin='6px';
+          c.appendChild(dot);
+          const num = document.createElement('div'); num.style.fontWeight='600'; num.style.marginLeft='6px'; num.textContent = d;
+          c.appendChild(num);
+          calendarEl.appendChild(c);
+        }
+        // trailing
+        const total = startDay + days; const trailing = (7 - (total % 7)) % 7;
+        for(let i=0;i<trailing;i++){ const e = document.createElement('div'); e.className='calendar-cell small empty'; calendarEl.appendChild(e); }
+
+        // atualizar fundo grande para o mesmo mês e com eventDays marcados
+        renderBgLarge();
+      }
+
+      prevBtn.addEventListener('click', ()=>{ current.setMonth(current.getMonth()-1); renderCalendar(); });
+      nextBtn.addEventListener('click', ()=>{ current.setMonth(current.getMonth()+1); renderCalendar(); });
+
+      // modal handlers
+      const overlay = document.getElementById('overlay');
+      const modalForm = document.getElementById('modalForm');
+      const cancelBtn = document.getElementById('cancelBtn');
+
+      // cancelar: voltar para o calendário mensal. Se a URL traz y/m, preserva esses valores.
+      cancelBtn.addEventListener('click', ()=> {
+        const params = new URLSearchParams(window.location.search);
+        const y = params.get('y');
+        const m = params.get('m');
+        const target = (y && m) ? `calendarComAgenda.html?y=${y}&m=${m}` : 'calendarComAgenda.html';
+        window.location.href = target;
+      });
+      overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.style.display='none'; });
+
+      // Se a página recebeu ?y=YYYY&m=MM&d=DD, pré-preenche o modal (YYYY-MM-DD) e abre (foco no título).
+      (function prefillFromQuery(){
+        const params = new URLSearchParams(window.location.search);
+        const y = params.get('y');
+        const m = params.get('m');
+        const d = params.get('d');
+        if (y && m) {
+          current = new Date(parseInt(y,10), parseInt(m,10), 1);
+          renderCalendar();
+          renderBgLarge();
+        }
+        if (d) {
+          const dateInput = document.getElementById('mDate');
+          if (dateInput) {
+            const mm = String(parseInt(m,10) + 1).padStart(2,'0');
+            const dd = String(parseInt(d,10)).padStart(2,'0');
+            dateInput.value = `${y}-${mm}-${dd}`;
+          }
+          overlay.style.display = 'flex';
+          const titleInput = document.getElementById('mTitle');
+          if (titleInput) titleInput.focus();
+        }
+      })();
+
+      modalForm.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const title = document.getElementById('mTitle').value.trim();
+        const dateVal = document.getElementById('mDate')?.value;
+        const time = document.getElementById('mTime').value;
+        const note = document.getElementById('mNote').value.trim();
+        if(!title || !dateVal) { alert('Preencha o título e a data.'); return; }
+        const parsed = new Date(dateVal);
+        if (!parsed || isNaN(parsed)) { alert('Data inválida'); return; }
+        const day = parsed.getDate();
+        const month = parsed.getMonth() + 1;
+        const year = parsed.getFullYear();
+
+        // envia ao backend (JSON). O endpoint /events aceita JSON.
+        const payload = { day, month, year, title, time, note };
+        // BACKEND: criar evento (mesma contract usada nas outras páginas)
+        // POST /events
+        // - Content-Type: application/json
+        // - body: { day: Number, title: String, time?: String, note?: String, month?: Number, year?: Number }
+        // - resposta: JSON com o evento criado
+        // - recomenda-se também um endpoint GET /events?year=YYYY&month=MM para popular a UI ao entrar na página
+        fetch('/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(res => {
+          if (!res.ok) throw new Error('Falha ao criar evento');
+          return res.json();
+        }).then(created => {
+          // atualizar UI localmente
+          const createdDay = created.day || day;
+          events.unshift({ day: createdDay, title: created.title || title, note: created.time ? `${created.time} • ${created.note || ''}` : created.note || note });
+          if (!eventDays.includes(createdDay)) eventDays.push(createdDay);
+           renderEventsList();
+           renderCalendar();
+           overlay.style.display = 'none';
+           // mostrar toast breve
+           const t = document.getElementById('toastSuccess'); t.textContent = 'Evento criado com sucesso'; t.style.display='block';
+           setTimeout(()=> t.style.display='none', 2200);
+         }).catch(err => {
+           // fallback local caso backend indisponível
+           console.warn('Falha fetch /events, fallback local:', err);
+           events.unshift({ day, title, note: time ? `${time} • ${note}` : note });
+           if (!eventDays.includes(day)) eventDays.push(day);
+           renderEventsList();
+           renderCalendar();
+           overlay.style.display = 'none';
+           const t = document.getElementById('toastSuccess'); t.textContent = 'Evento criado (offline)'; t.style.display='block';
+           setTimeout(()=> t.style.display='none', 2200);
+         });
+        });
+
+      // inicial render
+      renderEventsList();
+      renderCalendar();
+      // reforça render do fundo na inicialização
+      renderBgLarge();
+      // modal aberto por padrão (já visível)
+    })();
+  </script>
+</body>
+</html>

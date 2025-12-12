@@ -1,0 +1,803 @@
+/* --------------------------------------------
+   style.css — comentários úteis para estudo
+   - Variáveis no :root definem a paleta e medidas.
+   - Use as classes a11y-high-contrast / a11y-large-font
+     no elemento <html> para ativar modos de acessibilidade.
+   - Comentários curtos mostram o propósito de cada bloco.
+   -------------------------------------------- */
+
+:root{
+  /* Paleta e tokens (cores, raios, sombras, fontes) */
+  --brand-1: #2e7d32;
+  --brand-2: #66bb6a;
+  --accent: #66bb6a;
+  --muted: #6b7280;
+  --text: #0f172a;
+  --bg: #90EE90;
+  --panel: #ffffff;
+  --danger: #b91c1c;
+
+  --radius: 12px;
+  --shadow-sm: 0 6px 18px rgba(15,23,42,0.06);
+  --shadow-lg: 0 10px 30px rgba(15,23,42,0.08);
+  --transition: 160ms;
+
+  --font-sans: "Roboto", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial;
+  --font-heading: "Roboto", var(--font-sans);
+  --a11y-font-scale:1; --a11y-line-mult:1;
+
+  --topbar-height: 64px; /* altura do topbar usada por topbar + sidebar */
+}
+
+/* Tipografia
+   - Aplicamos a fonte base (Roboto) aos elementos principais.
+   - Mantenha tamanho e pesos controlados por variáveis quando possível. */
+body, input, button, select, textarea, .small, label {
+  font-family: var(--font-sans);
+}
+h1,h2,h3,h4,h5,.logo {
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+/* Reset leve: garante box-sizing e remove margens padrão */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0} /* uso intencional: não transformar body em flex global */
+
+/* Páginas específicas
+   - .login-page: layout centralizado apenas para telas de login.
+   - Outras páginas usam classes diferentes (ex: .calendar-page). */
+.login-page {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px;
+  min-height:100vh;
+}
+
+/* Layout login */
+.login-wrap{
+  width:100%;
+  max-width:1100px;
+  display:grid;
+  grid-template-columns:1fr 420px;
+  gap:36px;
+  align-items:center;
+  padding:6px;
+}
+
+/* Hero (lado esquerdo) */
+.hero{
+  padding:28px;
+  border-radius:var(--radius);
+  background:transparent;
+  min-height:300px;
+}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.logo{
+  width:64px;height:64px;border-radius:12px;
+  background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+  display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;
+  box-shadow:var(--shadow-lg);
+  /* garantir fonte de título e contraste */
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+  text-transform: none; /* mantém "Ag" */
+}
+.hero h1{margin:0 0 8px 0;font-size:28px}
+.hero p{margin:0;color:var(--muted);max-width:44ch;line-height:1.45}
+
+/* Card / formulário */
+.card{
+  background:var(--panel);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);
+  padding:24px;
+  min-width:320px;
+}
+.card h2{margin:0 0 12px 0;font-size:18px;color:var(--brand-1)}
+
+/* Form controls */
+form{display:flex;flex-direction:column;gap:12px}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+.input{
+  display:flex;align-items:center;gap:10px;background:#fbfff9;border-radius:10px;padding:10px 12px;
+  border:1px solid transparent;transition:box-shadow var(--transition),border-color var(--transition);
+}
+.input:focus-within{
+  box-shadow:0 8px 22px rgba(102,187,106,0.12);
+  border-color: rgba(46,125,50,0.14);
+}
+input[type="text"], input[type="password"], input[type="email"]{
+  border:0;background:transparent;outline:none;font-size:15px;width:100%;color:var(--text);
+}
+input::placeholder{color:#9aa3b2}
+
+/* Buttons */
+.btn{
+  background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;
+  transition:transform 120ms ease,opacity 120ms linear,filter 120ms ease;
+  box-shadow: 0 6px 18px rgba(102,187,106,0.12);
+}
+/* adiciona estilo claro para botão "primary" */
+.btn.primary {
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(46,125,50,0.12);
+}
+.btn.secondary{background:transparent;color:var(--brand-1);border:1px solid rgba(46,125,50,0.10);box-shadow:none}
+
+/* Loading indicator */
+.btn.loading{position:relative;pointer-events:none;opacity:0.95}
+.btn.loading::after{
+  content:"";
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.35);border-top-color:white;animation:spin 800ms linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg) translateY(-50%)}}
+
+/* Helpers */
+.small{font-size:13px;color:var(--muted)}
+.help{color:var(--muted);font-size:13px;margin-top:8px;text-align:center}
+.error{color:var(--danger);font-size:13px;margin-top:6px;display:none}
+
+/* Eye toggle */
+.eye{background:none;border:0;cursor:pointer;color:var(--muted);font-size:16px;padding:4px}
+.eye:focus{outline:2px solid rgba(0,0,0,0.06);border-radius:6px}
+
+/* Calendar (mantive estilos coerentes com a paleta) */
+.calendar-wrap{
+  /* mantém o contêiner, mas deixa o bloco de células separado visualmente */
+  width:100%;
+  max-width:1100px;
+  margin:28px auto;
+  background:transparent;        /* deixa o fundo do painel transparente para realçar o bloco branco das células */
+  border-radius:10px;
+  padding:16px;
+  border:1px solid rgba(46,125,50,0.06);
+  box-shadow:0 12px 30px rgba(15,23,42,0.06);
+}
+
+/* Bloco branco entre as caixinhas: o grid tem fundo branco e padding (gutter) */
+#calendarContent.calendar-grid{
+  background: #ffffff !important;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:12px;
+  padding:14px;
+  border-radius:10px;
+  box-sizing:border-box;
+}
+
+/* Aparência das células: mantêm fundo claro e bordas suaves */
+.calendar-cell{
+  min-height:100px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#fbfff9 0%,#f0fff4 100%);
+  border:1px solid rgba(0,0,0,0.04);
+  padding:8px;
+  position:relative;
+  overflow:visible; /* evita corte de texto */
+  color:inherit;
+}
+
+/* Header do calendário: usa grid para 3 áreas (título | controles centrais | toggles à direita) */
+.calendar-header{
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap:12px;
+  align-items: center;
+  padding: 8px 0 12px 0;
+  width:100%;
+  box-sizing: border-box;
+}
+
+/* título no canto esquerdo (ocupa a primeira coluna) */
+.calendar-title{
+  margin:0;
+  font-size:18px;
+  color:var(--brand-1);
+  font-weight:600;
+}
+
+/* controles de navegação (centro) */
+.calendar-controls{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-self:center;
+}
+
+/* grupo de toggle de visualização (direita) */
+.view-toggle{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-self:end;
+}
+
+/* padroniza aparência dos botões do header (tamanho/altura iguais) */
+.calendar-header .btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 10px;
+  min-width:44px;
+  height:44px;
+  border-radius:10px;
+  box-shadow:none;
+  font-weight:600;
+  line-height:1;
+}
+
+/* botão circular pequeno para prev/next */
+.calendar-controls .btn{
+  width:44px;
+  padding:0;
+  border-radius:10px;
+}
+
+/* ajuste visual do botão ativo (Mês/Semana/Dia) */
+.view-toggle .btn{
+  min-width:64px;
+  padding:8px 12px;
+}
+
+/* garante que as labels dos dias fiquem em uma linha de 7 colunas */
+.weekday-labels{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:12px;
+  width:100%;
+  margin-top:8px;
+  box-sizing:border-box;
+  align-items:center;
+}
+.weekday-labels .calendar-weekday{
+  text-align:left;      /* ou 'center' se preferir */
+  padding:6px 10px;
+  font-weight:600;
+  color:var(--text);
+}
+
+/* separação do grid de células abaixo do header */
+#calendarContent{
+  margin-top:12px;
+  width:100%;
+  box-sizing:border-box;
+}
+
+/* responsivo: rearranja header sem quebrar labels */
+@media (max-width:720px){
+  .calendar-header{
+    grid-template-columns: 1fr auto;
+    grid-auto-flow: row;
+  }
+  .view-toggle{ justify-self:flex-start; order:3; margin-top:6px; }
+  .calendar-controls{ justify-self:flex-start; }
+}
+@media (max-width:960px){
+  .login-wrap{grid-template-columns:1fr;max-width:520px;padding:0}
+  .hero{order:2}
+  .card{order:1}
+}
+@media (max-width:820px){
+  .calendar-wrap{padding:12px;margin:12px}
+  .calendar-cell{min-height:80px;padding:6px}
+  .weekday-labels{gap:6px}
+}
+@media (max-width:520px){
+  .calendar-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .weekday-labels{display:none}
+  #calendarContent.calendar-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* Utilitários */
+.center{display:flex;align-items:center;justify-content:center}
+.mt-8{margin-top:8px}
+
+/* APP TOPBAR (global) */
+.app-topbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height: var(--topbar-height); /* usa variável */
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:0 18px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.92), rgba(250,255,250,0.92));
+  border-bottom:1px solid rgba(15,23,42,0.04);
+  z-index:11000;
+  box-shadow: 0 6px 18px rgba(15,23,42,0.04);
+}
+.app-topbar .brand {
+  display:flex;align-items:center;gap:12px;
+}
+.app-topbar .brand .logo{ width:44px;height:44px;border-radius:10px;font-size:18px }
+.app-topbar .top-actions { display:flex;align-items:center;gap:10px }
+
+/* Page container to keep content centered and aligned under the topbar */
+.app-container{
+  max-width:1200px;
+  margin: calc(var(--topbar-height) + 24px) auto 48px; /* usa offset dinâmico */
+  padding:0 18px;
+  box-sizing:border-box;
+}
+
+/* Toast / transient success (small, subtle) */
+.toast {
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  background: rgba(47,122,56,0.96);
+  color: #fff;
+  padding:10px 14px;
+  border-radius:10px;
+  box-shadow: 0 8px 26px rgba(46,125,50,0.12);
+  z-index:16000;
+  font-weight:600;
+  display:none;
+}
+
+/* Button polish */
+.btn {
+  transition: transform 120ms ease, box-shadow 180ms ease, background 160ms ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(46,125,50,0.08); }
+.btn.secondary:hover { transform:none; box-shadow:none; filter:brightness(0.98); }
+
+/* Slightly more compact cards for a professional feel */
+.card {
+  border-radius: 12px;
+  padding: 18px;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+.card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(15,23,42,0.06); }
+
+/* Utility: subtle divider */
+.hr-subtle { height:1px;background:rgba(15,23,42,0.04);width:100%;margin:12px 0;border-radius:1px; }
+
+/* ensure topbar doesn't break a11y mode */
+html.a11y-high-contrast .app-topbar {
+  background: var(--panel) !important;
+  border-bottom-color: rgba(255,255,255,0.08) !important;
+}
+
+/* Alto contraste */
+.a11y-high-contrast {
+  /* cores fortes para alto contraste */
+  --panel: #101212;        /* painel escuro (um pouco mais claro que preto) */
+  --text: #ffffff;         /* texto claro */
+  --muted: #dcdcdc;        /* texto secundário claro */
+  --accent: #ffff66;       /* ação/links em amarelo claro */
+  --bg: #191919;           /* fundo quase-preto (~90% preto) */
+  background-color: #ffffff !important;
+  color: var(--text) !important;
+}
+.a11y-high-contrast .card,
+.a11y-high-contrast .calendar-wrap { box-shadow: none; }
+
+/* Texto maior (aplica aumentos específicos para elementos textuais) */
+.a11y-large-font { --a11y-font-scale: 1.9; } /* ajuste: escala maior para impacto visível */
+.a11y-large-font html,
+.a11y-large-font body {
+  font-size: calc(100% * var(--a11y-font-scale)) !important; /* aumenta base */
+}
+.a11y-large-font h1,
+.a11y-large-font .hero h1 { font-size: calc(28px * var(--a11y-font-scale)) !important; }
+.a11y-large-font h2,
+.a11y-large-font .card h2 { font-size: calc(18px * var(--a11y-font-scale)) !important; }
+.a11y-large-font input,
+.a11y-large-font textarea,
+.a11y-large-font select,
+.a11y-large-font .btn,
+.a11y-large-font .small,
+.a11y-large-font label {
+  font-size: calc(15px * var(--a11y-font-scale)) !important;
+  line-height: calc(1.4 * var(--a11y-font-scale)) !important;
+}
+.a11y-large-font .input {
+  padding: calc(10px * var(--a11y-font-scale)) calc(12px * var(--a11y-font-scale)) !important;
+  border-radius: calc(10px * var(--a11y-font-scale)) !important;
+}
+.a11y-large-font .btn {
+  padding: calc(12px * var(--a11y-font-scale)) calc(18px * var(--a11y-font-scale)) !important;
+  border-radius: calc(10px * var(--a11y-font-scale)) !important;
+}
+
+/* === Acessibilidade: alto contraste bem mais forte === */
+.a11y-high-contrast {
+  /* cores fortes para alto contraste */
+  --panel: #000000;        /* painel escuro */
+  --text: #ffffff;         /* texto claro */
+  --muted: #dcdcdc;        /* texto secundário claro */
+  --accent: #ffff66;       /* ação/links em amarelo claro */
+  --bg: #000000;           /* fundo totalmente escuro */
+}
+
+/* força fundo escuro e texto claro */
+html.a11y-high-contrast, html.a11y-high-contrast body {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* adapta componentes principais */
+.a11y-high-contrast .card,
+.a11y-high-contrast .calendar-wrap {
+  background: var(--panel) !important;
+  color: var(--text) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  box-shadow: none !important;
+}
+
+/* inputs bem visíveis */
+.a11y-high-contrast .input {
+  background: transparent !important;
+  border: 2px solid #ffffff !important;
+  color: var(--text) !important;
+}
+.a11y-high-contrast input::placeholder { color: rgba(255,255,255,0.85) !important; opacity:1 !important; }
+
+/* botões com alto contraste (fundo claro e texto escuro) */
+.a11y-high-contrast .btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: none !important;
+}
+.a11y-high-contrast .btn.secondary {
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255,255,255,0.2) !important;
+}
+
+/* links bem destacadas */
+.a11y-high-contrast a,
+.a11y-high-contrast .small a {
+  color: var(--accent) !important;
+  text-decoration: underline !important;
+}
+
+/* labels e legendas mais claras */
+.a11y-high-contrast label,
+.a11y-high-contrast .small,
+.a11y-high-contrast .help {
+  color: var(--muted) !important;
+}
+
+/* cabeçalhos e números do calendário */
+.a11y-high-contrast .calendar-weekday,
+.a11y-high-contrast .day-num {
+  color: #ffffff !important;
+  background: transparent !important;
+}
+
+/* garante placeholders e texto interno fortes */
+.a11y-high-contrast input,
+.a11y-high-contrast textarea,
+.a11y-high-contrast select {
+  color: var(--text) !important;
+}
+
+/* reduz efeitos sutis que podem prejudicar leitura no modo contraste */
+.a11y-high-contrast .logo,
+.a11y-high-contrast .hero { opacity: 1 !important; filter:none !important; }
+
+/* Widget fixo (não empurra o conteúdo) */
+#a11yWidget{
+  position:fixed;
+  right:16px;
+  top:16px;
+  z-index:9999;
+  font-family:var(--font-sans);
+}
+#a11yWidget .a11y-toggle-btn{
+  width:44px;height:44px;border-radius:8px;border:0;background:#2f2f2f;color:#fff;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.25);font-weight:700;
+}
+#a11yWidget .panel{
+  display:none;
+  position:absolute;
+  right:0;
+  top:52px;
+  width:260px;
+  background:var(--panel);
+  border-radius:10px;
+  box-shadow:var(--shadow-sm);
+  padding:10px;
+  max-height:70vh;
+  overflow:auto;
+}
+#a11yWidget.open .panel{ display:block; }
+
+/* Helpers finais e ajustes responsivos
+   - Pequenas classes utilitárias e media queries para manter a página adaptável. */
+.center{display:flex;align-items:center;justify-content:center}
+.mt-8{margin-top:8px}
+
+/* Observação geral para quem estuda:
+   - Prefira modificar variáveis em :root para ajustar a aparência global.
+   - Teste os modos de acessibilidade alterando classes no elemento <html>.
+   - Para integração com backend, mantenha o CSS desacoplado do JS (JS só adiciona/retira classes). */
+
+/* --- ajuste: não centralizar TODO o site via body (cause layout break no calendar) --- */
+/* remova display:flex/centragem global e use classes por página */
+html,body{height:100%;margin:0;padding:0} /* <-- garanta que NÃO esteja display:flex aqui */
+
+/* centrar apenas a página de login */
+.login-page {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px;
+  min-height:100vh;
+}
+
+/* calendário: garante grid estável (sempre 7 colunas quando view = month) */
+body.calendar-page {
+  display:block;           /* evita flex que quebra labels */
+  padding:32px;
+}
+
+/* Rótulos dos dias — sempre em linha */
+.weekday-labels,
+.calendar-grid.weekday-labels{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:12px;
+  width:100%;
+  box-sizing:border-box;
+}
+
+/* bloco de células com "fundo entre caixinhas" e gutters */
+#calendarContent.calendar-grid{
+  background: #ffffff !important;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:12px;
+  padding:14px;
+  border-radius:10px;
+  box-sizing:border-box;
+}
+
+/* proteção das células */
+.calendar-cell{
+  min-height:100px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#fbfff9 0%,#f0fff4 100%);
+  border:1px solid rgba(0,0,0,0.04);
+  padding:8px;
+  position:relative;
+  overflow:visible; /* evita corte de texto */
+  color:inherit;
+}
+
+/* --- Fix: mantém controles do header estáveis em alto contraste --- */
+html.a11y-high-contrast .calendar-header {
+  display: grid !important;
+  grid-template-columns: 1fr auto auto !important; /* título | prev/next | view-toggle */
+  gap: 12px !important;
+  align-items: center !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* garante posicionamento dos três blocos */
+html.a11y-high-contrast .calendar-title  { justify-self: start !important; align-self: center !important; }
+html.a11y-high-contrast .calendar-controls{ justify-self: center !important; align-self: center !important; display:flex !important; gap:10px !important; }
+html.a11y-high-contrast .view-toggle     { justify-self: end !important; align-self: center !important; display:flex !important; gap:10px !important; }
+
+/* botões prev/next e toggles com tamanho consistente em contraste */
+html.a11y-high-contrast .calendar-controls .btn,
+html.a11y-high-contrast .view-toggle .btn {
+  min-width: 44px !important;
+  height: 44px !important;
+  padding: 0 10px !important;
+  border-radius: 10px !important;
+}
+
+/* evita que o widget (a11y) empurre ou sobreponha o header */
+html.a11y-high-contrast #a11yWidget { position: fixed !important; right: 16px !important; top: 16px !important; z-index: 9999 !important; }
+
+/* fundo principal: suave a partir de --bg */
+body{
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg) 16%, white),
+    var(--bg)
+  ) fixed no-repeat;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* se quiser o bloco branco ENTRE as células, mantenha #calendarContent.calendar-grid { background:#fff; }
+   para mostrar o fundo geral entre as células, torne-o transparente */
+#calendarContent.calendar-grid{
+  /* background:#ffffff; */  /* comente/remova se quiser ver o fundo verde entre as caixinhas */
+  background: transparent;
+}
+
+/* força fundo branco entre as caixinhas (gutter branco) */
+#calendarContent.calendar-grid{
+  background: #ffffff !important;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:12px;
+  padding:14px;
+  border-radius:10px;
+  box-sizing:border-box;
+}
+
+/* Inverte o "gutter" branco em modo alto contraste e ajusta células */
+html.a11y-high-contrast #calendarContent.calendar-grid{
+  background: var(--panel-contrast) !important; /* usa cor de painel escuro definida no modo contraste */
+  box-shadow: none !important;
+}
+
+html.a11y-high-contrast .calendar-cell{
+  background: transparent !important;            /* deixa a "caixinha" sobre o gutter escuro */
+  color: var(--panel-text) !important;           /* texto claro sobre painel escuro */
+  border-color: rgba(255,255,255,0.08) !important;
+}
+html.a11y-high-contrast .day-num,
+html.a11y-high-contrast .calendar-weekday,
+html.a11y-high-contrast .event-info { color: var(--panel-text) !important; }
+
+/* Inverte apenas a caixa de login quando Alto Contraste estiver ativo */
+html.a11y-high-contrast .card {
+  background: var(--panel-contrast, #0b0b0b) !important; /* painel escuro */
+  color: var(--panel-text, #fff) !important;              /* texto claro */
+  border-color: rgba(255,255,255,0.08) !important;
+  box-shadow: none !important;
+}
+
+/* Inputs dentro do card: fundo transparente, borda clara, texto visível */
+html.a11y-high-contrast .card .input {
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: var(--panel-text, #fff) !important;
+}
+html.a11y-high-contrast .card input::placeholder {
+  color: rgba(255,255,255,0.7) !important;
+}
+
+/* Labels/pequenos textos no card */
+html.a11y-high-contrast .card label,
+html.a11y-high-contrast .card .small,
+html.a11y-high-contrast .card .help {
+  color: rgba(255,255,255,0.9) !important;
+}
+
+/* Botões dentro do card: fundo claro e texto escuro para contraste */
+html.a11y-high-contrast .card .btn {
+  background: var(--panel-text, #ffffff) !important;
+  color: var(--panel-contrast, #0b0b0b) !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  box-shadow: none !important;
+}
+html.a11y-high-contrast .card .btn.secondary {
+  background: transparent !important;
+  color: var(--panel-text, #ffffff) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+
+/* Garantia: título do formulário legível */
+html.a11y-high-contrast .card h2 { color: var(--panel-text, #fff) !important; }
+
+/* Barra lateral fixa (ícones + botão criar) */
+.app-sidebar{
+  position:fixed;
+  top:var(--topbar-height); /* empurra abaixo do topbar para não ficar coberto */
+  left:0;
+  bottom:0;
+  width:80px; /* padrão coerente com outras páginas */
+  background:var(--bg);
+  border-right:1px solid rgba(15,23,42,0.08);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:16px 10px;
+  box-shadow:var(--shadow-sm);
+  z-index:9999;
+}
+.app-sidebar .icon-btn{
+  width:48px;height:48px;border-radius:10px;border:0;
+  background: transparent;            /* igual ao calendarComAgenda.html */
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;cursor:pointer;color:var(--text); /* ícone escuro por padrão */
+  box-shadow:none;                       /* sem sombreado no ícone */
+}
+.app-sidebar .icon-btn:focus{outline:3px solid rgba(102,187,106,0.14);border-radius:10px}
+.app-sidebar .sidebar-sep{width:56px;height:1px;background:rgba(15,23,42,0.06);margin-top:8px;border-radius:2px}
+
+/* botão de criar evento (destacado) */
+.app-sidebar .create-btn{
+  width:56px;height:56px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+  color:#fff;font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  box-shadow: 0 8px 22px rgba(46,125,50,0.16);
+}
+.app-sidebar .create-btn:focus{outline:3px solid rgba(102,187,106,0.18);outline-offset:3px}
+
+/* Evita sobreposição: adiciona recuo para páginas que usam a sidebar */
+@media (min-width:880px){
+  /* aplica recuo consistente para páginas com sidebar */
+  body.calendar-page,
+  body.year-page,
+  body.profile-page,
+  body.add-event-page {
+    padding-left: 100px; /* espaço para a sidebar + segurança visual */
+  }
+}
+
+/* Modal de evento (simples) */
+.event-modal{
+  position:fixed;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:1500;
+}
+.event-modal-backdrop{
+  position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.28);border:0;
+}
+.event-modal-panel{
+  position:relative;background:var(--panel);border-radius:12px;padding:16px;z-index:1501;min-width:320px;max-width:420px;
+  box-shadow:0 18px 40px rgba(15,23,42,0.12);
+}
+.event-modal-panel h3{margin:0 0 8px 0;color:var(--brand-1)}
+.event-modal-panel label{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+.event-modal-panel input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-top:6px}
+
+/* Button polish */
+.btn {
+  transition: transform 120ms ease, box-shadow 180ms ease, background 160ms ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(46,125,50,0.08); }
+.btn.secondary:hover { transform:none; box-shadow:none; filter:brightness(0.98); }
+
+/* Foco visível só quando navegação por teclado (boas práticas modernas) */
+:focus { outline: none; }
+:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand-1) 60%, white);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* Destaques do calendário: hoje e célula selecionada */
+.calendar-cell.today {
+  box-shadow: 0 8px 22px rgba(102,187,106,0.10);
+  border: 1px solid rgba(46,125,50,0.14);
+  transform: translateY(-2px);
+}
+.calendar-cell.selected {
+  outline: 3px solid rgba(102,187,106,0.18);
+  outline-offset: 2px;
+  box-shadow: 0 10px 28px rgba(46,125,50,0.08);
+}
+
+/* números dos dias: padroniza visual e hierarquia */
+.day-num{
+  font-weight:700;
+  font-size:14px;
+  color:var(--text);
+  margin-bottom:6px;
+}
+
+/* pontos de evento (mais consistentes visualmente) */
+.event-dot{
+  width:10px;height:10px;border-radius:50%;display:inline-block;
+  background: var(--brand-1);
+  box-shadow: 0 4px 12px rgba(46,125,50,0.12);
+  margin-right:6px;
+}
+
+/* melhorias responsivas e contraste suave */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
