@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class Erro401Controller {
 
     @GetMapping
-    public String mostrarTelaError() {
+    public String mostrarTelaErro() {
         return "error401";
     }
 }
