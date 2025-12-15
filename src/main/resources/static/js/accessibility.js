@@ -16,7 +16,6 @@
     document.documentElement.classList.toggle('a11y-more-spacing', !!state.moreSpacing);
     document.documentElement.classList.toggle('a11y-reduce-motion', !!state.reduceMotion);
   }
-
   // Salva o estado atual no localStorage (chamado sempre que o usuário altera uma opção)
   function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 
@@ -43,54 +42,71 @@
     const toggleBtn = root.querySelector('.a11y-toggle-btn');
     const panel = root.querySelector('.panel');
 
-    // Abre/fecha o painel; quando abre, foca o primeiro controle para navegação por teclado.
-    function open(close) {
-      const isOpen = root.classList.toggle('open', close !== true);
-      panel.setAttribute('aria-hidden', String(!isOpen));
-      toggleBtn.setAttribute('aria-expanded', String(isOpen));
-      if(isOpen) {
-        const first = root.querySelector('input[data-key]');
-        if(first) first.focus();
-      } else {
-        toggleBtn.focus();
-      }
+    // Estado de abertura do painel
+    let isOpen = false;
+
+    function openPanel() {
+      isOpen = true;
+      root.classList.add('open');
+      panel.setAttribute('aria-hidden', 'false');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      // Foca o primeiro controle
+      const first = root.querySelector('input[data-key]');
+      if(first) first.focus();
+    }
+    function closePanel() {
+      isOpen = false;
+      root.classList.remove('open');
+      panel.setAttribute('aria-hidden', 'true');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      toggleBtn.focus();
     }
 
-    toggleBtn.addEventListener('click', ()=> open());
-    toggleBtn.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    // Toggle ao clicar no botão
+    toggleBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(isOpen) closePanel();
+      else openPanel();
+    });
+    toggleBtn.addEventListener('keydown', (e)=> {
+      if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBtn.click(); }
+    });
 
-    // Inicializa os checkboxes com o estado atual (permite que o widget reflita localStorage)
+    // Fecha ao clicar fora
+    document.addEventListener('mousedown', (ev)=>{
+      if (!root.contains(ev.target) && isOpen) closePanel();
+    });
+    // Fecha ao pressionar ESC
+    document.addEventListener('keydown', (e)=>{
+      if (isOpen && e.key === 'Escape') closePanel();
+    });
+
+    // Inicializa os checkboxes com o estado atual
     Object.keys(state).forEach(k => {
       const cb = root.querySelector(`input[data-key="${k}"]`);
       if(cb) cb.checked = !!state[k];
     });
 
-    // Ao mudar qualquer checkbox atualiza o estado, aplica classes e salva.
+    // Atualiza estado ao mudar qualquer checkbox
     root.querySelectorAll('input[data-key]').forEach(inp => {
       inp.addEventListener('change', (e)=>{
         const k = e.target.getAttribute('data-key');
         state[k] = e.target.checked;
         apply(); save();
       });
-      // permite alternar com a barra de espaço no teclado
       inp.addEventListener('keydown', (e)=>{ if(e.key === ' ') { e.preventDefault(); inp.checked = !inp.checked; inp.dispatchEvent(new Event('change')); } });
     });
 
-    // Botão reset: volta ao padrão e atualiza visual/estado
+    // Botão reset
     root.querySelector('#a11yReset').addEventListener('click', ()=>{
       Object.assign(state, defaults); save();
       root.querySelectorAll('input[data-key]').forEach(cb => cb.checked = !!state[cb.getAttribute('data-key')]);
       apply();
-      toggleBtn.focus();
+      closePanel();
     });
 
-    // Fecha o painel ao apertar ESC ou clicar fora do widget
-    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') { root.classList.remove('open'); panel.setAttribute('aria-hidden','true'); toggleBtn.setAttribute('aria-expanded','false'); } });
-    document.addEventListener('click', (ev)=> {
-      if (!root.contains(ev.target) && root.classList.contains('open')) {
-        root.classList.remove('open'); panel.setAttribute('aria-hidden','true'); toggleBtn.setAttribute('aria-expanded','false');
-      }
-    });
+    // Aplica classes iniciais
+    apply();
   }
 
   // Se DOM ainda não estiver pronto, espera; caso contrário aplica e constrói widget imediatamente.

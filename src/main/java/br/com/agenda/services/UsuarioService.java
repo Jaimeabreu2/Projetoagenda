@@ -47,6 +47,14 @@ public class UsuarioService {
         return false;
     }
 
+    public Usuario getUsuarioPorEmail(String email) {
+        for (Usuario usuario : repository.findAll()) {
+            if (usuario.getEmail().equals(email))
+                return usuario;
+        }
+        return null;
+    }
+
     public boolean verificarLoginValido(String email, String senha) {
         for (Usuario usuarioAtual : repository.findAll()) {
             if (usuarioAtual.getEmail().equals(email) && usuarioAtual.getSenha().equals(senha)) {

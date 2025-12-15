@@ -13,12 +13,27 @@
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* cores por tipo de evento (variáveis e classes) */
+:root{
+  --evt-aula-1: #0b5a2b;    /* verde escuro */
+  --evt-aula-2: #7bd49b;    /* verde claro */
+  --evt-prova-1: #7a2b1b;   /* tijolo */
+  --evt-prova-2: #f3b49a;   /* pêssego */
+  --evt-trabalho-1: #2b4f7a; /* azul */
+  --evt-trabalho-2: #9dbfe6; /* azul claro */
+  --evt-reuniao-1: #6a4b9a;  /* roxo */
+  --evt-reuniao-2: #cbb8e8;  /* roxo claro */
+  --evt-outro-1: #7a7a7a;    /* neutro */
+  --evt-outro-2: #e6e6e6;
+}
+
 .agenda-panel {
-    background: linear-gradient(180deg, #f8fff9 0%, #eefbf0 100%);
+    /* reforço do fundo e sombra para maior contraste com o fundo pastel */
+    background: var(--panel);
     border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-    min-height: 360px;
+    padding: 20px;
+    box-shadow: 0 22px 48px rgba(10,30,18,0.06), 0 6px 18px rgba(15,23,42,0.06);
+    border: 1px solid rgba(15,23,42,0.04);
     display: flex;
     flex-direction: column;
     border: 1px solid rgba(46, 125, 50, 0.06);
@@ -60,11 +75,45 @@
     transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
+/* Tornar os itens mais flexíveis e previsíveis em tamanhos variados */
+.appointments .appointment {
+  display:flex;
+  gap:12px;
+  align-items:flex-start; /* permite que badge e conteúdo alinhem melhor */
+  flex-wrap:wrap;         /* permite quebra quando o espaço é pequeno */
+  box-sizing:border-box;
+  word-break: break-word;
+}
+
 .appointment:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
     background: linear-gradient(180deg, #fcfff9, #f2fff2);
 }
+
+/* Eventos criados pelo usuário: destaque visual mais forte */
+.appointment.user-event {
+  background: linear-gradient(90deg, rgba(102,193,138,0.12), rgba(15,63,31,0.04));
+  border-left: 6px solid var(--brand-1);
+  box-shadow: 0 8px 22px rgba(15,63,31,0.06);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.appointment.user-event:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15,63,31,0.10);
+}
+
+/* badge dos eventos de usuário mais contrastada */
+.appointment.user-event .badge {
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+  color: #fff;
+  border: none;
+  box-shadow: 0 6px 18px rgba(15,63,31,0.08);
+}
+
+/* texto do corpo do evento: garantir contraste quando user-event */
+.appointment.user-event .appt-body strong { color: #0b3f1d; }
+.appointment.user-event .appt-body small  { color: rgba(11,63,29,0.72); }
 
 .badge {
     min-width: 46px;
@@ -80,6 +129,26 @@
     font-size: 16px;
 }
 
+/* badge: garantir espaço consistente, texto centralizado e quebrável em múltiplas linhas */
+.badge {
+  min-width:56px;
+  height:auto;
+  padding:8px 10px;
+  border-radius:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:13px;
+  line-height:1.05;
+  text-align:center;
+  color:#fff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  overflow:hidden;
+  word-break:break-word;     /* permite que datas longas quebrem para a próxima linha */
+}
+
 .appt-body strong {
     display: block;
     font-size: 14px;
@@ -91,6 +160,28 @@
     color: rgba(15, 23, 42, 0.6);
     font-size: 12px;
     margin-top: 4px;
+}
+
+/* garantir que o corpo do evento ocupe o restante do espaço e permita truncamento */
+.appt-body {
+  flex: 1 1 auto;
+  min-width: 0; /* essencial para truncamento em flex containers */
+}
+.appt-body strong {
+  display:block;
+  font-size:14px;
+  color:var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* evita que títulos estiquem o cartão */
+}
+.appt-body small {
+  display:block;
+  color: rgba(15, 23, 42, 0.66);
+  font-size:12px;
+  margin-top:4px;
+  white-space: normal; /* permite quebra nas descrições */
+  overflow-wrap: anywhere;
 }
 
 .appointment::before {
@@ -108,6 +199,15 @@
     background: transparent;
 }
 
+/* cria uma "superfície" branca para o calendário (separação clara do fundo) */
+.calendar-main > .calendar-surface {
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 22px 48px rgba(10,30,18,0.04);
+    border: 1px solid rgba(15,23,42,0.04);
+}
+
 #calendarContent.calendar-grid {
     gap: 10px;
     padding: 12px;
@@ -116,7 +216,37 @@
 .calendar-cell {
     min-height: 68px;
     padding: 8px;
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    cursor: default;
 }
+
+/* hover geral: célula fica com tom verde escuro sutil e leve elevação */
+.calendar-cell:not(.empty):hover {
+  background: linear-gradient(180deg, rgba(15,63,31,0.06), rgba(15,63,31,0.03));
+  border-color: rgba(15,63,31,0.10);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15,63,31,0.06);
+  cursor: pointer;
+}
+
+/* quando já há evento: aparência mais forte; hover acentua */
+.calendar-cell.has-event {
+  background: linear-gradient(180deg, rgba(11,63,31,0.10), rgba(11,63,31,0.04));
+  border: 1px solid rgba(15,63,31,0.16);
+  box-shadow: inset 0 6px 14px rgba(15,63,31,0.03);
+}
+.calendar-cell.has-event:hover {
+  background: linear-gradient(180deg, rgba(11,63,31,0.16), rgba(11,63,31,0.06));
+  border-color: rgba(15,63,31,0.22);
+  box-shadow: 0 14px 36px rgba(15,63,31,0.10);
+}
+
+/* o ponto de evento (event-dot) fica mais visível em dias marcados */
+.calendar-cell .event-dot {
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+  opacity: 1;
+}
+.calendar-cell.has-event .event-dot { transform: scale(1); opacity: 1; }
 
 .calendar-cell.selected {
     outline: 2px solid rgba(102, 187, 106, 0.16);
@@ -298,27 +428,29 @@
 }
 
 .app-topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-    background: var(--bg);
-    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    height: 60px;
+    height: var(--topbar-height);
+    display:flex;
+    align-items:center;
+    padding: 0 20px;
 }
 
-.app-topbar .brand {
-    display: flex;
-    align-items: center;
-    font-size: 18px;
-    color: var(--text);
+.app-topbar .brand { 
+    display:flex; 
+    align-items:center; 
+    gap:10px; 
 }
 
 .app-topbar .logo {
-    font-weight: 700;
-    margin-right: 8px;
-    font-size: 22px;
+    width:44px;
+    height:44px;
+    font-size:16px;
+    border-radius:10px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin-right:8px;
+    line-height:1;
+    transform:none;
 }
 
 .app-topbar .top-actions {
@@ -342,4 +474,159 @@
 .app-topbar .btn.primary {
     background: var(--brand-1);
     color: #fff;
+}
+
+/* cartão / list item — override por tipo */
+.appointment.evt-type-aula {
+  background: linear-gradient(90deg, rgba(11,90,43,0.06), rgba(123,212,155,0.04));
+  border-left: 6px solid var(--evt-aula-1);
+}
+.appointment.evt-type-prova {
+  background: linear-gradient(90deg, rgba(122,43,27,0.06), rgba(243,180,154,0.04));
+  border-left: 6px solid var(--evt-prova-1);
+}
+.appointment.evt-type-trabalho {
+  background: linear-gradient(90deg, rgba(43,79,122,0.06), rgba(157,191,230,0.04));
+  border-left: 6px solid var(--evt-trabalho-1);
+}
+.appointment.evt-type-reuniao {
+  background: linear-gradient(90deg, rgba(106,75,154,0.06), rgba(203,184,232,0.04));
+  border-left: 6px solid var(--evt-reuniao-1);
+}
+.appointment.evt-type-outro {
+  background: linear-gradient(90deg, rgba(122,122,122,0.03), rgba(230,230,230,0.02));
+  border-left: 6px solid var(--evt-outro-1);
+}
+
+/* badge color por tipo (override da .badge padrão) */
+.appointment.evt-type-aula .badge { background: linear-gradient(135deg, var(--evt-aula-1), var(--evt-aula-2)); }
+.appointment.evt-type-prova .badge { background: linear-gradient(135deg, var(--evt-prova-1), var(--evt-prova-2)); }
+.appointment.evt-type-trabalho .badge { background: linear-gradient(135deg, var(--evt-trabalho-1), var(--evt-trabalho-2)); }
+.appointment.evt-type-reuniao .badge { background: linear-gradient(135deg, var(--evt-reuniao-1), var(--evt-reuniao-2)); }
+.appointment.evt-type-outro .badge { background: linear-gradient(135deg, var(--evt-outro-1), var(--evt-outro-2)); }
+
+/* ponto de evento (mini-calendar / small calendars) */
+.event-dot.evt-type-aula { background: var(--evt-aula-1); box-shadow: 0 0 0 6px rgba(11,90,43,0.06); }
+.event-dot.evt-type-prova { background: var(--evt-prova-1); box-shadow: 0 0 0 6px rgba(122,43,27,0.06); }
+.event-dot.evt-type-trabalho { background: var(--evt-trabalho-1); box-shadow: 0 0 0 6px rgba(43,79,122,0.06); }
+.event-dot.evt-type-reuniao { background: var(--evt-reuniao-1); box-shadow: 0 0 0 6px rgba(106,75,154,0.06); }
+.event-dot.evt-type-outro { background: var(--evt-outro-1); box-shadow: 0 0 0 6px rgba(122,122,122,0.04); }
+
+/* garantir contraste mínimo nos textos quando o cartão for colorido */
+.appointment.evt-type-aula .appt-body strong,
+.appointment.evt-type-prova .appt-body strong,
+.appointment.evt-type-trabalho .appt-body strong,
+.appointment.evt-type-reuniao .appt-body strong,
+.appointment.evt-type-outro .appt-body strong {
+  color: var(--text);
+}
+
+/* pequena melhoria visual para evitar que a data "saia" da badge */
+.badge span, .badge * { max-width:100%; box-sizing:border-box; }
+
+/* compacta badge em telas pequenas e coloca badge acima do texto quando necessário */
+@media (max-width:640px){
+  .appointments .appointment {
+    flex-direction: column;
+    align-items: stretch;
+    gap:10px;
+  }
+  .badge {
+    min-width: 64px;
+    align-self: flex-start; /* fica no canto superior esquerdo do cartão */
+    margin-left: 6px;
+    font-size:12px;
+    padding:6px 8px;
+  }
+  .appt-body strong { white-space: normal; } /* permitir quebra do título em mobile */
+}
+
+/* animação de pulso verde quando um dia é marcado (feedback visual) */
+@keyframes pulseGreen {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgba(15,63,31,0.24);
+  }
+  35% {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 20px 6px rgba(15,63,31,0.10);
+  }
+  70% {
+    transform: translateY(0) scale(1.01);
+    box-shadow: 0 20px 40px 14px rgba(15,63,31,0.04);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgba(15,63,31,0);
+  }
+}
+
+/* aplica a animação à célula; remova a classe via JS após terminar */
+.calendar-cell.pulse {
+  animation: pulseGreen 900ms cubic-bezier(.2,.8,.2,1);
+}
+
+/* também um pequeno destaque no ponto do evento para acompanhar o pulso */
+.calendar-cell.pulse .event-dot {
+  transform: scale(1.25);
+  transition: transform 360ms ease;
+}
+
+/* Hover mais específico e de maior prioridade para células do calendário (dias) */
+.calendar-main #calendarContent.calendar-grid .calendar-cell:not(.empty):hover,
+#calendarContent.calendar-grid .calendar-cell:not(.empty):hover {
+  pointer-events: auto !important; /* garantir que receba hover */
+  background: linear-gradient(180deg, rgba(15,63,31,0.14), rgba(15,63,31,0.06)) !important;
+  border-color: rgba(15,63,31,0.16) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 28px rgba(15,63,31,0.10) !important;
+}
+
+/* Contraste do número do dia ao passar o mouse */
+.calendar-main #calendarContent.calendar-grid .calendar-cell:not(.empty):hover .day-num,
+#calendarContent.calendar-grid .calendar-cell:not(.empty):hover .day-num {
+  color: #f7fff7 !important;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.18);
+}
+
+/* Garante que apenas células de dias tenham cursor pointer */
+.calendar-cell:not(.empty) {
+  cursor: pointer !important;
+}
+
+/* Hover verde escuro forte para qualquer célula de dia */
+.calendar-cell:not(.empty):hover {
+  background: linear-gradient(180deg, #0b3f1d 0%, #145823 100%) !important;
+  border-color: #0b3f1d !important;
+  color: #fff !important;
+  box-shadow: 0 8px 28px rgba(15,63,31,0.13) !important;
+  z-index: 2;
+}
+.calendar-cell:not(.empty):hover .day-num {
+  color: #fff !important;
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.16);
+}
+
+/* Quando já há evento: mantém marcação e permite hover escuro */
+.calendar-cell.has-event {
+  background: linear-gradient(180deg, #bfecc0 0%, #9fd9a0 100%) !important;
+  border: 1px solid #2e7d32 !important;
+  box-shadow: 0 10px 22px rgba(46, 125, 50, 0.08) inset !important;
+}
+.calendar-cell.has-event .day-num {
+  color: #154d2b !important;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+}
+.calendar-cell.has-event:hover {
+  background: linear-gradient(180deg, #0b3f1d 0%, #145823 100%) !important;
+  border-color: #0b3f1d !important;
+  color: #fff !important;
+  box-shadow: 0 18px 40px rgba(15,63,31,0.18) !important;
+}
+.calendar-cell.has-event:hover .day-num {
+  color: #fff !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.16);
 }

@@ -18,23 +18,110 @@
     let current = startY || startM !== null ? new Date(startY || new Date().getFullYear(), startM || 0, startD || 1) : new Date();
 
     const storedEvents = [];
+    // helper: formata ISO "YYYY-MM-DD" ou número -> "dd/MM/yyyy"; se já for "dd/MM/yyyy" retorna direto
+    function formatDayLabel(day) {
+      if (typeof day === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(day)) {
+        return day; // já no formato brasileiro
+      }
+      if (typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day)) {
+        const [y,m,d] = day.split('-');
+        return `${d}/${m}/${y}`;
+      }
+      if (typeof day === 'number' && !isNaN(day)) {
+        const dd = String(day).padStart(2,'0');
+        const mm = String(current.getMonth() + 1).padStart(2,'0');
+        const yyyy = String(current.getFullYear());
+        return `${dd}/${mm}/${yyyy}`;
+      }
+      return String(day || '');
+    }
+
     function parseInitialAppointments() {
         if (!eventsListEl) return;
         const nodes = Array.from(eventsListEl.querySelectorAll('.appointment'));
         nodes.forEach(n => {
-            const badge = n.querySelector('.badge')?.textContent?.trim();
+            const badgeEl = n.querySelector('.badge');
+            let badge = badgeEl?.textContent?.trim();
             const title = n.querySelector('.appt-body strong')?.textContent?.trim();
             const note = n.querySelector('.appt-body small')?.textContent?.trim();
-            const day = badge ? parseInt(badge, 10) : null;
-            if (title && day) storedEvents.push({ day, title, note });
+            // se badge estiver em ISO, formata visualmente
+            if (badge && /^\d{4}-\d{2}-\d{2}$/.test(badge)) {
+              badgeEl.textContent = formatDayLabel(badge);
+            }
+            // tenta extrair dia numérico (mantemos storedEvents para listagem)
+            const dayNum = /^\d{4}-\d{2}-\d{2}$/.test(badge) ? badge : (badge ? parseInt(badge, 10) : null);
+            if (title && dayNum) storedEvents.push({ day: dayNum, title, note });
         });
     }
     parseInitialAppointments();
 
+    function _dayNumberFromEvt(evt) {
+      if (typeof evt.day === 'number') return evt.day;
+      if (typeof evt.day === 'string') {
+        // ISO date "YYYY-MM-DD"
+        if (/^\d{4}-\d{2}-\d{2}$/.test(evt.day)) {
+          const d = new Date(evt.day);
+          if (!isNaN(d)) return d.getDate();
+        }
+        // dd/MM/yyyy -> extract day
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(evt.day)) return parseInt(evt.day.split('/')[0],10);
+        const n = parseInt(evt.day,10);
+        if (!isNaN(n)) return n;
+      }
+      return null;
+    }
+
+    function _markCalendarCell(day, type) {
+      if (!content) return;
+      const cells = Array.from(content.querySelectorAll('.calendar-cell:not(.empty)'));
+      for (const c of cells) {
+        const numEl = c.querySelector('.day-num');
+        if (!numEl) continue;
+        const num = parseInt(numEl.textContent, 10);
+        if (num === day) {
+          c.classList.add('has-event');
+          let dot = c.querySelector('.event-dot');
+          if (!dot) {
+            dot = document.createElement('div');
+            dot.className = 'event-dot';
+            c.appendChild(dot);
+          }
+          // aplica tipo se houver (classe evt-type-*)
+          if (type) {
+            dot.classList.remove(...Array.from(dot.classList).filter(cl=>cl.startsWith('evt-type-')));
+            dot.classList.add('evt-type-' + type);
+          }
+
+          // pulso visual: adiciona classe e remove após animação
+          try {
+            c.classList.remove('pulse'); // reinicia caso já esteja
+            // forçar reflow para reiniciar a animação
+            // eslint-disable-next-line no-unused-expressions
+            void c.offsetWidth;
+            c.classList.add('pulse');
+            const onEnd = () => { c.classList.remove('pulse'); c.removeEventListener('animationend', onEnd); };
+            c.addEventListener('animationend', onEnd, { once: true });
+            // fallback: garante remoção após 1.1s se animationend não disparar
+            setTimeout(() => c.classList.remove('pulse'), 1200);
+          } catch (err) {
+            // silencioso — não quebrar fluxo se algo falhar
+          }
+
+          break;
+        }
+      }
+    }
+
+    /* aplicar marcação imediata quando adicionar à lista */
     function addEventToList(evt) {
         storedEvents.push(evt);
         const item = document.createElement('div'); item.className = 'appointment';
-        const b = document.createElement('div'); b.className = 'badge'; b.textContent = evt.day;
+        // se o evento vier marcado como criado pelo usuário, adiciona classe para estilo
+        if (evt.user) item.classList.add('user-event');
+        // aplica classe por tipo (ex: evt-type-prova)
+        if (evt.type) item.classList.add('evt-type-' + evt.type);
+        const b = document.createElement('div'); b.className = 'badge';
+        b.textContent = formatDayLabel(evt.day);
         const body = document.createElement('div'); body.className = 'appt-body';
         const strong = document.createElement('strong'); strong.textContent = evt.title;
         const small = document.createElement('small'); small.style.display = 'block'; small.style.color = 'rgba(15,23,42,0.6)';
@@ -42,6 +129,13 @@
         body.appendChild(strong); body.appendChild(small);
         item.appendChild(b); item.appendChild(body);
         eventsListEl.appendChild(item);
+
+        // marca célula do calendário imediatamente (feedback visual)
+        const dayNum = _dayNumberFromEvt(evt);
+        if (dayNum) {
+          if (!eventDays.includes(dayNum)) eventDays.push(dayNum);
+          _markCalendarCell(dayNum, evt.type);
+        }
     }
 
     function filterEvents(q) {
@@ -126,7 +220,8 @@
             cell.addEventListener('click', () => {
                 const y = current.getFullYear();
                 const m = current.getMonth();
-                window.location.href = `addEventScreen.html?y=${y}&m=${m}&d=${day}`;
+                // abrir a tela de adicionar evento já com ano/mês/dia preenchidos
+                window.location.href = `/addEventScreen?y=${y}&m=${m}&d=${day}`;
             });
             content.appendChild(cell);
         }
@@ -247,7 +342,8 @@
     eventForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const titleVal = document.getElementById('evtTitle').value.trim();
-        const dayVal = parseInt(document.getElementById('evtDay').value, 10);
+        const dayValRaw = document.getElementById('evtDay').value;
+        const dayVal = parseInt(dayValRaw, 10);
         const timeVal = document.getElementById('evtTime').value.trim();
         const noteVal = document.getElementById('evtNote').value.trim();
         if (!titleVal || !dayVal || isNaN(dayVal)) {
@@ -263,18 +359,42 @@
             if (!res.ok) throw new Error('Erro ao criar evento');
             return res.json();
         }).then(created => {
-            addEventToList({ day: created.day || dayVal, title: created.title || titleVal, time: created.time || timeVal, note: created.note || noteVal });
-            if (!eventDays.includes(created.day || dayVal)) eventDays.push(created.day || dayVal);
+            const evt = { day: created.day || dayVal, title: created.title || titleVal, time: created.time || timeVal, note: created.note || noteVal, user: true, type: created.type || null };
+            addEventToList(evt);
             hideModal();
             render();
         }).catch(err => {
             console.warn('POST /events falhou, fallback local', err);
-            addEventToList({ day: dayVal, title: titleVal, time: timeVal, note: noteVal });
-            if (!eventDays.includes(dayVal)) eventDays.push(dayVal);
+            const evt = { day: dayVal, title: titleVal, time: timeVal, note: noteVal, user: true, type: null };
+            addEventToList(evt);
+            const last = eventsListEl.lastElementChild;
+            if (last) last.classList.add('user-event');
             hideModal();
             render();
         });
     });
+
+    // navegação para criar evento: elementos .create-btn (âncoras ou botões) devem abrir /addEventScreen com ano/mês atuais
+    function bindCreateButtons() {
+      document.querySelectorAll('.create-btn').forEach(el => {
+        el.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const y = current.getFullYear();
+          const m = current.getMonth();
+          // navega para rota do backend; backend/Thymeleaf deve aceitar /addEventScreen
+          window.location.href = `/addEventScreen?y=${y}&m=${m}`;
+        });
+      });
+    }
+    // invocar após declarar current (logo antes de render)
+    bindCreateButtons();
+
+    // também reaplicar bindCreateButtons quando render for chamado (se necessário)
+    const originalRender = render;
+    render = function(){
+      originalRender();
+      bindCreateButtons();
+    };
 
     parseInitialAppointments();
     render();

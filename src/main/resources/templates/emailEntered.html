@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Senha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        /* Estilos da página de recuperação de senha */
+
+        .recover-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 32px;
+            background: var(--bg);
+            text-align: center;
+        }
+
+        .recover-box {
+            background: var(--panel);
+            padding: 34px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            max-width: 420px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .recover-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .recover-desc {
+            font-size: 15px;
+            color: var(--muted);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--text);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            outline: none;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity var(--transition), transform var(--transition);
+            box-shadow: 0 6px 18px rgba(102, 187, 106, 0.12);
+        }
+
+        .btn-submit:hover { opacity: 0.92; }
+        .btn-submit:active { transform: translateY(1px); }
+
+        .recover-links {
+            margin-top: 18px;
+        }
+
+        .recover-links a {
+            font-size: 14px;
+            color: var(--brand-1);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .recover-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="recover-page">
+
+    <div class="brand">
+        <div class="logo">Ag</div>
+        <h1 class="logo-text" style="font-size:22px;color:var(--text);margin:0;">
+            Sistema
+        </h1>
+    </div>
+
+    <div class="recover-box">
+        <h2 class="recover-title">Recuperar Senha</h2>
+
+        <p class="recover-desc">
+            Digite seu e-mail para receber as instruções de recuperação de senha.
+        </p>
+
+        <form th:action="@{/emailEntered}" method="post">
+
+            <div class="input-group">
+                <label for="email">E-mail</label>
+                <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="seuemail@email.com"
+                        required
+                >
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Enviar
+            </button>
+        </form>
+
+        <div class="recover-links">
+            <a th:href="@{/}">Voltar para o login</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

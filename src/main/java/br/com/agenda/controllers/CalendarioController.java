@@ -16,9 +16,11 @@ public class CalendarioController {
     private final UsuarioService usuarioService;
     private final EventoService eventoService;
 
-    public CalendarioController(UsuarioService usuarioService, EventoService service) {
+    public CalendarioController(UsuarioService usuarioService, EventoService eventoService) {
         this.usuarioService = usuarioService;
-        this.eventoService = service;
+        this.eventoService = eventoService;
+
+        eventoService.deletarEventosPassados();
     }
 
     @GetMapping

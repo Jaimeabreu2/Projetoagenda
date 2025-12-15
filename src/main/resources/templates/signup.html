@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="login-page">
+  <a class="skip-link" href="#signupForm" style="position:absolute;left:-999px;top:auto"
+     onfocus="this.style.left='16px';this.style.top='16px';" onblur="this.style.left='-999px'">Ir para criar conta</a>
+  <div class="animated-gradient" aria-hidden="true"></div>
+<svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <!-- ...svg defs/shapes as in index.html... -->
+</svg>
 <main class="login-wrap" aria-labelledby="signup-title">
     <section class="hero" aria-hidden="false">
         <div class="brand">
@@ -20,8 +26,8 @@
             </div>
         </div>
 
-        <h1 id="signup-title">Crie sua conta</h1>
-        <p>Cadastre-se para começar a usar seu calendário acadêmico.</p>
+        <h1 id="signup-title">Criar conta</h1>
+        <p>Cadastre-se para acessar seu calendário institucional.</p>
         <div class="small" style="margin-top:18px">Dica: prefira usar seu e-mail institucional.</div>
     </section>
 
@@ -42,20 +48,21 @@
 
             <label for="signupSenha">Senha</label>
             <input id="signupSenha" name="senha" type="password" placeholder=" ••••••••" minlength="6" maxlength="20"
-                   required/>
+                   required aria-describedby="signupPwdHint"/>
 
             <label for="signupSenha2">Confirmar senha</label>
             <div class="input">
                 <input id="signupSenha2" name="pass2" type="password" placeholder="••••••••" minlength="6"
-                       maxlength="20" required aria-required="true"/>
+                       maxlength="20" required aria-required="true" aria-describedby="pwdMatch"/>
                 <button type="button" class="eye" aria-label="Mostrar senha"><i class="fa-solid fa-eye"></i></button>
             </div>
 
+            <div id="signupPwdHint" class="small">Use uma senha segura (mínimo 6 caracteres).</div>
             <div id="pwdMatch" class="small" aria-live="polite" style="margin-top:6px;color:#666"></div>
 
             <div style="display:flex;gap:10px;margin-top:8px">
                 <button type="submit" class="btn" th:href="@{/}" id="signupSubmit">Criar conta</button>
-                <a class="btn secondary" th:href="@{/}" id="backToLogin">Voltar</a>
+                <a class="btn secondary" th:href="@{/}" id="backToLogin">Retornar ao login</a>
             </div>
 
             <div class="error" id="signupError" role="alert"></div>
@@ -119,5 +126,21 @@
 </script>
 
 <script src="js/accessibility.js"></script>
+<script>
+    (function(){
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.addEventListener('click', function(e){
+        const btn = e.target.closest('.btn'); if(!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span'); ripple.className='ripple';
+        const size = Math.max(rect.width, rect.height) * 0.9;
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(()=> ripple.remove(), 700);
+      }, {passive:true});
+    })();
+  </script>
 </body>
 </html>

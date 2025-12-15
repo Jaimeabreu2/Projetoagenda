@@ -12,6 +12,13 @@
     <link rel="stylesheet" href="css/addEventScreen.css">
 </head>
 <body class="add-event-page">
+  <a class="skip-link" href="#mTitle" style="position:absolute;left:-999px"
+     onfocus="this.style.left='16px';this.style.top='16px';" onblur="this.style.left='-999px'">Ir para adicionar evento</a>
+  <div class="animated-gradient" aria-hidden="true"></div>
+<svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <!-- ...svg defs/shapes as in index.html... -->
+</svg>
+
 <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
     <div class="brand">
         <div class="logo">Ag</div>
@@ -85,10 +92,22 @@
                     <input id="mTime" name="horario" type="time"/>
                 </div>
 
+                <label for="mType">Tipo</label>
+                <div class="input">
+                    <select id="mType" name="tipo">
+                        <option value="aula">Aula</option>
+                        <option value="prova">Prova</option>
+                        <option value="trabalho">Trabalho</option>
+                        <option value="reuniao">Reunião</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+
                 <label for="mNote">Descrição</label>
                 <div class="input">
-                    <input id="mNote" name="descricao" type="text" placeholder="Descrição breve"/>
+                    <input id="mNote" name="descricao" type="text" placeholder="Descrição breve" aria-describedby="noteHint"/>
                 </div>
+                <div id="noteHint" class="small">Opcional. Local / observações rápidas.</div>
 
                 <div class="actions">
                     <a th:href="@{/calendarComAgenda}">
@@ -100,8 +119,25 @@
         </div>
     </div>
 
-    <div id="toastSuccess" class="toast" role="status" aria-live="polite">Evento criado</div>
+    <div id="toastSuccess" class="toast" role="status" aria-live="polite">Evento criado com sucesso.</div>
 </div>
 <script src="js/addEventScreen.js"></script>
+<script src="js/accessibility.js"></script>
+<script>
+    (function(){
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.addEventListener('click', function(e){
+        const btn = e.target.closest('.btn'); if(!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span'); ripple.className='ripple';
+        const size = Math.max(rect.width, rect.height) * 0.9;
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(()=> ripple.remove(), 700);
+      }, {passive:true});
+    })();
+  </script>
 </body>
 </html>

@@ -16,6 +16,10 @@
 <body class="event-page">
 <!-- adiciona o calendário de fundo -->
 <div id="bgCalendar" class="bg-calendar" aria-hidden="true"></div>
+<div class="animated-gradient" aria-hidden="true"></div>
+<svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <!-- ...svg defs/shapes as in index.html... -->
+</svg>
 
 <main class="event-card" aria-labelledby="pageTitle">
     <!-- Texto introdutório e instruções:
@@ -31,8 +35,7 @@
         </div>
 
         <h1 id="pageTitle" style="margin:16px 0 8px 0">Adicionar evento</h1>
-        <p class="note">Preencha os dados abaixo para testar a criação de um evento. Os dados aparecem no console e
-            podem ser enviados ao backend (stub incluso).</p>
+        <p class="note">Preencha os campos obrigatórios (Título e Data). Após salvar, o evento será exibido no calendário.</p>
         <div class="small" style="margin-top:18px">Voltar: <a th:href="@{/calendarComAgenda}">Calendário</a></div>
     </section>
 
@@ -83,7 +86,7 @@
             <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
                 <button type="submit" class="btn" id="saveBtn">Salvar evento</button>
                 <a class="btn secondary" th:href="@{/calendarComAgenda}">Cancelar</a>
-                <div class="success" id="successMsg" role="status">Evento criado (teste).</div>
+                <div class="success" id="successMsg" role="status">Evento criado com sucesso.</div>
             </div>
 
             <div style="margin-top:10px" class="small">Os campos obrigatórios: Título e Data.</div>
@@ -92,5 +95,21 @@
 </main>
 
 <script src="js/accessibility.js"></script>
+<script>
+    (function(){
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.addEventListener('click', function(e){
+        const btn = e.target.closest('.btn'); if(!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span'); ripple.className='ripple';
+        const size = Math.max(rect.width, rect.height) * 0.9;
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(()=> ripple.remove(), 700);
+      }, {passive:true});
+    })();
+  </script>
 </body>
 </html>

@@ -1,8 +1,21 @@
-    /* estilo específico da tela anual (leva em conta variáveis do style.css) */
+/* estilo específico da tela anual (leva em conta variáveis do style.css) */
     /* mantém fontes originais, reduz apenas o tamanho dos "blocos" dos meses (~10%) */
-    body.year-page { padding:28px; min-height:100vh; } /* restaura padding original */
-    .year-wrap{ max-width:1200px;margin:0 auto; }
-    .year-header{ display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px }
+    body.year-page {
+      /* garante espaço suficiente acima (topbar + folga) */
+      padding: calc(var(--topbar-height, 64px) + 20px) 28px 28px 28px;
+      min-height: 100vh;
+    } /* restaura padding original */
+    .year-wrap{
+      padding-top: 8px;
+      position: relative;
+      z-index: 1;
+      max-width:1200px;margin:0 auto;
+    }
+    .year-header{
+      position: relative;
+      z-index: 60;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px
+    }
     .year-title{ font-size:20px;color:var(--brand-1);font-weight:700 } /* fonte original */
     .year-controls{ display:flex;gap:8px;align-items:center }
 
@@ -76,7 +89,41 @@
 
     /* espaço lateral para a barra lateral fixa (não aplica em telas pequenas) */
     @media (min-width:880px){
-      body.year-page { padding-left: 96px; }
+      body.year-page { padding-left: calc(var(--topbar-height,64px) / 1.0 + 28px); } /* mantém recuo + folga */
     }
 
     .back-link{ text-decoration:none;color:var(--brand-1); font-weight:700; border:1px solid transparent;padding:8px;border-radius:8px }
+
+    /* evita que o conteúdo do cabeçalho fique "embaixo" da sidebar em telas largas */
+@media (min-width:880px){
+  .year-wrap { margin-left: 8px; } /* já existe margem esquerda pela .app-container, isso garante leve separação */
+  .year-header { padding: 6px 12px; align-items:center; }
+}
+
+/* melhora a apresentação dos controles (prev/next/ano) */
+.year-controls {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.year-controls button {
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  box-shadow: 0 6px 18px rgba(46,125,50,0.06);
+}
+
+/* top toolbar ajustes: botão Hoje + input */
+.year-toolbar { gap:10px; align-items:center; }
+.year-toolbar .filter { min-width: 160px; padding:8px 10px; border-radius:10px; }
+.year-toolbar .today-btn { padding:8px 12px; border-radius:10px; }
+
+/* garantir boa leitura do título do ano e evitar sobreposição com ícones da sidebar */
+.year-title { margin-left: 6px; }
+
+/* reduz chance de overflow e melhora espaçamento quando o sidebar está presente */
+.year-wrap main { padding-bottom: 18px; }

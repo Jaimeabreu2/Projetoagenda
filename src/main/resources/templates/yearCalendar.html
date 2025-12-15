@@ -12,6 +12,11 @@
 
 </head>
 <body class="year-page">
+<div class="animated-gradient" aria-hidden="true"></div>
+<svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <!-- ...same small SVG defs + shapes as in index.html... -->
+</svg>
+
 <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
     <div class="brand">
         <div class="logo">Ag</div>
@@ -39,7 +44,7 @@
         <div class="year-header" role="banner">
             <div>
                 <div class="year-title" id="yearLabel">Calendário anual</div>
-                <div class="small" id="yearSubtitle">Visualização por ano</div>
+                <div class="small" id="yearSubtitle">Visualização anual</div>
             </div>
 
             <div style="display:flex;align-items:center;gap:12px">
@@ -54,7 +59,7 @@
                     <input id="filterInput" class="filter" type="search" placeholder="Filtrar mês (ex: jan, mar)"
                            aria-label="Filtrar meses"/>
                     <button id="todayBtn" class="today-btn" title="Ir para o ano atual">Hoje</button>
-                    <a class="back-link" th:href="@{/calendarComAgenda}">Voltar</a>
+                    <a class="back-link" th:href="@{/calendarComAgenda}">Retornar ao calendário</a>
                 </div>
             </div>
         </div>
@@ -74,5 +79,22 @@
 </script>
 
 <script src="js/yearCalendar.js"></script>
+<script src="js/accessibility.js"></script>
+<script>
+    (function(){
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.addEventListener('click', function(e){
+        const btn = e.target.closest('.btn'); if(!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span'); ripple.className='ripple';
+        const size = Math.max(rect.width, rect.height) * 0.9;
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(()=> ripple.remove(), 700);
+      }, {passive:true});
+    })();
+  </script>
 </body>
 </html>

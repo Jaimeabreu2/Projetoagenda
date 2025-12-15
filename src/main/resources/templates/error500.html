@@ -80,6 +80,10 @@
 
 </head>
 <body>
+  <div class="animated-gradient" aria-hidden="true"></div>
+  <svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <!-- ...svg defs/shapes as in index.html... -->
+  </svg>
 
 <div class="error-page">
 
@@ -93,14 +97,31 @@
         <h2 class="error-title">Erro Interno do Servidor</h2>
 
         <p class="error-desc">
-            Ocorreu um problema interno no servidor.<br>
-            Tente novamente mais tarde ou contate o suporte.
+            Ocorreu um erro interno no servidor.<br>
+            Tente novamente mais tarde. Caso o problema persista, contate o suporte.
         </p>
 
-        <a th:href="@{/}" class="btn-home">Voltar para o Login</a>
+        <a th:href="@{/}" class="btn-home">Retornar à tela de login</a>
     </div>
 
 </div>
 
+<script src="js/accessibility.js"></script>
+<script>
+  (function(){
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('.btn'); if(!btn) return;
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span'); ripple.className='ripple';
+      const size = Math.max(rect.width, rect.height) * 0.9;
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+      ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+      btn.appendChild(ripple);
+      setTimeout(()=> ripple.remove(), 700);
+    }, {passive:true});
+  })();
+</script>
 </body>
 </html>

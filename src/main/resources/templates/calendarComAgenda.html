@@ -11,8 +11,75 @@
 
     <link rel="stylesheet" href="css/style.css"/>
     <link rel="stylesheet" href="css/calendarComAgenda.css"/>
+
+    <!-- destaque visual para dias com evento -->
+    <style>
+        /* destaca o dia que possui evento */
+        #calendarContent .has-event {
+            background: linear-gradient(180deg,#e6f1ff 0%, #d6e9ff 100%) !important;
+            border: 1px solid #4f8cff !important;
+            color: #0b3b66 !important;
+            box-shadow: inset 0 -4px 8px rgba(79,140,255,0.06);
+            border-radius: 10px;
+            padding: 6px;
+        }
+        #calendarContent .has-event .date-number,
+        #calendarContent .has-event .day-number {
+            font-weight: 700;
+            color: #06314a;
+        }
+
+        /* estilos para o toast de notificações */
+        .upcoming-toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 340px;
+            max-width: calc(100% - 40px);
+            background: linear-gradient(180deg,#fff,#f7fff7);
+            border: 1px solid rgba(46,125,50,0.08);
+            box-shadow: 0 12px 36px rgba(23,99,58,0.12);
+            border-radius: 12px;
+            padding: 12px;
+            z-index: 2000;
+            font-family: inherit;
+            overflow: hidden;
+        }
+        .upcoming-toast h4 { margin:0 0 8px 0; font-size:15px; color:var(--brand-1); }
+        .upcoming-list { list-style:none;margin:0;padding:0; max-height:220px; overflow:auto; }
+        .upcoming-list li { display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.04); }
+        .upcoming-list .meta { color:rgba(11,63,29,0.8); font-weight:600; font-size:13px; margin-left:8px; white-space:nowrap; }
+        .upcoming-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+        .upcoming-actions .btn { padding:6px 10px; font-size:13px; border-radius:8px; }
+        .upcoming-snooze { background:var(--brand-2); color:#fff; border:0; }
+        .upcoming-close { background:transparent; color:var(--brand-1); border:1px solid rgba(46,125,50,0.08); }
+
+        /* botão "x" no canto */
+        .upcoming-toast .close-x {
+          position: absolute;
+          right: 8px;
+          top: 8px;
+          width: 30px;
+          height: 30px;
+          border-radius: 6px;
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          background: transparent;
+          border: none;
+          color: #4f8cff;
+          font-weight:700;
+          cursor: pointer;
+        }
+        .upcoming-toast .close-x:focus { outline: 3px solid rgba(79,140,255,0.12); border-radius:6px; }
+    </style>
 </head>
 <body class="calendar-page">
+<div class="animated-gradient" aria-hidden="true"></div>
+<svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <!-- ...svg defs/shapes as in index.html... -->
+</svg>
+
 <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
     <div class="brand">
         <div class="logo">Ag</div>
@@ -20,6 +87,9 @@
     </div>
     <div class="top-actions">
         <a class="btn secondary" th:href="@{/profile}" title="Meu Perfil">Meu Perfil</a>
+        <button id="viewNotificationsBtn" class="btn" title="Notificações" aria-label="Notificações">
+          Notificações <span id="notifBadge" style="display:none;margin-left:8px;background:#e6f8ec;color:#0b3f1d;padding:2px 6px;border-radius:999px;font-weight:700;font-size:12px"></span>
+        </button>
         <button id="goTodayBtn" class="btn" title="Hoje" aria-label="Ir para hoje">Hoje</button>
         <button id="exportBtn" class="btn" title="Exportar eventos" aria-label="Exportar eventos">Exportar</button>
         <a class="btn primary" th:href="@{/addEventScreen}" title="Adicionar evento">Adicionar evento</a>
@@ -39,7 +109,7 @@
         <a class="btn" th:href="@{/yearCalendar}" title="Tarefas" aria-label="Tarefas">✅</a>
         <a class="btn" th:href="@{/profile}" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
         <div class="sidebar-sep" aria-hidden="true"></div>
-        <button id="openCreateBtn" class="create-btn" title="Adicionar evento" aria-label="Adicionar evento">+</button>
+        <a id="openCreateBtn" class="create-btn" href="/addEventScreen" title="Adicionar evento" aria-label="Adicionar evento">+</a>
     </nav>
 
     <div class="calendar-wrap">
@@ -53,14 +123,12 @@
                 <input id="eventSearch" type="search" placeholder="Buscar eventos (título, nota)"
                        aria-label="Buscar eventos" class="filter"
                        style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff">
-                <button id="exportListBtn" class="btn secondary" title="Exportar lista" style="padding:8px 10px">
-                    Exportar
-                </button>
+                <button id="exportListBtn" class="btn secondary" title="Exportar lista" style="padding:8px 10px">Exportar</button>
             </div>
 
             <div class="appointments" id="eventsList">
                 <div class="appointment" th:each="evento : ${eventos}">
-                    <div class="badge" th:text="${evento.dia}"></div>
+                    <div class="badge" th:text="${#temporals.format(evento.dia, 'dd/MM/yyyy')}"></div>
                     <div class="appt-body">
                         <strong th:text="${evento.disciplina}"></strong>
                         <small th:text="${evento.descricao + ' (' + evento.horario + ')'}"></small>
@@ -100,21 +168,20 @@
     </div>
 </div>
 
-<div id="eventModal" class="event-modal" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle"
-     style="display:none">
+<div id="eventModal" class="event-modal" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle" style="display:none">
     <div class="event-modal-panel" role="document">
         <h3 id="eventModalTitle">Adicionar evento</h3>
         <form id="eventForm">
             <label for="evtTitle">Título</label>
             <input id="evtTitle" name="title" type="text" required/>
-            <label for="evtDay">Dia (número)</label>
+            <label for="evtDay">Dia do mês</label>
             <input id="evtDay" name="day" type="number" min="1" max="31" required/>
             <label for="evtTime">Horário (ex: 09:30)</label>
             <input id="evtTime" name="time" type="text" placeholder="09:30"/>
             <label for="evtNote">Descrição</label>
             <input id="evtNote" name="note" type="text"/>
             <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
-                <button type="button" class="btn secondary" id="cancelEvent">Cancelar</button>
+                <button type="button" class="btn secondary" id="cancelEvent">Cancelar e retornar</button>
                 <button type="submit" class="btn" id="saveEvent">Salvar</button>
             </div>
         </form>
@@ -123,13 +190,291 @@
 </div>
 
 <script th:inline="javascript">
-    /*<![CDATA[*/
-    const eventDays = [[${dias}]];
-    console.log(eventDays);
-    /*]]>*/
+/*<![CDATA[*/
+window.eventDays = [[${dias}]]; // torna disponível globalmente para o script de marcação
+console.log('eventDays (server):', window.eventDays);
+/*]]>*/
 </script>
 
 <script src="js/calendarComAgenda.js"></script>
 <script src="js/accessibility.js"></script>
+
+<!-- marca dias com eventos (usa a variável `eventDays` já gerada no template) -->
+<script>
+(function(){
+  function markEventDays(){
+    if (!window.eventDays || !Array.isArray(window.eventDays)) return;
+    const days = window.eventDays.flat ? window.eventDays.flat() : window.eventDays;
+    const container = document.getElementById('calendarContent');
+    if (!container) return;
+    container.querySelectorAll('.has-event').forEach(el => el.classList.remove('has-event'));
+    days.forEach(d => {
+      if (d == null) return;
+      const dayStr = String(d);
+      let el = container.querySelector('[data-day="'+dayStr+'"], .calendar-day[data-day="'+dayStr+'"], .calendar-cell[data-day="'+dayStr+'"]');
+      if (!el) {
+        const candidates = Array.from(container.querySelectorAll('div, button, span'));
+        for (const c of candidates) {
+          const txt = (c.textContent || '').trim();
+          if (txt === dayStr || txt.startsWith(dayStr + ' ') || txt === String(Number(dayStr))) { el = c; break; }
+        }
+      }
+      if (el) el.classList.add('has-event');
+    });
+  }
+
+  window.addEventListener('load', function(){ setTimeout(markEventDays, 120); });
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(markEventDays, 120); });
+
+  const cont = document.getElementById('calendarContent');
+  if (cont) {
+    const observer = new MutationObserver(() => { setTimeout(markEventDays, 40); });
+    observer.observe(cont, { childList: true, subtree: true });
+  }
+})();
+</script>
+
+<!-- notificador de eventos próximos + persistência + painel -->
+<script>
+(function(){
+  const DAYS_THRESHOLD = 2;
+  const STORAGE_PREFIX = 'agenda_snooze:';
+  const NOTIF_KEY = 'agenda_notifications';
+
+  function parseBadgeDate(txt) {
+    if (!txt) return null;
+    const m = txt.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!m) return null;
+    const d = parseInt(m[1],10), mo = parseInt(m[2],10)-1, y = parseInt(m[3],10);
+    const dt = new Date(y, mo, d);
+    return isNaN(dt) ? null : dt;
+  }
+
+  function daysUntil(date) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    return Math.ceil((target - today) / (1000*60*60*24));
+  }
+
+  function shouldShowForKey(key) {
+    const v = sessionStorage.getItem(STORAGE_PREFIX + key);
+    if (!v) return true;
+    try { const until = parseInt(v,10); return Date.now() > until; } catch(e){ return true; }
+  }
+
+  function snoozeKey(key, days) {
+    const until = Date.now() + (days * 24 * 60 * 60 * 1000);
+    sessionStorage.setItem(STORAGE_PREFIX + key, String(until));
+  }
+
+  function buildKey(badgeTxt, title) {
+    return encodeURIComponent((badgeTxt||'') + '|' + (title||''));
+  }
+
+  function collectUpcoming(options = { includeSnoozed: false }) {
+    const includeSnoozed = !!options.includeSnoozed;
+    const nodes = Array.from(document.querySelectorAll('#eventsList .appointment'));
+    const upcoming = [];
+    nodes.forEach(n => {
+      const badge = n.querySelector('.badge')?.textContent?.trim();
+      const title = n.querySelector('.appt-body strong')?.textContent?.trim() || '';
+      const note = n.querySelector('.appt-body small')?.textContent?.trim() || '';
+      const dt = parseBadgeDate(badge);
+      if (!dt) return;
+      const days = daysUntil(dt);
+      if (days >= 0 && days <= DAYS_THRESHOLD) {
+        const key = buildKey(badge, title);
+        if (!includeSnoozed && !shouldShowForKey(key)) return;
+        upcoming.push({ badge, title, note, dt, days, key });
+      }
+    });
+    return upcoming.sort((a,b)=> a.days - b.days);
+  }
+
+  function renderToast(events) {
+    if (!events || events.length === 0) return;
+    let root = document.querySelector('.upcoming-toast');
+    if (root) root.remove();
+
+    root = document.createElement('div');
+    root.className = 'upcoming-toast';
+    root.setAttribute('role','region');
+    root.setAttribute('aria-live','polite');
+
+    const closeX = document.createElement('button');
+    closeX.className = 'close-x';
+    closeX.setAttribute('aria-label','Fechar notificação');
+    closeX.innerHTML = '✕';
+    root.appendChild(closeX);
+
+    const h = document.createElement('h4');
+    h.textContent = events.length === 1 ? 'Evento próximo' : 'Próximos eventos';
+    root.appendChild(h);
+
+    const ul = document.createElement('ul');
+    ul.className = 'upcoming-list';
+    events.forEach(ev => {
+      const li = document.createElement('li');
+      const left = document.createElement('div'); left.style.flex = '1';
+      const t = document.createElement('div'); t.textContent = ev.title; t.style.fontWeight = '700';
+      const s = document.createElement('div'); s.textContent = ev.badge + (ev.note ? ' • ' + ev.note : ''); s.style.fontSize='12px'; s.style.color='rgba(11,63,29,0.7)';
+      left.appendChild(t); left.appendChild(s);
+      const meta = document.createElement('div'); meta.className = 'meta';
+      meta.textContent = (typeof ev.days === 'number') ? (ev.days === 0 ? 'Hoje' : (ev.days === 1 ? 'Falta 1 dia' : `Faltam ${ev.days} dias`)) : (ev.days || '');
+      li.appendChild(left); li.appendChild(meta);
+      ul.appendChild(li);
+    });
+    root.appendChild(ul);
+
+    const actions = document.createElement('div'); actions.className = 'upcoming-actions';
+    const snoozeBtn = document.createElement('button'); snoozeBtn.className = 'btn upcoming-snooze'; snoozeBtn.textContent = 'Lembrar em 1 dia';
+    const closeBtn = document.createElement('button'); closeBtn.className = 'btn upcoming-close'; closeBtn.textContent = 'Fechar';
+    actions.appendChild(snoozeBtn); actions.appendChild(closeBtn);
+    root.appendChild(actions);
+
+    document.body.appendChild(root);
+
+    // auto-close after 10 seconds
+    let autoTimer = setTimeout(()=> { if (root && root.parentNode) root.remove(); }, 10000);
+
+    root.addEventListener('mouseenter', ()=> { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } });
+    root.addEventListener('mouseleave', ()=> { if (!autoTimer) autoTimer = setTimeout(()=> { if (root && root.parentNode) root.remove(); }, 10000); });
+
+    function removeRoot() { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } if (root && root.parentNode) root.remove(); }
+
+    closeX.addEventListener('click', removeRoot);
+    closeBtn.addEventListener('click', removeRoot);
+    snoozeBtn.addEventListener('click', ()=> { events.forEach(ev => snoozeKey(ev.key, 1)); removeRoot(); });
+  }
+
+  // storage helper for persistent notifications
+  function loadNotifications() { try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || '[]'); } catch(e){ return []; } }
+  function saveNotifications(list) { try { localStorage.setItem(NOTIF_KEY, JSON.stringify(list || [])); updateNotificationsBadge(); } catch(e){} }
+  function addNotificationsToStore(events) {
+    if (!events || !events.length) return;
+    const current = loadNotifications();
+    events.forEach(ev => { if (!current.find(x => x.key === ev.key)) current.push(Object.assign({}, ev, { savedAt: Date.now() })); });
+    saveNotifications(current);
+  }
+  function removeNotificationByKey(key) { saveNotifications(loadNotifications().filter(x => x.key !== key)); }
+  function clearAllNotifications() { saveNotifications([]); }
+
+  function updateNotificationsBadge() {
+    const b = document.getElementById('notifBadge');
+    if (!b) return;
+    const list = loadNotifications();
+    if (list.length) { b.style.display = 'inline-block'; b.textContent = String(list.length); }
+    else { b.style.display = 'none'; b.textContent = ''; }
+  }
+
+  // observe toasts to persist them automatically
+  const toastObserver = new MutationObserver(muts => {
+    for (const m of muts) {
+      for (const n of Array.from(m.addedNodes)) {
+        if (n.nodeType === 1 && n.classList.contains('upcoming-toast')) {
+          const items = Array.from(n.querySelectorAll('.upcoming-list li')).map(li => {
+            const title = (li.querySelector('div')?.textContent || '').trim();
+            const detail = (li.querySelector('div:nth-child(1) > div:nth-child(2)')?.textContent || '').trim();
+            const badgeMatch = detail.match(/\d{2}\/\d{2}\/\d{4}/);
+            const badge = badgeMatch ? badgeMatch[0] : '';
+            const key = encodeURIComponent(badge + '|' + title);
+            const meta = (li.querySelector('.meta')?.textContent || '').trim();
+            return { badge, title, note: detail.replace(badge,'').trim(), days: meta, key };
+          });
+          addNotificationsToStore(items);
+          updateNotificationsBadge();
+        }
+      }
+    }
+  });
+  toastObserver.observe(document.body, { childList: true, subtree: true });
+
+  // notification panel
+  function renderNotificationsPanel() {
+    let panel = document.getElementById('notificationsPanel');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 'notificationsPanel';
+      panel.className = 'event-modal';
+      panel.style.display = 'none';
+      panel.innerHTML = `
+        <div class="event-modal-panel" role="dialog" aria-modal="true" aria-labelledby="notifPanelTitle" style="max-width:520px;">
+          <h3 id="notifPanelTitle">Notificações salvas</h3>
+          <div id="notifList" style="max-height:360px;overflow:auto;margin-top:8px"></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+            <button id="clearAllNotifs" class="btn secondary">Limpar tudo</button>
+            <button id="closeNotifs" class="btn">Fechar</button>
+          </div>
+        </div>
+        <button class="event-modal-backdrop" id="closeNotificationsBackdrop" aria-label="Fechar"></button>
+      `;
+      document.body.appendChild(panel);
+      panel.querySelector('#closeNotifs').addEventListener('click', ()=> panel.style.display = 'none');
+      panel.querySelector('#closeNotificationsBackdrop').addEventListener('click', ()=> panel.style.display = 'none');
+      panel.querySelector('#clearAllNotifs').addEventListener('click', ()=> { clearAllNotifications(); renderNotificationsPanel(); updateNotificationsBadge(); });
+    }
+
+    const listEl = panel.querySelector('#notifList');
+    const items = loadNotifications();
+    listEl.innerHTML = '';
+    if (!items.length) {
+      listEl.innerHTML = `<div class="small" style="padding:12px;color:var(--muted)">Nenhuma notificação salva.</div>`;
+    } else {
+      items.forEach(it => {
+        const row = document.createElement('div');
+        row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center';
+        row.style.padding='8px 6px'; row.style.borderBottom='1px solid rgba(0,0,0,0.04)';
+        const left = document.createElement('div'); left.style.flex='1';
+        left.innerHTML = `<div style="font-weight:700">${it.title}</div><div class="small" style="color:var(--muted)">${it.badge}${it.note? ' • ' + it.note : ''}</div>`;
+        const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px';
+        const snoozeBtn = document.createElement('button'); snoozeBtn.className='btn secondary'; snoozeBtn.textContent='Lembrar 1d';
+        const delBtn = document.createElement('button'); delBtn.className='btn'; delBtn.textContent='Remover';
+        actions.appendChild(snoozeBtn); actions.appendChild(delBtn);
+        row.appendChild(left); row.appendChild(actions);
+        listEl.appendChild(row);
+
+        snoozeBtn.addEventListener('click', ()=> {
+          const until = Date.now() + (1 * 24 * 60 * 60 * 1000);
+          try { sessionStorage.setItem('agenda_snooze:' + it.key, String(until)); } catch(e){}
+          snoozeBtn.textContent = 'Adiado'; snoozeBtn.disabled = true;
+        });
+        delBtn.addEventListener('click', ()=> {
+          removeNotificationByKey(it.key);
+          renderNotificationsPanel();
+          updateNotificationsBadge();
+        });
+      });
+    }
+    return panel;
+  }
+
+  const viewBtn = document.getElementById('viewNotificationsBtn');
+  if (viewBtn) viewBtn.addEventListener('click', (ev) => { const panel = renderNotificationsPanel(); panel.style.display = 'flex'; });
+
+  updateNotificationsBadge();
+
+  // show notifications after login (forced ignore snooze)
+  function checkAndNotify(){
+    try {
+      const showOnLogin = sessionStorage.getItem('agenda_show_upcoming') === '1';
+      const upcoming = collectUpcoming({ includeSnoozed: showOnLogin });
+      if (upcoming.length && showOnLogin) {
+        renderToast(upcoming);
+        try { sessionStorage.removeItem('agenda_show_upcoming'); } catch(e){}
+      }
+    } catch(e){ console.warn('notify error', e); }
+  }
+
+  window.addEventListener('load', ()=> setTimeout(checkAndNotify, 240));
+  document.addEventListener('DOMContentLoaded', ()=> setTimeout(checkAndNotify, 240));
+  const ap = document.getElementById('eventsList');
+  if (ap) new MutationObserver(()=> setTimeout(checkAndNotify, 80)).observe(ap, { childList:true, subtree:true });
+
+  // expose for debug
+  window._agendaNotifications = { loadNotifications, saveNotifications, addNotificationsToStore, clearAllNotifications };
+})();
+</script>
+
 </body>
 </html>

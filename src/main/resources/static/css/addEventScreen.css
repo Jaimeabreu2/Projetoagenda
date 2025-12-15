@@ -269,3 +269,53 @@ html.a11y-high-contrast .bg-calendar-large .calendar-bg .calendar-cell.has-event
 html.a11y-high-contrast .modal .input:focus-within {
     box-shadow: none !important;
 }
+
+/* Responsividade para a lista de eventos */
+.events-list .appointment {
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+  box-sizing:border-box;
+  word-break:break-word;
+}
+
+.events-list .badge {
+  min-width:56px;
+  height:auto;
+  padding:8px 10px;
+  border-radius:8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:13px;
+  line-height:1.05;
+  text-align:center;
+  overflow:hidden;
+  word-break:break-word;
+}
+
+/* texto do corpo do evento responsivo */
+.events-list .appointment > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.events-list .appointment strong {
+  display:block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.events-list .appointment .small {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* mobile: empilha conteúdo e reduz badge */
+@media (max-width:640px){
+  .events-list .appointment { flex-direction:column; align-items:stretch; gap:8px; }
+  .events-list .badge { align-self:flex-start; font-size:12px; padding:6px 8px; }
+  .events-list .appointment strong { white-space: normal; }
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Não Encontrado</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Estilos da página de aviso de usuário não encontrado */
+
+        .notification-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 100vh;
+            padding: 32px;
+            background: var(--bg);
+        }
+
+        .notification-box {
+            background: var(--panel);
+            padding: 34px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            max-width: 480px;
+            margin-top: 20px;
+        }
+
+        .notification-icon {
+            font-size: 64px;
+            color: #f44336; /* vermelho para erro */
+            margin-bottom: 12px;
+        }
+
+        .notification-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 6px 0 12px 0;
+        }
+
+        .notification-desc {
+            font-size: 15px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .btn-home {
+            margin-top: 22px;
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity var(--transition), transform var(--transition);
+            box-shadow: 0 6px 18px rgba(244, 67, 54, 0.12);
+        }
+        .btn-home:hover { opacity: 0.92; }
+        .btn-home:active { transform: translateY(1px); }
+    </style>
+</head>
+<body>
+
+<div class="notification-page">
+
+    <div class="brand">
+        <div class="logo">Ag</div>
+        <h1 class="logo-text" style="font-size:22px;color:var(--text);margin:0;">Sistema</h1>
+    </div>
+
+    <div class="notification-box">
+        <div class="notification-icon">❌</div>
+        <h2 class="notification-title">Usuário Não Encontrado</h2>
+
+        <p class="notification-desc">
+            Não encontramos nenhum cadastro com este endereço de email.<br>
+            Verifique se digitou corretamente ou tente outro email cadastrado.
+        </p>
+
+        <a th:href="@{/}" class="btn-home">Voltar para o Login</a>
+    </div>
+
+</div>
+
+</body>
+</html>

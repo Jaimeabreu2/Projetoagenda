@@ -2,6 +2,7 @@ package br.com.agenda.services;
 
 import br.com.agenda.entities.Evento;
 import br.com.agenda.repositories.EventoRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,6 +17,11 @@ public class EventoService {
 
     public EventoService(EventoRepository repository) {
         this.repository = repository;
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void deletarEventosPassados() {
+        repository.deleteByDiaBefore(LocalDate.now());
     }
 
     public void salvarEvento(String disciplina, String descricao, String horario, String dia) {

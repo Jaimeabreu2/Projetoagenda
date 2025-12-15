@@ -14,7 +14,14 @@
 
         for(let m=0;m<12;m++){
           const card = document.createElement('section'); card.className='month-card';
+          // tornar o cartão acessível/acionável por teclado
+          card.setAttribute('role','button');
+          card.tabIndex = 0;
           const title = document.createElement('div'); title.className='month-title'; title.textContent = monthNames[m];
+          // permitir ativação por teclado (Enter / Space)
+          card.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); card.click(); }
+          });
           // contador simples de eventos (usa eventDays; conta apenas dias válidos no mês)
           const daysInMonth = new Date(y,m+1,0).getDate();
           const count = eventDays.filter(d => d>=1 && d<=daysInMonth).length;
@@ -66,8 +73,8 @@
           const now = new Date();
           if (y === now.getFullYear() && m === now.getMonth()) card.classList.add('current-month');
 
-          // destaca Outubro especificamente (índice 9) com verde claro
-          if (m === new Date().getMonth()) card.classList.add('october-highlight');
+          // destaca Outubro especificamente (índice 9)
+          if (m === 9) card.classList.add('october-highlight');
 
           yearGrid.appendChild(card);
         }

@@ -27,10 +27,13 @@
             redirect: 'follow'
         }).then(response => {
             if (response.redirected) {
+                // sinaliza que o usuário acabou de logar para que a página do calendário mostre notificações
+                try { sessionStorage.setItem('agenda_show_upcoming', '1'); } catch(e){}
                 window.location.href = response.url;
                 return;
             }
             if (response.ok) {
+                try { sessionStorage.setItem('agenda_show_upcoming', '1'); } catch(e){}
                 window.location.href = calendarUrl;
                 return;
             }
@@ -40,6 +43,7 @@
             window.location.href = calendarUrl;
         }).catch(err => {
             console.warn('Auth fetch failed, fallback to local redirect', err);
+            try { sessionStorage.setItem('agenda_show_upcoming', '1'); } catch(e){}
             window.location.href = calendarUrl;
         }).finally(() => {
             submitBtn.disabled = false;
@@ -159,10 +163,12 @@
             redirect: 'follow'
         }).then(response => {
             if (response.redirected) {
+                try { sessionStorage.setItem('agenda_show_upcoming', '1'); } catch(e){}
                 window.location.href = response.url;
                 return;
             }
             if (response.ok) {
+                try { sessionStorage.setItem('agenda_show_upcoming', '1'); } catch(e){}
                 window.location.href = 'calendarComAgenda.html';
                 return;
             }
@@ -172,6 +178,7 @@
             window.location.href = 'calendarComAgenda.html';
         }).catch(err => {
             console.warn('Auth fetch failed (generic handler), fallback to local redirect', err);
+            try { sessionStorage.setItem('agenda_show_upcoming', '1'); } catch(e){}
             window.location.href = 'calendarComAgenda.html';
         }).finally(() => {
             if(submitBtn){

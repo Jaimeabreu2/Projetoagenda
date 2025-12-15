@@ -52,8 +52,8 @@ public class ResumoSemanalComponent {
     }
 
 
-    @Scheduled(cron = "0 26 16 ? * FRI")
-    public void executarTodoSabado() {
+    @Scheduled(cron = "0 0 15 ? * MON")
+    public void enviarResumoSemanal() {
         for (Usuario usuario : usuarioService.listarUsuarios()) {
             if (!usuario.getResumoSemanal())
                 continue;
