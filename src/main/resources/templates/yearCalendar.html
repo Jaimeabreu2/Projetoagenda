@@ -1,252 +1,100 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Agenda — Calendário anual</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    /* estilo específico da tela anual (leva em conta variáveis do style.css) */
-    /* mantém fontes originais, reduz apenas o tamanho dos "blocos" dos meses (~10%) */
-    body.year-page { padding:28px; min-height:100vh; } /* restaura padding original */
-    .year-wrap{ max-width:1200px;margin:0 auto; }
-    .year-header{ display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px }
-    .year-title{ font-size:20px;color:var(--brand-1);font-weight:700 } /* fonte original */
-    .year-controls{ display:flex;gap:8px;align-items:center }
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Agenda — Calendário anual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/yearCalendar.css"/>
 
-    /* toolbar adicional: filtro e botão "Hoje" */
-    .year-toolbar{ display:flex;gap:8px;align-items:center;margin-left:12px }
-    .year-toolbar .filter{
-      padding:8px 10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);
-      background:var(--panel);box-shadow:var(--shadow-sm);min-width:160px;
-    }
-    .year-toolbar .today-btn{
-      background:var(--brand-2);color:#fff;border:0;padding:8px 10px;border-radius:10px;cursor:pointer;font-weight:700;
-      box-shadow:0 8px 20px rgba(46,125,50,0.12);
-    }
-
-    .year-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; } /* gap levemente reduzido para compactar */
-
-    .month-card{
-      background: linear-gradient(180deg,#ffffff,#f7fff7);
-      border-radius:12px;
-      padding:8px;               /* reduz padding interno para encolher bloco (~20% menos) */
-      border:1px solid rgba(0,0,0,0.04);
-      box-shadow:var(--shadow-sm);
-     transition: transform 220ms var(--transition), box-shadow 220ms var(--transition), border-color 220ms var(--transition);
-     cursor:default;
-    }
-    .month-card:hover{
-      transform: translateY(-6px);
-      box-shadow: 0 18px 40px rgba(15,23,42,0.10);
-      border-color: rgba(46,125,50,0.12);
-    }
-    .month-card.current-month{
-      outline: 2px solid rgba(102,187,106,0.12);
-      box-shadow: 0 12px 32px rgba(102,187,106,0.06);
-      transform: translateY(-4px);
-    }
-
-    .month-title{ font-size:13px;font-weight:700;color:var(--brand-1); margin-bottom:6px; text-transform:capitalize } /* mantém tamanho de fonte */
-    .month-meta{ display:flex;align-items:center;gap:8px; font-size:12px;color:var(--muted); margin-bottom:6px }
-    .month-meta .count{ background:linear-gradient(135deg,var(--brand-1),var(--brand-2)); color:#fff;border-radius:8px;padding:4px 8px;font-weight:700;font-size:12px; box-shadow:var(--shadow-sm) }
-
-    .month-weekdays{ display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:6px } /* gap reduzido levemente */
-    .month-weekdays div{ font-size:11px;font-weight:700;color:var(--muted); text-align:left; padding:4px 6px; } /* mantém legibilidade */
-    .month-grid{ display:grid;grid-template-columns:repeat(7,1fr); gap:6px } /* gap levemente menor que original */
-    .m-day{ min-height:32px;border-radius:8px;padding:6px;font-size:13px;display:flex;align-items:flex-start;gap:6px } /* min-height reduzido ~10% */
-    .m-day.empty{ opacity:0.18 }
-    .m-day.has-event{ background: linear-gradient(180deg,#e7f7ec,#ddf2df); border:1px solid rgba(46,125,50,0.12); font-weight:700; color:var(--brand-1) }
-    .m-day .dot{ width:8px;height:8px;border-radius:50%;background:var(--brand-1); margin-top:4px; flex-shrink:0; box-shadow:0 4px 10px rgba(46,125,50,0.08); } /* mantém ponto legível */
-
-    /* esconder temporariamente o contador, o campo de pesquisa e o botão Hoje */
-    #filterInput, #todayBtn, .month-meta { display: none !important; }
-
-    /* destaque específico para Outubro (índice 9) — verde claro diferenciado */
-    .month-card.october-highlight{
-      /* tom mais saturado / contraste aumentado */
-      background: linear-gradient(180deg,#e8ffe9 0%, #cfefd0 60%, #b8e7b6 100%);
-      border:1px solid rgba(46,125,50,0.22); /* borda mais visível */
-      box-shadow: 0 14px 38px rgba(46,125,50,0.10);
-      color: #0f3f21; /* garante texto escuro sobre o fundo claro */
-    }
-    /* título do mês mais escuro para destaque */
-    .month-card.october-highlight .month-title{
-      color: #145823;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.35);
-    }
-    /* hover um pouco mais forte quando for outubro */
-    .month-card.october-highlight:hover{
-      transform: translateY(-8px);
-      box-shadow: 0 22px 48px rgba(46,125,50,0.14);
-      border-color: rgba(46,125,50,0.28);
-    }
-
-    /* espaço lateral para a barra lateral fixa (não aplica em telas pequenas) */
-    @media (min-width:880px){
-      body.year-page { padding-left: 96px; }
-    }
-
-    .back-link{ text-decoration:none;color:var(--brand-1); font-weight:700; border:1px solid transparent;padding:8px;border-radius:8px }
-  </style>
 </head>
 <body class="year-page">
+<div class="animated-gradient" aria-hidden="true"></div>
+<svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <!-- ...same small SVG defs + shapes as in index.html... -->
+</svg>
 
-  <!-- Barra lateral fixa (reutiliza classes do style.css) -->
-  <nav class="app-sidebar" aria-label="Barra de navegação">
-    <a class="icon-btn" href="calendarComAgenda.html" title="Calendário" aria-label="Calendário">📅</a>
-    <button class="icon-btn" title="Tarefas" aria-label="Tarefas">✅</button>
-    <button class="icon-btn" title="Contatos" aria-label="Contatos">👥</button>
-    <div class="sidebar-sep" aria-hidden="true"></div>
-    <a class="create-btn" href="addEventScreen.html" title="Adicionar evento" aria-label="Adicionar evento">+</a>
-  </nav>
-
-  <div class="year-wrap">
-    <!-- Cabeçalho do ano: controles de navegação e ferramentas (pesquisa/Hoje).
-         Dica: use ← e → para trocar de ano, tecla "T" para ir ao ano atual. -->
-    <div class="year-header" role="banner">
-      <div>
-        <div class="year-title" id="yearLabel">Calendário anual</div>
-        <div class="small" id="yearSubtitle">Visualização por ano</div>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="year-controls" role="group" aria-label="Controles do ano">
-          <button id="prevYear" class="btn" aria-label="Ano anterior">◀</button>
-          <div style="min-width:120px;text-align:center;font-weight:700" id="yearValue" aria-live="polite"></div>
-          <button id="nextYear" class="btn" aria-label="Próximo ano">▶</button>
-        </div>
-        <div class="year-toolbar" role="search" aria-label="Ferramentas do ano">
-          <!-- pesquisa e hoje estão ocultos por enquanto -->
-          <input id="filterInput" class="filter" type="search" placeholder="Filtrar mês (ex: jan, mar)" aria-label="Filtrar meses" />
-          <button id="todayBtn" class="today-btn" title="Ir para o ano atual">Hoje</button>
-          <a class="back-link" href="calendarComAgenda.html" title="Voltar ao calendário mensal">Voltar</a>
-        </div>
-      </div>
+<header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
+    <div class="brand">
+        <div class="logo">Ag</div>
+        <div style="font-weight:700">Projeto Agenda</div>
+    </div>
+    <div class="top-actions">
+        <a class="btn secondary" th:href="@{/profile}">Meu Perfil</a>
+        <a class="btn primary" th:href="@{/addEvent}">Adicionar evento</a>
     </div>
 
-    <main>
-      <!-- Grid anual: 12 cartões de mês. Cada cartão é clicável para abrir o mês correspondente. -->
-      <div id="yearGrid" class="year-grid" aria-live="polite"></div>
-    </main>
-  </div>
+</header>
+<div class="app-container">
+    <!-- Barra lateral fixa (reutiliza classes do style.css) -->
+    <nav class="app-sidebar" aria-label="Barra de navegação">
+        <a class="icon-btn" th:href="@{/calendarComAgenda}">📅</a>
+        <a class="btn" th:href="@{/yearCalendar}" title="Tarefas" aria-label="Tarefas">✅</a>
+        <a class="icon-btn" th:href="@{/profile}">👤</a>
+        <div class="sidebar-sep" aria-hidden="true"></div>
+        <a class="create-btn" th:href="@{/addEvent}">+</a>
+    </nav>
 
-  <script>
-    // Script: renderiza os 12 meses dinamicamente.
-    // Funções úteis: renderYear, applyFilter, goToToday.
+    <div class="year-wrap">
+        <!-- Cabeçalho do ano: controles de navegação e ferramentas (pesquisa/Hoje).
+             Dica: use ← e → para trocar de ano, tecla "T" para ir ao ano atual. -->
+        <div class="year-header" role="banner">
+            <div>
+                <div class="year-title" id="yearLabel">Calendário anual</div>
+                <div class="small" id="yearSubtitle">Visualização anual</div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px">
+                <div class="year-controls" role="group" aria-label="Controles do ano">
+                    <button id="prevYear" class="btn" aria-label="Ano anterior">◀</button>
+                    <div style="min-width:120px;text-align:center;font-weight:700" id="yearValue"
+                         aria-live="polite"></div>
+                    <button id="nextYear" class="btn" aria-label="Próximo ano">▶</button>
+                </div>
+                <div class="year-toolbar" role="search" aria-label="Ferramentas do ano">
+                    <!-- pesquisa e hoje estão ocultos por enquanto -->
+                    <input id="filterInput" class="filter" type="search" placeholder="Filtrar mês (ex: jan, mar)"
+                           aria-label="Filtrar meses"/>
+                    <button id="todayBtn" class="today-btn" title="Ir para o ano atual">Hoje</button>
+                    <a class="back-link" th:href="@{/calendarComAgenda}">Retornar ao calendário</a>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <!-- Grid anual: 12 cartões de mês. Cada cartão é clicável para abrir o mês correspondente. -->
+            <div id="yearGrid" class="year-grid" aria-live="polite"></div>
+        </main>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const eventDays = [[${dias}]];
+    console.log(eventDays);
+    /*]]>*/
+</script>
+
+<script src="js/yearCalendar.js"></script>
+<script src="js/accessibility.js"></script>
+<script>
     (function(){
-      const yearGrid = document.getElementById('yearGrid');
-      const yearValue = document.getElementById('yearValue');
-      const filterInput = document.getElementById('filterInput');
-      const todayBtn = document.getElementById('todayBtn');
-      // exemplo de dias recorrentes do mês com evento (aplica-se a todos os meses)
-      const eventDays = [2,16,22];
-      let year = new Date().getFullYear();
-
-      function renderYear(y){
-        yearGrid.innerHTML = '';
-        yearValue.textContent = String(y);
-        const monthNames = Array.from({length:12},(_,i)=> new Date(y,i,1).toLocaleString('pt-BR',{ month:'long' }));
-
-        for(let m=0;m<12;m++){
-          const card = document.createElement('section'); card.className='month-card';
-          const title = document.createElement('div'); title.className='month-title'; title.textContent = monthNames[m];
-          // contador simples de eventos (usa eventDays; conta apenas dias válidos no mês)
-          const daysInMonth = new Date(y,m+1,0).getDate();
-          const count = eventDays.filter(d => d>=1 && d<=daysInMonth).length;
-          const meta = document.createElement('div'); meta.className='month-meta';
-          const countEl = document.createElement('span'); countEl.className='count'; countEl.textContent = `${count}`;
-          const labelEl = document.createElement('small'); labelEl.textContent = count === 1 ? ' evento' : ' eventos';
-          meta.appendChild(countEl); meta.appendChild(labelEl);
-          card.appendChild(title);
-          card.appendChild(meta);
-
-          const wk = document.createElement('div'); wk.className='month-weekdays';
-          ['D','S','T','Q','Q','S','S'].forEach(d=>{ const el=document.createElement('div'); el.textContent=d; wk.appendChild(el); });
-          card.appendChild(wk);
-
-          const grid = document.createElement('div'); grid.className='month-grid';
-          const first = new Date(y,m,1);
-          const last = new Date(y,m+1,0);
-          const startDay = first.getDay();
-          const daysInMonthLocal = last.getDate();
-
-          for(let i=0;i<startDay;i++){ const e=document.createElement('div'); e.className='m-day empty'; grid.appendChild(e); }
-
-          for(let d=1; d<=daysInMonth; d++){
-            const cell = document.createElement('div'); cell.className='m-day';
-            const num = document.createElement('div'); num.textContent = d; num.style.flexGrow = '1';
-            cell.appendChild(num);
-
-            if(eventDays.includes(d)){
-              cell.classList.add('has-event');
-              const dot = document.createElement('div'); dot.className='dot'; cell.appendChild(dot);
-            }
-            // clique: navega para calendário mensal focando neste mês/dia
-            cell.addEventListener('click', ()=> {
-              // redireciona à página mensal centralizando no mês/ano selecionado
-              // simples: passa ano e mês por querystring (pode ser lida pela página mensal no futuro)
-              window.location.href = `calendarComAgenda.html?y=${y}&m=${m}&d=${d}`;
-            });
-
-            grid.appendChild(cell);
-          }
-
-          // trailing
-          const total = startDay + daysInMonth;
-          const trailing = (7 - (total % 7)) % 7;
-          for(let i=0;i<trailing;i++){ const e=document.createElement('div'); e.className='m-day empty'; grid.appendChild(e); }
-
-          card.appendChild(grid);
-          // destaca mês atual se estiver no mesmo ano e mês
-          const now = new Date();
-          if (y === now.getFullYear() && m === now.getMonth()) card.classList.add('current-month');
-
-          // destaca Outubro especificamente (índice 9) com verde claro
-          if (m === 9) card.classList.add('october-highlight');
-
-          yearGrid.appendChild(card);
-        }
-      }
-
-      // filtro simples por nome de mês
-      function applyFilter() {
-        const q = (filterInput.value || '').trim().toLowerCase();
-        Array.from(yearGrid.children).forEach(card=>{
-          const title = card.querySelector('.month-title').textContent.toLowerCase();
-          card.style.display = title.includes(q) ? '' : 'none';
-        });
-      }
-
-      // "Hoje" botão: vai para o ano atual e destaca
-      function goToToday() {
-        const now = new Date();
-        year = now.getFullYear();
-        renderYear(year);
-        // rolar levemente até o mês atual
-        const cur = yearGrid.querySelector('.month-card.current-month');
-        if (cur) cur.scrollIntoView({behavior:'smooth',block:'center'});
-      }
-
-      // atalhos de teclado: ← → para trocar ano, T para hoje
-      document.addEventListener('keydown', (e)=>{
-        if (e.key === 'ArrowLeft') { year--; renderYear(year); }
-        if (e.key === 'ArrowRight') { year++; renderYear(year); }
-        if (e.key.toLowerCase() === 't') { goToToday(); }
-      });
-
-      document.getElementById('prevYear').addEventListener('click', ()=>{ year--; renderYear(year); });
-      document.getElementById('nextYear').addEventListener('click', ()=>{ year++; renderYear(year); });
-
-      filterInput.addEventListener('input', applyFilter);
-      todayBtn.addEventListener('click', goToToday);
-
-      // inicial
-      renderYear(year);
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.addEventListener('click', function(e){
+        const btn = e.target.closest('.btn'); if(!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span'); ripple.className='ripple';
+        const size = Math.max(rect.width, rect.height) * 0.9;
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(()=> ripple.remove(), 700);
+      }, {passive:true});
     })();
-   </script>
- </body>
+  </script>
+</body>
 </html>

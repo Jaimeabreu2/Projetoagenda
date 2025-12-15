@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Perfil — Projeto Agenda</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/profile.css"/>
+    <style>
+:root {
+  --profile-header-space: 80px;
+  --profile-card-radius: 20px;
+  --profile-card-shadow: 0 8px 32px 0 rgba(40,60,90,0.13), 0 2px 8px 0 rgba(40,60,90,0.07);
+  --profile-avatar-size: 96px;
+  --profile-avatar-font: 2.1rem;
+  --profile-tab-padding: 0 32px 32px 32px;
+}
+
+body.profile-page {
+  padding-top: calc(var(--topbar-height, 64px) + var(--profile-header-space));
+  min-height: 100vh;
+  background: linear-gradient(120deg, #e0e7ff 0%, #f5f7fa 100%);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.profile-outer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: calc(100vh - var(--profile-header-space) - var(--topbar-height, 64px));
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+}
+
+.profile-glass-card {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  max-width: 700px !important;
+  width: 100%;
+  box-shadow: 0 8px 32px 0 rgba(40,60,90,0.13), 0 2px 8px 0 rgba(40,60,90,0.07);
+  border-radius: 20px !important;
+  background: rgba(255,255,255,0.97) !important;
+  border: 1.5px solid #e0e7ff !important;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  overflow: visible !important;
+}
+
+.profile-avatar-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin-bottom: 0;
+  padding-top: 24px;
+  z-index: 2;
+}
+
+.avatar {
+  width: var(--profile-avatar-size);
+  height: var(--profile-avatar-size);
+  background: linear-gradient(135deg, #17633a 60%, #38b48e 100%);
+  color: #fff;
+  font-size: var(--profile-avatar-font);
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px 0 rgba(23,99,58,0.18);
+  margin-bottom: 8px;
+  border: 4px solid #fff;
+  transition: width 0.2s, height 0.2s, font-size 0.2s;
+}
+.avatar-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.small.meta {
+  color: #8b98a9;
+  margin-bottom: 8px;
+}
+
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 18px 0;
+  border-bottom: 1.5px solid #e5e7eb;
+}
+.profile-tab-btn {
+  background: none;
+  border: none;
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #4f8cff;
+  padding: 12px 32px 10px 32px;
+  cursor: pointer;
+  border-radius: 18px 18px 0 0;
+  transition: background 0.18s, color 0.18s;
+  outline: none;
+}
+.profile-tab-btn.active, .profile-tab-btn:focus {
+  background: #f5f7fa;
+  color: #2d3748;
+  border-bottom: 2.5px solid #4f8cff;
+}
+
+.profile-tab-content {
+  padding: var(--profile-tab-padding);
+  min-height: 220px;
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadein 0.3s;
+}
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(16px);}
+  to { opacity: 1; transform: none;}
+}
+.profile-summary {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.profile-summary h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 2px;
+}
+.profile-summary .small {
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+.summary-row {
+  margin: 10px 0 8px 0;
+}
+.summary-row strong {
+  font-size: 1.08rem;
+  color: #374151;
+}
+.summary-row .muted {
+  color: #8b98a9;
+  font-size: 0.97rem;
+}
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  justify-content: center;
+}
+.profile-actions .btn {
+  min-width: 100px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 7px;
+}
+.profile-actions .btn svg {
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
+}
+
+#editarTabContent .edit-layout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+#editarTabContent .edit-side {
+  flex: 0 0 120px;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+  box-sizing: border-box;
+}
+#editarTabContent .edit-form { flex: 1; }
+#editarTabContent .edit-side .avatar { width: 80px; height: 80px; font-size: 1.5rem; }
+#editarTabContent .edit-side .avatar-btn-row { margin-bottom: 8px; }
+#editarTabContent .edit-side .small.meta { margin-top: 8px; }
+
+.profile-glass-card.editing .profile-avatar-top { display: none !important; }
+
+/* --- AJUSTES ESPECÍFICOS PARA A ABA DISCIPLINAS --- */
+#disciplinasTabContent.profile-tab-content {
+  padding: 36px 36px 36px 36px !important;
+  min-height: 320px !important;
+  background: transparent !important;
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Em telas pequenas, reduz padding e permite rolagem horizontal */
+@media (max-width: 900px) {
+  #disciplinasTabContent.profile-tab-content {
+    padding: 18px 4vw 18px 4vw !important;
+  }
+  #disciplinasTabContent .form-header,
+  #disciplinasTabContent form,
+  #disciplinasTabContent .table-responsive {
+    max-width: 99vw;
+    padding: 0;
+  }
+  #disciplinasTable {
+    min-width: 420px;
+    font-size: 13px;
+    border-spacing: 0 6px !important;
+  }
+}
+@media (max-width: 600px) {
+  #disciplinasTabContent.profile-tab-content {
+    padding: 8px 2vw 8px 2vw !important;
+  }
+  #disciplinasTable th, #disciplinasTable td {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+  #disciplinasTable {
+    min-width: 340px;
+  }
+}
+
+/* Tabela responsiva: rolagem horizontal em telas pequenas */
+#disciplinasTabContent .table-responsive {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  overflow-x: auto;
+  background: transparent;
+  border-radius: 16px;
+  box-shadow: none;
+  padding: 0;
+}
+#disciplinasTable {
+  min-width: 540px;
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0 14px !important;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(44,62,80,0.07);
+  border-radius: 14px;
+  margin: 0 auto;
+}
+#disciplinasTable th, #disciplinasTable td {
+  background: #fff;
+  border: none !important;
+  white-space: nowrap;
+}
+#disciplinasTable th {
+  font-size: 16px;
+  color: #17633a;
+  font-weight: 700;
+  padding: 14px 8px;
+  position: sticky;
+  top: 0;
+  background: #f5f7fa;
+  z-index: 2;
+}
+#disciplinasTable td {
+  font-size: 15px;
+  color: #222;
+  padding: 18px 12px;
+  border-radius: 12px;
+  vertical-align: top;
+}
+#disciplinasTable tr {
+  box-shadow: 0 4px 18px rgba(44,62,80,0.07);
+  border-radius: 14px;
+  background: #fff;
+}
+@media (max-width: 700px) {
+  #disciplinasTable th, #disciplinasTable td {
+    font-size: 13px;
+    padding: 8px 4px;
+  }
+  #disciplinasTable {
+    min-width: 480px;
+    font-size: 13px;
+    border-spacing: 0 6px !important;
+  }
+  #disciplinasTabContent .table-responsive {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+/* Ajuste para formulário de disciplinas em telas pequenas */
+#disciplinasTabContent .form-grid {
+  gap: 12px !important;
+}
+#disciplinasTabContent input[type="text"],
+#disciplinasTabContent input[type="number"] {
+  font-size: 1rem !important;
+  padding: 10px 12px !important;
+  border-radius: 7px !important;
+}
+
+/* --- AJUSTE CRÍTICO PARA O CARD NUNCA FICAR SOB O CABEÇALHO --- */
+body.profile-page {
+  padding-top: 110px !important;
+  min-height: 100vh !important;
+  background: linear-gradient(120deg, #e0e7ff 0%, #f5f7fa 100%);
+  box-sizing: border-box !important;
+}
+.profile-outer {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  min-height: calc(100vh - 110px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* ...existing code... */
+    </style>
+</head>
+<body class="profile-page">
+  <a class="skip-link" href="#fullName" style="position:absolute;left:-999px"
+     onfocus="this.style.left='16px';this.style.top='16px';" onblur="this.style.left='-999px'">Ir para conteúdo</a>
+  <div class="animated-gradient" aria-hidden="true"></div>
+  <svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+      <!-- ...svg defs/shapes as in index.html... -->
+  </svg>
+
+  <!-- Cabeçalho/topbar padronizado -->
+  <header class="app-topbar" role="banner" aria-label="Cabeçalho da aplicação">
+      <div class="brand">
+          <div class="logo">Ag</div>
+          <div style="font-weight:700">Projeto Agenda</div>
+      </div>
+      <div class="top-actions">
+          <a class="btn secondary" th:href="@{/calendarComAgenda}" title="Calendário">Calendário</a>
+          <a class="btn secondary" th:href="@{/yearCalendar}" title="Tarefas">Tarefas</a>
+          <a class="btn primary" th:href="@{/addEventScreen}" title="Adicionar evento">Adicionar evento</a>
+      </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Barra lateral: atalhos rápidos para navegar entre telas (use Tab para focar) -->
+    <nav class="app-sidebar" aria-label="Barra de navegação">
+        <a class="btn" th:href="@{/calendarComAgenda}" title="Calendário" aria-label="Calendário">📅</a>
+        <a class="btn" th:href="@{/yearCalendar}" title="Tarefas" aria-label="Tarefas">✅</a>
+        <a class="btn" th:href="@{/profile}" title="Meu Perfil" aria-label="Meu Perfil">👤</a>
+        <div class="sidebar-sep" aria-hidden="true"></div>
+        <a class="create-btn" th:href="@{/addEventScreen}" title="Adicionar evento" aria-label="Adicionar evento">+</a>
+    </nav>
+
+    <!-- Conteúdo principal: área de edição do perfil. -->
+    <main>
+      <div class="profile-outer">
+        <div class="profile-glass-card">
+          <div class="profile-avatar-top">
+            <div id="avatarInitials" class="avatar" aria-hidden="true">JA</div>
+            <div class="avatar-btn-row">
+              <input id="avatarInput" type="file" accept="image/*" style="display:none" aria-hidden="true"/>
+              <button id="changeAvatarBtn" type="button" class="btn secondary small-btn" aria-label="Alterar avatar">Alterar</button>
+            </div>
+            <div class="small meta" style="color:#8b98a9;">Último login: <span th:text="${#temporals.format(usuario.ultimoLogin,'dd/MM/yyyy')}">--/--/----</span></div>
+          </div>
+          <div class="profile-tabs">
+            <button class="profile-tab-btn active" id="tabPerfil" type="button" onclick="showTab('perfil')">Perfil</button>
+            <button class="profile-tab-btn" id="tabEditar" type="button" onclick="showTab('editar')">Editar</button>
+            <button class="profile-tab-btn" id="tabDisciplinas" type="button" onclick="showTab('disciplinas')">Disciplinas</button>
+          </div>
+          <div id="perfilTabContent" class="profile-tab-content">
+            <div class="profile-summary">
+              <h2 id="profileTitle">Meu perfil</h2>
+              <div class="small">Gerencie suas informações e preferências</div>
+              <div class="summary-row">
+                <div><strong th:text="${usuario.nome}">Nome Exemplo</strong></div>
+                <div class="small muted" th:text="${usuario.email}">email@exemplo</div>
+              </div>
+              <div class="profile-actions">
+                <a class="btn" th:href="@{/calendarComAgenda}">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  Calendário
+                </a>
+                <a class="btn secondary" th:href="@{/}">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7"/><path d="M3 21V3"/></svg>
+                  Sair
+                </a>
+              </div>
+            </div>
+          </div>
+          <div id="editarTabContent" class="profile-tab-content" style="display:none;">
+            <div class="edit-layout">
+              <aside class="edit-side" aria-hidden="false">
+                <div id="editAvatar" class="avatar" aria-hidden="true">JA</div>
+                <div class="avatar-btn-row">
+                  <input id="avatarInputEdit" type="file" accept="image/*" style="display:none"/>
+                  <button type="button" id="changeAvatarBtnEdit" class="btn secondary small-btn">Alterar</button>
+                </div>
+                <div class="small meta" style="color:#8b98a9;margin-top:8px;">Último login: <span th:text="${#temporals.format(usuario.ultimoLogin,'dd/MM/yyyy')}">--/--/----</span></div>
+              </aside>
+              <section class="edit-form" style="flex:1">
+                <form id="profileForm" class="profile-form" autocomplete="on" novalidate th:action="@{/profile}" method="post" aria-labelledby="profileFormTitle">
+                  <div class="form-header">
+                    <h3 id="profileFormTitle">Editar informações</h3>
+                    <div class="small muted">Campos obrigatórios marcados com *</div>
+                  </div>
+                  <div class="form-grid">
+                    <!-- Nome completo -->
+                    <label for="fullName">Nome completo *</label>
+                    <input id="fullName" name="nome" type="text" th:value="${usuario.nome}" required aria-describedby="fullNameHint"/>
+                    <!-- E-mail -->
+                    <label for="email">E-mail institucional</label>
+                    <input id="email" name="email" type="email" th:value="${usuario.email}" readonly/>
+                    <!-- Preferências -->
+                    <div class="form-checkbox-row">
+                      <input id="notifyEmail" type="checkbox" name="notifyEmail" th:checked="${usuario.notificacaoEmail}"/>
+                      <label for="notifyEmail">Receber notificações por e‑mail</label>
+                    </div>
+                    <div class="form-checkbox-row">
+                      <input id="notifyWeekly" type="checkbox" name="notifyWeekly" th:checked="${usuario.resumoSemanal}"/>
+                      <label for="notifyWeekly">Resumo semanal</label>
+                    </div>
+                    <!-- Senhas -->
+                    <label for="pwdCurrent">Senha atual</label>
+                    <input id="pwdCurrent" name="pwd" type="password" placeholder="Deixe em branco para manter" autocomplete="current-password"/>
+                    <label for="pwdNew">Nova senha</label>
+                    <input id="pwdNew" name="newPwd" type="password" placeholder="••••••••" autocomplete="new-password"/>
+                    <label for="confirmPwd">Confirmar nova senha</label>
+                    <input id="confirmPwd" name="confirmPwd" type="password" placeholder="Repita a nova senha" autocomplete="new-password"/>
+                  </div>
+                  <div class="form-actions">
+                    <button type="button" class="btn secondary" id="cancelEdit" onclick="window.location.reload()">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                      Cancelar
+                    </button>
+                    <button type="submit" class="btn" id="saveProfile">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                      Salvar
+                    </button>
+                    <button type="button" id="deleteAccountBtn" class="btn danger" aria-label="Excluir minha conta" title="Excluir minha conta">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 7V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2"/></svg>
+                      Excluir
+                    </button>
+                  </div>
+                  <div id="error" class="danger-msg" role="alert" aria-live="assertive"></div>
+                </form>
+              </section>
+            </div>
+          </div>
+          <div id="disciplinasTabContent" class="profile-tab-content" style="display:none;">
+            <div class="form-header">
+              <h3>Minhas Disciplinas</h3>
+              <div class="small muted">
+                Cadastre suas disciplinas, anote faltas e notas.<br>
+                Clique em "Editar" para adicionar/remover avaliações (NPC1, NPC2, NEF, etc).
+              </div>
+            </div>
+            <form id="disciplinasForm" autocomplete="off" style="margin-bottom:18px">
+              <div class="form-grid">
+                <label for="disciplinaNome">Nome da disciplina *</label>
+                <input id="disciplinaNome" name="disciplinaNome" type="text" required placeholder="Ex: Matemática"/>
+                <label for="disciplinaFaltas">Faltas</label>
+                <input id="disciplinaFaltas" name="disciplinaFaltas" type="number" min="0" value="0"/>
+                <div id="avaliacoesInputs" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+                  <!-- Campos de avaliações dinâmicos -->
+                  <label style="margin-bottom:0">Avaliações</label>
+                  <div id="avaliacoesList"></div>
+                  <button type="button" id="addAvaliacaoBtn" class="btn secondary" style="width:max-content;margin-top:6px;">Adicionar avaliação</button>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn">Adicionar</button>
+              </div>
+            </form>
+            <div>
+              <table id="disciplinasTable" style="width:100%;border-collapse:separate;border-spacing:0 10px;">
+                <thead>
+                  <tr style="background:#f5f7fa">
+                    <th style="padding:14px 8px;text-align:left;font-size:16px;">Disciplina</th>
+                    <th style="padding:14px 8px;text-align:center;font-size:16px;">Faltas</th>
+                    <th style="padding:14px 8px;text-align:center;font-size:16px;">Avaliações</th>
+                    <th style="padding:14px 8px;text-align:center;font-size:16px;">Presença</th>
+                    <th style="padding:14px 8px;text-align:center;font-size:16px;">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Linhas adicionadas via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal de confirmação de exclusão -->
+      <div id="confirmDeleteModal" class="event-modal" role="dialog" aria-modal="true" aria-labelledby="confirmDeleteTitle" style="display:none;">
+        <div class="event-modal-panel" role="document" style="max-width:420px;">
+          <h3 id="confirmDeleteTitle">Confirmação</h3>
+          <p>Tem certeza que deseja excluir sua conta? Esta ação é irreversível.</p>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+            <button id="cancelDeleteBtn" type="button" class="btn secondary">Cancelar</button>
+            <button id="confirmDeleteBtn" type="button" class="btn danger">Excluir conta</button>
+          </div>
+        </div>
+        <button class="event-modal-backdrop" id="closeConfirmBackdrop" aria-label="Fechar"></button>
+      </div>
+      <div id="saveSuccess" class="toast" role="status" aria-live="polite">Alterações salvas</div>
+    </main>
+  </div>
+
+  <!-- Remover nós de texto acidentais (ex: "{ /* replaced profile-card + profile-main with improved layout */ }") -->
+  <script>
+    // remove text nodes diretos no <body> que se parecem com comentários ou com chaves JSX acidentais
+    document.addEventListener('DOMContentLoaded', function () {
+      const body = document.body;
+      // remove text nodes como: { /* ... */ }
+      Array.from(body.childNodes).forEach(n => {
+        if (n.nodeType === Node.TEXT_NODE) {
+          const txt = n.textContent.trim();
+          if (/^\{\s*\/\*[\s\S]*\*\/\s*\}$/.test(txt)) n.remove();
+        }
+      });
+      // remove elementos que contenham exatamente a string acidental (caso tenha sido inserido como nó de elemento)
+      Array.from(body.querySelectorAll('*')).forEach(el => {
+        const t = (el.textContent || '').trim();
+          if (t === '{ /* replaced profile-card + profile-main with improved layout */ }') el.remove();
+      });
+    });
+  </script>
+
+<script src="js/accessibility.js"></script>
+<script>
+  (function(){
+    // ripple (existing)...
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('.btn'); if(!btn) return;
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span'); ripple.className='ripple';
+      const size = Math.max(rect.width, rect.height) * 0.9;
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+      ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+      btn.appendChild(ripple);
+      setTimeout(()=> ripple.remove(), 700);
+    }, {passive:true});
+  })();
+
+  // Controle do modal de confirmação (abre/fecha/confirm)
+  (function(){
+    const deleteBtn = document.getElementById('deleteAccountBtn');
+    const modal = document.getElementById('confirmDeleteModal');
+    const cancelBtn = document.getElementById('cancelDeleteBtn');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const backdrop = document.getElementById('closeConfirmBackdrop');
+
+    function openModal(){ modal.style.display = 'flex'; }
+    function closeModal(){ modal.style.display = 'none'; }
+
+    if (deleteBtn) deleteBtn.addEventListener('click', (e)=>{ e.preventDefault(); openModal(); });
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+    // ESC fecha modal
+    document.addEventListener('keydown', (ev)=>{ if(ev.key === 'Escape') closeModal(); });
+
+    if (confirmBtn) confirmBtn.addEventListener('click', function(){
+      // Aqui você pode chamar a API DELETE /users/me (quando tiver backend)
+      // Para agora, fazemos fallback: redireciona para página inicial e mostra alerta
+      closeModal();
+      // opcional: enviar fetch('/profile/delete', { method:'DELETE' }) ...
+      try {
+        fetch('/profile/delete', { method: 'DELETE', credentials: 'include' })
+          .then(res => {
+            if (res.ok) window.location.href = '/';
+            else {
+              // fallback visual
+              alert('Conta excluída (simulação).');
+              window.location.href = '/';
+            }
+          }).catch(()=> { alert('Conta excluída (simulação).'); window.location.href = '/'; });
+      } catch(err){
+        alert('Conta excluída (simulação).'); window.location.href = '/';
+      }
+    });
+  })();
+
+  // Abas de perfil/editar (substituir a função existente)
+  function showTab(tab) {
+    document.getElementById('perfilTabContent').style.display = tab === 'perfil' ? '' : 'none';
+    document.getElementById('editarTabContent').style.display = tab === 'editar' ? '' : 'none';
+    document.getElementById('disciplinasTabContent').style.display = tab === 'disciplinas' ? '' : 'none';
+    document.getElementById('tabPerfil').classList.toggle('active', tab === 'perfil');
+    document.getElementById('tabEditar').classList.toggle('active', tab === 'editar');
+    document.getElementById('tabDisciplinas').classList.toggle('active', tab === 'disciplinas');
+    const card = document.querySelector('.profile-glass-card');
+    if (card) card.classList.toggle('editing', tab === 'editar');
+    if (tab === 'editar') {
+      setTimeout(() => {
+        try {
+          card && card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const firstInput = card.querySelector('#fullName, input[type="text"], input[type="email"], input[type="password"]');
+          if (firstInput) firstInput.focus({ preventScroll: true });
+        } catch(e) { }
+      }, 160);
+    }
+  }
+</script>
+<script>
+/* ...existing code... */
+/* validação cliente para alteração de senha */
+(function(){
+  const form = document.getElementById('profileForm');
+  if (!form) return;
+  form.addEventListener('submit', function(e){
+    const current = document.getElementById('pwdCurrent').value || '';
+    const newPwd = document.getElementById('pwdNew').value || '';
+    const confirm = document.getElementById('confirmPwd').value || '';
+    const errEl = document.getElementById('error');
+    if (!newPwd && !confirm) {
+      // sem alteração de senha — permitir submit
+      if (errEl) errEl.textContent = '';
+      return;
+    }
+    // se usuário preencheu nova senha, validar
+    if (newPwd !== confirm) {
+      e.preventDefault();
+      if (errEl) errEl.textContent = 'As senhas não coincidem.';
+      return;
+    }
+    if (newPwd.length < 6) {
+      e.preventDefault();
+      if (errEl) errEl.textContent = 'A nova senha deve ter, pelo menos, 6 caracteres.';
+      return;
+    }
+    if (current && current === newPwd) {
+      e.preventDefault();
+      if (errEl) errEl.textContent = 'A nova senha deve ser diferente da atual.';
+      return;
+    }
+    if (errEl) errEl.textContent = '';
+    // deixa o backend validar regras adicionais
+  }, {capture:false});
+})();
+</script>
+<!-- ...existing code... -->
+<script>
+  // Disciplinas: lógica local (salva no localStorage)
+  (function(){
+    const STORAGE_KEY = 'agenda_disciplinas_v2';
+    const MAX_FALTAS = 18;
+    const TOTAL_AULAS = 68; // 18 faltas ≈ 26% (68 aulas = 100%)
+    function load() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch(e){ return []; }
+    }
+    function save(list) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list||[])); } catch(e){}
+    }
+    function calcularSituacao(disc) {
+      const faltas = disc.faltas || 0;
+      if (faltas >= MAX_FALTAS) return { status: 'Reprovado por falta', cor: '#b91c1c' };
+
+      // NPCs: avaliações cujo nome começa com "NPC" (case-insensitive)
+      const npcs = (disc.avaliacoes||[]).filter(av => /^npc\d*$/i.test(av.nome));
+      const nef = (disc.avaliacoes||[]).find(av => /^nef$/i.test(av.nome));
+      const mediaNPC = npcs.length ? (npcs.reduce((s,av)=>s+(parseFloat(av.nota)||0),0)/npcs.length) : null;
+
+      if (mediaNPC === null) return { status: 'Sem notas', cor: '#666' };
+      if (mediaNPC >= 7) return { status: 'Aprovado', cor: '#17633a', media: mediaNPC.toFixed(2) };
+      if (mediaNPC < 4) return { status: 'Reprovado por nota', cor: '#b91c1c', media: mediaNPC.toFixed(2) };
+
+      // Se média entre 4 e 7, pode fazer NEF
+      if (mediaNPC >= 4 && mediaNPC < 7) {
+        if (!nef || nef.nota === null || nef.nota === undefined || nef.nota === '') {
+          return { status: 'Precisa de NEF', cor: '#b97c1c', media: mediaNPC.toFixed(2) };
+        }
+        // Regra: NEF >= 3 e MF >= 5
+        const mf = (mediaNPC + parseFloat(nef.nota)) / 2;
+        if (nef.nota >= 3 && mf >= 5) {
+          return { status: 'Aprovado (NEF)', cor: '#17633a', media: mediaNPC.toFixed(2), mf: mf.toFixed(2), nef: nef.nota };
+        } else {
+          return { status: 'Reprovado (NEF)', cor: '#b91c1c', media: mediaNPC.toFixed(2), mf: mf.toFixed(2), nef: nef.nota };
+        }
+      }
+      return { status: 'Indefinido', cor: '#666' };
+    }
+    function renderTable() {
+      const tbody = document.querySelector('#disciplinasTable tbody');
+      if (!tbody) return;
+      const list = load();
+      tbody.innerHTML = '';
+      if (!list.length) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="5" style="text-align:center;color:#888;padding:18px;font-size:16px;">Nenhuma disciplina cadastrada.</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+      list.forEach((disc, idx) => {
+        const faltas = disc.faltas || 0;
+        const presenca = Math.max(0, Math.round(100 * (1 - (faltas / TOTAL_AULAS))));
+        const situacao = calcularSituacao(disc);
+        // monta avaliações (agora em bloco mais espaçado)
+        const avs = (disc.avaliacoes||[]).map(av =>
+          `<div style="font-size:15px;margin-bottom:8px;line-height:1.5;"><span style="display:inline-block;min-width:54px;font-weight:600;">${av.nome}:</span> <span style="font-weight:700">${av.nota!==null&&av.nota!==undefined?av.nota:'-'}</span></div>`
+        ).join('');
+        const tr = document.createElement('tr');
+        tr.style.background = "#fff";
+        tr.style.boxShadow = "0 4px 18px rgba(44,62,80,0.07)";
+        tr.style.borderRadius = "14px";
+        tr.innerHTML = `
+          <td style="padding:18px 12px;font-size:16px;vertical-align:top;font-weight:600;min-width:140px;">${disc.nome}</td>
+          <td style="padding:18px 12px;text-align:center;font-size:16px;vertical-align:top;min-width:60px;">${faltas}</td>
+          <td style="padding:18px 12px;text-align:left;font-size:15px;vertical-align:top;min-width:120px;">
+            <div style="display:flex;flex-direction:column;gap:4px;">${avs||'-'}</div>
+          </td>
+          <td style="padding:18px 12px;text-align:center;font-size:15px;vertical-align:top;min-width:120px;">
+            <span style="font-weight:700;color:${situacao.cor};font-size:18px;">${presenca}%</span>
+            <div style="font-size:14px;font-weight:700;color:${situacao.cor};margin-top:8px;">
+              ${situacao.status}
+              ${situacao.media ? `<br><span style="font-weight:400;">Média NPC:</span> ${situacao.media}` : ''}
+              ${situacao.nef !== undefined ? `<br><span style="font-weight:400;">NEF:</span> ${situacao.nef}` : ''}
+              ${situacao.mf !== undefined ? `<br><span style="font-weight:400;">MF:</span> ${situacao.mf}` : ''}
+            </div>
+          </td>
+          <td style="padding:18px 12px;text-align:center;vertical-align:top;min-width:100px;">
+            <button type="button" class="btn secondary" data-edit="${idx}" style="padding:8px 18px;font-size:15px;margin-bottom:8px;">Editar</button>
+            <button type="button" class="btn danger" data-del="${idx}" style="padding:8px 18px;font-size:15px;">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    document.addEventListener('DOMContentLoaded', renderTable);
+    document.getElementById('tabDisciplinas').addEventListener('click', renderTable);
+
+    // --- Formulário dinâmico de avaliações ---
+    const form = document.getElementById('disciplinasForm');
+    const avList = document.getElementById('avaliacoesList');
+    const addAvBtn = document.getElementById('addAvaliacaoBtn');
+    let avInputs = [];
+    function renderAvInputs(avals) {
+      avList.innerHTML = '';
+      avInputs = [];
+      (avals||[]).forEach((av, i) => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '6px';
+        row.style.alignItems = 'center';
+        row.style.marginBottom = '2px';
+        row.innerHTML = `
+          <input type="text" placeholder="Ex: NPC${i+1}" value="${av.nome||''}" style="width:80px" required/>
+          <input type="number" min="0" max="10" step="0.01" placeholder="Nota" value="${av.nota!==undefined&&av.nota!==null?av.nota:''}" style="width:60px"/>
+          <button type="button" class="btn danger" style="padding:2px 8px;font-size:13px" data-remove="${i}">✕</button>
+        `;
+        avList.appendChild(row);
+        avInputs.push(row);
+      });
+    }
+    function getAvFormValues() {
+      return avInputs.map(row => {
+        const nome = row.querySelector('input[type="text"]').value.trim() || '';
+        const notaStr = row.querySelector('input[type="number"]').value;
+        const nota = notaStr === '' ? null : parseFloat(notaStr);
+        return { nome, nota };
+      }).filter(av => av.nome);
+    }
+    // Inicializa com NPC1/NPC2
+    let avFormState = [{nome:'NPC1',nota:null},{nome:'NPC2',nota:null}];
+    renderAvInputs(avFormState);
+
+    addAvBtn.addEventListener('click', function(){
+      avFormState.push({nome:'',nota:null});
+      renderAvInputs(avFormState);
+    });
+
+    avList.addEventListener('click', function(e){
+      const btn = e.target.closest('button[data-remove]');
+      if (!btn) return;
+      const idx = parseInt(btn.getAttribute('data-remove'),10);
+      avFormState.splice(idx,1);
+      renderAvInputs(avFormState);
+    });
+
+    // Ao editar, preenche o formulário
+    document.getElementById('disciplinasTable').addEventListener('click', function(e){
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const idx = btn.dataset.edit || btn.dataset.del;
+      let list = load();
+      if (btn.dataset.edit !== undefined) {
+        const disc = list[idx];
+        if (!disc) return;
+        form.disciplinaNome.value = disc.nome;
+        form.disciplinaFaltas.value = disc.faltas;
+        avFormState = (disc.avaliacoes||[{nome:'NPC1',nota:null},{nome:'NPC2',nota:null}]).map(av=>({nome:av.nome,nota:av.nota}));
+        renderAvInputs(avFormState);
+        // Remove da lista para re-adicionar ao salvar
+        list.splice(idx,1);
+        save(list);
+        renderTable();
+        form.disciplinaNome.focus();
+      } else if (btn.dataset.del !== undefined) {
+        if (confirm('Excluir disciplina?')) {
+          list.splice(idx,1);
+          save(list);
+          renderTable();
+        }
+      }
+    });
+
+    if (form) {
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const nome = form.disciplinaNome.value.trim();
+        const faltas = parseInt(form.disciplinaFaltas.value,10)||0;
+        const avaliacoes = getAvFormValues();
+        if (!nome) return;
+        const list = load();
+        list.push({ nome, faltas, avaliacoes });
+        save(list);
+        form.reset();
+        avFormState = [{nome:'NPC1',nota:null},{nome:'NPC2',nota:null}];
+        renderAvInputs(avFormState);
+        renderTable();
+      });
+    }
+  })();
+</script>
+</body>
+</html>

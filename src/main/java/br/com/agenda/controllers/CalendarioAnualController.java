@@ -1,24 +1,23 @@
 package br.com.agenda.controllers;
 
-import br.com.agenda.entities.Evento;
 import br.com.agenda.services.EventoService;
 import br.com.agenda.services.UsuarioService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 @Controller
-@RequestMapping("/calendarComAgenda")
-public class CalendarioController {
-    private final UsuarioService usuarioService;
-    private final EventoService eventoService;
+@RequestMapping("/yearCalendar")
+public class CalendarioAnualController {
+    UsuarioService usuarioService;
+    EventoService eventoService;
 
-    public CalendarioController(UsuarioService usuarioService, EventoService service) {
+    public CalendarioAnualController(UsuarioService usuarioService, EventoService eventoService) {
         this.usuarioService = usuarioService;
-        this.eventoService = service;
+        this.eventoService = eventoService;
     }
 
     @GetMapping
@@ -27,11 +26,8 @@ public class CalendarioController {
             return "error401";
 
         LocalDate[] dias = eventoService.getDias();
-        ArrayList<Evento> eventos = eventoService.getEventos();
-
         model.addAttribute("dias", dias);
-        model.addAttribute("eventos", eventos);
 
-        return "calendarComAgenda";
+        return "yearCalendar";
     }
 }

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 — Erro Interno</title>
+
+    <!-- Reusa o mesmo style.css -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Estilos apenas da página de erro — combinando com seu layout */
+
+        .error-page {
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          justify-content:center;
+          text-align:center;
+          min-height:100vh;
+          padding:32px;
+          background: var(--bg);
+        }
+
+        .error-box {
+          background: var(--panel);
+          padding:34px;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-lg);
+          max-width: 480px;
+          margin-top:20px;
+        }
+
+        .error-code {
+          font-size: 72px;
+          font-weight: 800;
+          color: var(--brand-1);
+          margin:0;
+          line-height:1;
+        }
+
+        .error-title {
+          margin: 6px 0 12px 0;
+          font-size: 22px;
+          color: var(--text);
+          font-weight: 700;
+        }
+
+        .error-desc {
+          margin: 0;
+          color: var(--muted);
+          font-size: 15px;
+          line-height:1.5;
+        }
+
+        .btn-home {
+          margin-top: 22px;
+          display:inline-block;
+          background: var(--accent);
+          color:white;
+          padding:12px 20px;
+          border-radius:10px;
+          font-weight:600;
+          text-decoration:none;
+          transition: opacity var(--transition), transform var(--transition);
+          box-shadow: 0 6px 18px rgba(102,187,106,0.12);
+        }
+        .btn-home:hover { opacity:0.92; }
+        .btn-home:active { transform:translateY(1px); }
+
+        /* acessibilidade: alto contraste */
+        html.a11y-high-contrast .error-box {
+          background: var(--panel) !important;
+          color: var(--text) !important;
+          border: 1px solid rgba(255,255,255,0.2);
+          box-shadow:none !important;
+        }
+        html.a11y-large-font .error-code { font-size: calc(72px * var(--a11y-font-scale)); }
+    </style>
+
+</head>
+<body>
+  <div class="animated-gradient" aria-hidden="true"></div>
+  <svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+    <!-- ...svg defs/shapes as in index.html... -->
+  </svg>
+
+<div class="error-page">
+
+    <div class="brand">
+        <div class="logo">Ag</div>
+        <h1 class="logo-text" style="font-size:22px;color:var(--text);margin:0;">Sistema</h1>
+    </div>
+
+    <div class="error-box">
+        <h1 class="error-code">500</h1>
+        <h2 class="error-title">Erro Interno do Servidor</h2>
+
+        <p class="error-desc">
+            Ocorreu um erro interno no servidor.<br>
+            Tente novamente mais tarde. Caso o problema persista, contate o suporte.
+        </p>
+
+        <a th:href="@{/}" class="btn-home">Retornar à tela de login</a>
+    </div>
+
+</div>
+
+<script src="js/accessibility.js"></script>
+<script>
+  (function(){
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('.btn'); if(!btn) return;
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span'); ripple.className='ripple';
+      const size = Math.max(rect.width, rect.height) * 0.9;
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+      ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+      btn.appendChild(ripple);
+      setTimeout(()=> ripple.remove(), 700);
+    }, {passive:true});
+  })();
+</script>
+</body>
+</html>

@@ -4,15 +4,22 @@ import br.com.agenda.entities.Usuario;
 import br.com.agenda.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 @Service
 public class UsuarioService {
-    private static Long idAtual = -1L;
+    private Long idAtual = -1L;
     private final UsuarioRepository repository;
+    private final EventoService eventoService;
+    private final JsonService jsonService;
+    private boolean podeAlterarSenha;
+    private Usuario usuario;
 
-    public UsuarioService(UsuarioRepository repository) {
+    public UsuarioService(UsuarioRepository repository, EventoService eventoService, JsonService jsonService) {
         this.repository = repository;
+        this.eventoService = eventoService;
+        this.jsonService = jsonService;
     }
 
     public void cadastrar(Usuario usuario) {
@@ -20,12 +27,16 @@ public class UsuarioService {
     }
 
     public Usuario getUsuarioAtual() {
-        Optional<Usuario> usuario = repository.findById(idAtual);
-        return usuario.orElse(null);
+        return usuario;
     }
 
     public void deletarUsuario() {
+        jsonService.salvarDados(-1L, "", "");
         repository.deleteById(idAtual);
+    }
+
+    public ArrayList<Usuario> listarUsuarios() {
+        return new ArrayList<>(repository.findAll());
     }
 
     public boolean verificarEmailExistente(String email) {
@@ -37,9 +48,15 @@ public class UsuarioService {
     }
 
     public boolean verificarLoginValido(String email, String senha) {
-        for (Usuario usuario : repository.findAll()) {
-            if (usuario.getEmail().equals(email) && usuario.getSenha().equals(senha)) {
-                idAtual = usuario.getId();
+        for (Usuario usuarioAtual : repository.findAll()) {
+            if (usuarioAtual.getEmail().equals(email) && usuarioAtual.getSenha().equals(senha)) {
+                idAtual = usuarioAtual.getId();
+                usuario = usuarioAtual;
+                usuario.setUltimoLogin(LocalDate.now());
+                eventoService.setIdUsuario(idAtual);
+                eventoService.listarEventos();
+
+                reajustarUsuario();
                 return true;
             }
         }
@@ -47,15 +64,50 @@ public class UsuarioService {
     }
 
     public boolean verificarAlterarSenha(String senha_atual, String nova_senha, String confirmar_senha) {
-        Usuario usuario = getUsuarioAtual();
-        return usuario.getSenha().equals(senha_atual) && nova_senha.equals(confirmar_senha);
+        podeAlterarSenha = usuario.getSenha().equals(senha_atual) && nova_senha.equals(confirmar_senha);
+
+        return podeAlterarSenha;
     }
 
-    public void alterarSenha(String nova_senha) {
-        getUsuarioAtual().setSenha(nova_senha);
+    public void alterarInformacoes(boolean notificacaoEmail, boolean resumoSemanal, String nome, String email, String novaSenha) {
+        usuario.setNotificacaoEmail(notificacaoEmail);
+        usuario.setResumoSemanal(resumoSemanal);
+        usuario.setEmail(email);
+        usuario.setNome(nome);
+
+        if (podeAlterarSenha)
+            usuario.setSenha(novaSenha);
+        if (jsonService.getId() != -1L)
+            jsonService.salvarDados(idAtual, email, novaSenha);
+
+        podeAlterarSenha = false;
     }
 
-    public static Long getIdAtual() {
+    public void reajustarUsuario() {
+        repository.save(usuario);
+    }
+
+    private void reajustarUsuarioNulo(Long novoID) {
+        if (novoID != -1L) {
+            idAtual = novoID;
+            eventoService.setIdUsuario(novoID);
+            eventoService.listarEventos();
+
+            for (Usuario usuarioAtual : repository.findAll()) {
+                if (usuarioAtual.getId().equals(novoID)) {
+                    usuario = usuarioAtual;
+                    break;
+                }
+            }
+
+            usuario.setUltimoLogin(LocalDate.now());
+        }
+    }
+
+    public Long getIdAtual() {
+        if (idAtual == -1L)
+            reajustarUsuarioNulo(jsonService.getId());
+
         return idAtual;
     }
 }

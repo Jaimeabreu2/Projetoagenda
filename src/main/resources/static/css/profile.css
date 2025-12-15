@@ -1,0 +1,732 @@
+/* ajustes locais: compactação máxima para evitar scroll vertical */
+        body.profile-page{ padding:10px; min-height:100vh; background:transparent }
+        .profile-wrap{
+          max-width:920px;
+          margin:10px auto;
+          display:grid;
+          grid-template-columns: 180px 1fr;
+          gap:12px;
+          align-items:start;
+          /* garante que todo o conteúdo caiba no viewport vertical sem scroll desnecessário */
+          min-height: calc(100vh - 20px);
+        }
+    
+        /* avatar e card mais compactos */
+        .profile-card{
+          background: linear-gradient(180deg,#ffffff,#fbfff9);
+          border-radius:10px;
+          padding:10px;
+          box-shadow:var(--shadow-sm);
+          border:1px solid rgba(0,0,0,0.04);
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:8px;
+        }
+        .avatar{
+          width:84px;height:84px;border-radius:12px;
+          background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+          color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto;
+          box-shadow:var(--shadow-lg);
+        }
+        .profile-actions{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+        .profile-actions .btn{padding:8px 10px;font-size:14px}
+    
+        /* painel principal compacto */
+        .profile-main{
+          /* tom verde um pouco mais escuro para melhor contraste */
+          background: linear-gradient(180deg,#eefbf0,#e2f6e6);
+          border-radius:10px;
+          padding:12px;
+          box-shadow:var(--shadow-sm);
+          border:1px solid rgba(46,125,50,0.06);
+        }
+        /* avisos menores e mais discretos (e-mail institucional e dica de senha) */
+        .email-note, #pwdHint { font-size:12px; color: rgba(15,23,42,0.68); }
+    
+        /* formulário em grid 2-colunas para economizar altura */
+        .profile-main form{
+          display:grid;
+          grid-template-columns: 1fr 1fr;
+          gap:8px 12px; /* row-gap / column-gap */
+          align-items:start;
+        }
+        .field{ margin:0; display:flex; flex-direction:column; }
+        .field.full{ grid-column: 1 / -1; }
+    
+        /* labels/inputs menores */
+        label{ font-size:13px; color:var(--muted); margin-bottom:6px; }
+        .profile-main .input{ background:#fbfff9; padding:8px 10px; border-radius:8px; border:1px solid transparent; }
+        .profile-main .input:focus-within{ box-shadow:0 8px 22px rgba(102,187,106,0.08); border-color: rgba(46,125,50,0.08); }
+        .profile-main select, .profile-main input { width:100%; border:0; background:transparent; padding:6px 0; font-size:14px; color:var(--text) }
+    
+        /* títulos e separadores mais compactos */
+        .profile-main h3{ margin:0 0 8px 0; font-size:16px; color:var(--brand-1) }
+        .profile-main hr{ grid-column: 1 / -1; border:none; border-top:1px solid rgba(0,0,0,0.04); margin:8px 0; }
+    
+        /* preferências alinhadas e compactas */
+        .pref-list{ display:flex;flex-direction:column;gap:6px; align-items:flex-start; }
+        .pref-list label{ display:flex; gap:8px; align-items:center; justify-content:flex-start; cursor:pointer; color:var(--muted); }
+        .pref-list input[type="checkbox"]{ width:16px; height:16px; flex-shrink:0; }
+    
+        /* ações: alinhar à direita e reduzir tamanho */
+        .actions-row{ grid-column: 1 / -1; display:flex; gap:8px; justify-content:flex-end; align-items:center; margin-top:6px; }
+        .actions-row .btn{ padding:8px 10px; font-size:14px; }
+    
+        /* mensagens pequenas */
+        .success-msg, .danger-msg{ font-size:13px; margin-top:6px; }
+    
+        /* responsivo: em telas pequenas volta a uma coluna */
+        @media (max-width:880px){
+          .profile-wrap{ grid-template-columns: 1fr; max-width:520px; padding:10px; margin:8px; min-height: auto; }
+          .profile-main form{ grid-template-columns: 1fr; gap:10px; }
+          .profile-actions .btn{ width:100% }
+        }
+    
+        /* reduz margens de botões e espaçamentos gerais para minimizar altura */
+        .btn{ padding:8px 10px; font-size:14px; border-radius:8px; }
+    
+        /* toast de sucesso */
+        .toast {
+          display: none;
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: rgba(76, 175, 80, 0.9);
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          box-shadow: var(--shadow-lg);
+          z-index: 1000;
+          font-size: 14px;
+        }
+    
+        /* Professional profile layout */
+        .profile-overview {
+          display:grid;
+          grid-template-columns: 360px 1fr;
+          gap: 22px;
+          align-items:start;
+          max-width:1100px;
+          margin: 12px auto;
+        }
+    
+        .profile-panel {
+          background: linear-gradient(180deg,#ffffff,#fbfff9);
+          border-radius:12px;
+          padding:18px;
+          box-shadow: var(--shadow-sm);
+          border:1px solid rgba(0,0,0,0.04);
+          display:flex;
+          gap:14px;
+          align-items:flex-start;
+        }
+    
+        .avatar-wrap {
+          width:120px;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:10px;
+        }
+        .avatar {
+          width:112px;height:112px;border-radius:16px;
+          background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+          color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:32px;
+          box-shadow: 0 10px 30px rgba(46,125,50,0.12);
+          border: 4px solid rgba(255,255,255,0.6);
+          object-fit:cover;
+          overflow:hidden;
+        }
+        .avatar img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:12px; }
+    
+        /* small action for avatar */
+        .small-btn { padding:6px 8px; font-size:13px; border-radius:8px; }
+    
+        /* summary area */
+        .profile-summary { flex:1; display:flex;flex-direction:column; gap:8px; }
+        .profile-summary h2 { margin:0; font-size:18px; color:var(--brand-1); }
+        .summary-row { display:flex;flex-direction:column; gap:4px; }
+    
+        /* form improvements */
+        .profile-form {
+          background: linear-gradient(180deg,#ffffff,#fbfff9);
+          border-radius:12px;
+          padding:18px;
+          box-shadow: var(--shadow-sm);
+          border:1px solid rgba(0,0,0,0.04);
+          max-width:1100px;
+          margin: 0 auto 28px;
+        }
+    
+        /* header inside form */
+        .form-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+        .form-header h3 { margin:0; color:var(--brand-1); font-size:16px; }
+    
+        /* two-column responsive grid */
+        .form-grid {
+          display:grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap:12px 18px;
+          align-items:center;
+        }
+        .form-grid label { margin-bottom:6px; font-size:13px; color:var(--muted); }
+        .form-grid input[type="text"],
+        .form-grid input[type="email"],
+        .form-grid input[type="password"],
+        .form-grid select {
+          padding:10px 12px;
+          border-radius:10px;
+          border:1px solid rgba(0,0,0,0.06);
+          background:#fbfff9;
+          font-size:14px;
+          outline:none;
+          transition: box-shadow var(--transition), border-color var(--transition);
+        }
+        .form-grid input:focus, .form-grid select:focus {
+          box-shadow: 0 8px 22px rgba(67,160,71,0.08);
+          border-color: rgba(67,160,71,0.14);
+        }
+    
+        /* checkboxes inline */
+        .form-grid input[type="checkbox"]{ width:auto; transform:scale(1.05); }
+    
+        /* actions: right aligned, compact, and distinct danger button */
+        .form-actions {
+          display:flex;
+          gap:10px;
+          justify-content:flex-end;
+          margin-top:14px;
+          align-items:center;
+        }
+        .form-actions .btn { padding:10px 14px; font-size:14px; border-radius:10px; }
+        .btn.danger {
+          background: var(--danger);
+          color:#fff;
+          border:0;
+          box-shadow: 0 6px 18px rgba(185,28,28,0.12);
+        }
+        .btn.danger:hover { filter:brightness(0.95); }
+    
+        /* messages */
+        .danger-msg { color:var(--danger); margin-top:8px; display:block; }
+    
+        /* responsive: collapse to single column */
+        @media (max-width:920px) {
+          .profile-overview { grid-template-columns: 1fr; padding: 12px; }
+          .profile-panel { flex-direction:row; gap:12px; padding:12px; }
+          .form-grid { grid-template-columns: 1fr; }
+          .avatar { width:92px; height:92px; font-size:24px; }
+          .avatar-wrap { width:auto; flex-direction:row; gap:12px; align-items:center; }
+          .profile-summary { order:2; }
+          .profile-panel { align-items:center; }
+        }
+    
+        /* micro-adjust for high-contrast mode */
+        html.a11y-high-contrast .profile-form,
+        html.a11y-high-contrast .profile-panel { border-color: rgba(255,255,255,0.12) !important; background: var(--panel) !important; }
+    
+        /* Centralização vertical e horizontal do conteúdo principal */
+        body.profile-page {
+          min-height: 100vh;
+          background: #e8f5e9;
+          padding-top: calc(var(--topbar-height, 64px) + 8px);
+          margin: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+    
+        /* Centraliza o container principal e remove margens extras */
+        .profile-wrap {
+          width: 100%;
+          max-width: 1100px;
+          margin: 0 auto;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 36px;
+          align-items: flex-start;
+          justify-content: center;
+          box-sizing: border-box;
+        }
+    
+        /* Centraliza a overview (painéis lado a lado) */
+        .profile-overview {
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 36px;
+          align-items: flex-start;
+          justify-content: center;
+          margin: 0 auto;
+        }
+    
+        /* --- AJUSTES PARA ORGANIZAÇÃO E RESPONSIVIDADE DO FORMULÁRIO DE PERFIL --- */
+    
+        /* Garante que o conteúdo principal nunca fique sob o cabeçalho fixo */
+        body.profile-page {
+          padding-top: 90px !important; /* igual ao profile.html */
+          min-height: 100vh !important;
+          box-sizing: border-box !important;
+        }
+    
+        /* Centraliza e limita o card de edição do perfil */
+        .profile-glass-card,
+        .profile-form,
+        .profile-main {
+          margin: 0 auto !important;
+          max-width: 520px !important;
+          border-radius: 16px !important;
+          padding: 0 0 36px 0 !important;
+          background: rgba(255,255,255,0.97) !important;
+          box-shadow: 0 8px 32px 0 rgba(40,60,90,0.09) !important;
+          border: 1px solid #e0e7ff !important;
+          position: relative !important;
+        }
+    
+        /* Espaçamento lateral confortável para o conteúdo do card */
+        .profile-tab-content,
+        .profile-form,
+        .profile-main {
+          padding-left: 48px !important;
+          padding-right: 48px !important;
+          padding-top: 32px !important;
+          padding-bottom: 32px !important;
+          box-sizing: border-box !important;
+          width: 100% !important;
+        }
+    
+        /* Formulário em coluna única, inputs 100% largura */
+        .form-grid,
+        .profile-form .form-grid,
+        .profile-main .form-grid {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 18px !important;
+          align-items: stretch !important;
+          width: 100% !important;
+          margin: 0 !important;
+          box-sizing: border-box !important;
+        }
+    
+        /* Inputs e labels proporcionais */
+        .form-grid label,
+        .profile-form label,
+        .profile-main label {
+          font-size: 1rem !important;
+          color: #374151 !important;
+          font-weight: 500 !important;
+          margin-bottom: 4px !important;
+          line-height: 1.3 !important;
+        }
+    
+        .form-grid input[type="text"],
+        .form-grid input[type="email"],
+        .form-grid input[type="password"],
+        .profile-form input[type="text"],
+        .profile-form input[type="email"],
+        .profile-form input[type="password"],
+        .profile-main input[type="text"],
+        .profile-main input[type="email"],
+        .profile-main input[type="password"] {
+          padding: 14px 16px !important;
+          border: 1.2px solid #cbd5e1 !important;
+          border-radius: 7px !important;
+          font-size: 1rem !important;
+          background: #fff !important;
+          transition: border 0.2s !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+    
+        .form-grid input:focus,
+        .profile-form input:focus,
+        .profile-main input:focus {
+          border-color: #4f8cff !important;
+          outline: none !important;
+        }
+    
+        /* Checkbox row confortável */
+        .form-checkbox-row,
+        .profile-form .form-checkbox-row,
+        .profile-main .form-checkbox-row {
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+          margin-bottom: 0 !important;
+          width: 100% !important;
+        }
+    
+        .form-checkbox-row label,
+        .profile-form .form-checkbox-row label,
+        .profile-main .form-checkbox-row label {
+          font-weight: 400 !important;
+          color: #4f8cff !important;
+          font-size: 0.97rem !important;
+          margin-bottom: 0 !important;
+          cursor: pointer !important;
+          line-height: 1.2 !important;
+        }
+    
+        /* Ações alinhadas à direita */
+        .form-actions,
+        .profile-form .form-actions,
+        .profile-main .form-actions {
+          display: flex !important;
+          gap: 12px !important;
+          margin-top: 18px !important;
+          align-items: center !important;
+          justify-content: flex-end !important;
+        }
+    
+        /* Botões proporcionais */
+        .form-actions .btn,
+        .profile-form .form-actions .btn,
+        .profile-main .form-actions .btn {
+          min-width: 90px !important;
+          font-size: 1rem !important;
+          padding: 8px 18px !important;
+          border-radius: 7px !important;
+        }
+    
+        /* Avatar centralizado */
+        .avatar,
+        .profile-card .avatar,
+        .avatar-wrap .avatar {
+          width: 104px !important;
+          height: 104px !important;
+          border-radius: 50% !important;
+          background: linear-gradient(135deg, #17633a 60%, #38b48e 100%) !important;
+          color: #fff !important;
+          font-size: 2.2rem !important;
+          font-weight: 700 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          box-shadow: 0 4px 16px 0 rgba(23,99,58,0.18) !important;
+          margin: 0 auto 8px auto !important;
+          border: 4px solid #fff !important;
+        }
+    
+        /* Responsividade: padding lateral reduzido em telas menores */
+        @media (max-width: 900px) {
+          .profile-tab-content,
+          .profile_form,
+          .profile-main {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+          }
+          .profile-glass-card,
+          .profile-form,
+          .profile-main {
+            max-width: 99vw !important;
+          }
+        }
+        @media (max-width: 600px) {
+          .profile-tab-content,
+          .profile_form,
+          .profile-main {
+            padding-left: 4vw !important;
+            padding-right: 4vw !important;
+            padding-top: 18px !important;
+            padding-bottom: 18px !important;
+          }
+          .profile-glass-card,
+          .profile-form,
+          .profile-main {
+            max-width: 99vw !important;
+            margin: 8px auto 0 auto !important;
+            padding: 0 0 18px 0 !important;
+          }
+        }
+    
+        /* Remove grid de duas colunas em qualquer outro lugar */
+        .profile-main form,
+        .form-grid {
+          grid-template-columns: 1fr !important;
+        }
+    
+        /* --- AJUSTE CRÍTICO PARA NUNCA FICAR SOB O CABEÇALHO --- */
+        body.profile-page {
+          padding-top: 110px !important; /* aumente para garantir espaço mesmo com cabeçalho maior */
+          min-height: 100vh !important;
+          box-sizing: border-box !important;
+        }
+    
+        /* Garante que o card nunca fique colado no topo */
+        .profile-outer {
+          margin-top: 0 !important;
+          padding-top: 0 !important;
+          min-height: calc(100vh - 110px) !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+        }
+    
+        /* --- AJUSTE DEFINITIVO PARA NADA FICAR SOB O CABEÇALHO --- */
+        body.profile-page {
+          padding-top: 140px !important; /* espaço suficiente para header + avatar */
+          min-height: 100vh !important;
+          box-sizing: border-box !important;
+        }
+
+        .profile-outer {
+          margin-top: 0 !important;
+          padding-top: 0 !important;
+          min-height: calc(100vh - 140px) !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+        }
+
+        /* Remove deslocamento negativo do avatar e afasta do topo */
+        .profile-avatar-top {
+          top: 0 !important;
+          margin-bottom: 0 !important;
+          padding-top: 32px !important; /* aumenta afastamento do topo */
+          z-index: 2 !important;
+          position: relative !important;
+        }
+
+        /* Avatar, botão "Alterar" e "Último login" sempre visíveis */
+        .avatar,
+        .profile-card .avatar,
+        .avatar-wrap .avatar {
+          margin-top: 0 !important;
+          margin-bottom: 8px !important;
+          z-index: 2 !important;
+          position: relative !important;
+        }
+
+        .avatar-btn-row,
+        .small.meta {
+          margin-top: 8px !important;
+          z-index: 2 !important;
+          position: relative !important;
+        }
+        
+        /* --- AJUSTE PARA GARANTIR DISTÂNCIA DO CABEÇALHO EM TODAS AS ABAS (Perfil e Editar) --- */
+    
+        /* Garante espaço para o cabeçalho em qualquer aba */
+        body.profile-page {
+          padding-top: 140px !important;
+          min-height: 100vh !important;
+          box-sizing: border-box !important;
+        }
+    
+        /* Container externo sempre com altura e alinhamento corretos */
+        .profile-outer {
+          margin-top: 0 !important;
+          padding-top: 0 !important;
+          min-height: calc(100vh - 140px) !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+        }
+    
+        /* Card principal SEM margin-top negativo */
+        .profile-glass-card,
+        .profile-form,
+        .profile-main {
+          margin-top: 0 !important;
+        }
+    
+        /* Avatar e topo do card SEM deslocamento negativo e com padding-top */
+        .profile-avatar-top {
+          top: 0 !important;
+          margin-bottom: 0 !important;
+          padding-top: 32px !important;
+          z-index: 2 !important;
+          position: relative !important;
+        }
+    
+        /* Avatar, botão "Alterar" e "Último login" sempre visíveis */
+        .avatar,
+        .profile-card .avatar,
+        .avatar-wrap .avatar {
+          margin-top: 0 !important;
+          margin-bottom: 8px !important;
+          z-index: 2 !important;
+          position: relative !important;
+        }
+
+        .avatar-btn-row,
+        .small.meta {
+          margin-top: 8px !important;
+          z-index: 2 !important;
+          position: relative !important;
+        }
+    
+        /* Garante que .profile-tab-content (usada em ambas as abas) respeite o padding do topo */
+        .profile-tab-content {
+          padding-top: 0 !important;
+          /* padding lateral e inferior já está definido, não precisa alterar */
+        }
+    
+        /* 1) Espaçamento extra apenas para a aba "Editar" (não altera a aba "Perfil") */
+#editarTabContent.profile-tab-content {
+  /* garante que o formulário de edição fique abaixo do topo/cabeçalho e do avatar */
+  padding-top: 96px !important;
+  box-sizing: border-box !important;
+}
+
+/* 2) Força avatar e metadados a permanecerem acima do conteúdo */
+.profile-avatar-top,
+.avatar,
+.avatar-btn-row,
+.small.meta {
+  position: relative !important;
+  z-index: 1200 !important; /* elevado para superar o topbar */
+}
+
+/* 3) Se o topo do card estiver empurrando conteúdo para cima, garanta um espaçamento mínimo */
+.profile-glass-card {
+  padding-top: 0 !important; /* remove possíveis valores conflitantes */
+}
+
+/* layout horizontal para a aba editar */
+#editarTabContent.profile-tab-content .edit-layout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* lado esquerdo: avatar e ações */
+#editarTabContent.profile-tab-content .edit-side {
+  width: 220px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+  box-sizing: border-box;
+}
+
+/* form ocupa o espaço restante */
+#editarTabContent.profile-tab-content .edit-form { flex: 1; }
+
+/* assegura espaçamento extra no topo da aba editar para não ficar sob o header */
+#editarTabContent.profile-tab-content {
+  padding-top: 96px !important;
+}
+
+/* quando em modo edição, esconder o avatar flutuante e ajustar o card */
+.profile-glass-card.editing .profile-avatar-top {
+  display: none !important;
+}
+
+/* garantir que avatar / botões de edição (lado esquerdo) fiquem acima do topbar */
+#editarTabContent.profile-tab-content .avatar,
+#editarTabContent.profile-tab-content .avatar-btn-row,
+#editarTabContent.profile-tab-content .small.meta {
+  position: relative !important;
+  z-index: 1200 !important;
+}
+
+/* responsivo: empilha lado esquerdo + formulário em telas pequenas */
+@media (max-width: 880px) {
+  #editarTabContent.profile-tab-content .edit-layout { flex-direction: column; gap: 18px; }
+  #editarTabContent.profile-tab-content .edit-side { width: 100%; min-width: auto; padding-top: 0; }
+  #editarTabContent.profile-tab-content { padding-top: 24px !important; }
+}
+
+/* 1) Empurra todo o card para baixo apenas no modo edição para não ficar sob o header */
+.profile-glass-card.editing {
+  margin-top: 140px !important; /* ajuste se seu header for maior/menor */
+  padding-top: 0 !important;
+  transition: margin-top 180ms ease;
+}
+
+/* 2) Esconde o avatar flutuante do topo (o que estava "sobreposto") quando estiver editando */
+.profile-glass-card.editing .profile-avatar-top {
+  display: none !important;
+}
+
+/* 3) Garante que o avatar lateral (da coluna de edição) fique acima do topbar */
+#editarTabContent.profile-tab-content .edit-side,
+#editarTabContent.profile-tab-content .edit-side .avatar,
+#editarTabContent.profile-tab-content .edit-side .avatar-btn-row,
+#editarTabContent.profile-tab-content .edit-side .small.meta {
+  position: relative !important;
+  z-index: 1500 !important;
+}
+
+/* 4) Segurança: garantir padding-top suficiente na própria aba editar (caso o header varie) */
+#editarTabContent.profile-tab-content {
+  padding-top: 28px !important; /* não muito grande — o espaço principal vem do margin-top do card */
+  box-sizing: border-box !important;
+}
+
+/* 5) Responsividade: reduzir margin-top aplicado no modo edição em telas pequenas */
+@media (max-width: 900px) {
+  .profile-glass-card.editing {
+    margin-top: 80px !important;
+  }
+}
+
+/* Melhorias específicas para modo edição: layout confortável e sem sobreposição */
+.profile-glass-card.editing {
+  max-width: 980px !important;       /* card mais largo em edição */
+  margin-top: 120px !important;      /* empurra o card abaixo do header */
+  padding: 28px !important;
+  box-shadow: 0 12px 48px rgba(20,40,60,0.12) !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+}
+
+/* remove avatar flutuante dentro do card quando estiver editando */
+.profile-glass-card.editing .profile-avatar-top {
+  display: none !important;
+}
+
+/* layout lado-a-lado: coluna esquerda com avatar, direita com formulário */
+#editarTabContent .edit-layout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* coluna esquerda */
+#editarTabContent .edit-side {
+  flex: 0 0 220px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+/* avatar lateral com destaque (z-index acima do header) */
+#editarTabContent .edit-side .avatar,
+#editarTabContent .edit-side .avatar-btn-row,
+#editarTabContent .edit-side .small.meta {
+  position: relative !important;
+  z-index: 1600 !important;
+}
+
+/* formulário ocupa o restante */
+#editarTabContent .edit-form { flex: 1; }
+
+/* garante espaçamento interno confortável no formulário */
+#editarTabContent .edit-form .form-grid > * { width: 100%; box-sizing: border-box; }
+
+/* responsivo: empilha as colunas em telas pequenas */
+@media (max-width: 880px) {
+  .profile-glass-card.editing { margin-top: 80px !important; padding: 18px !important; }
+  #editarTabContent .edit-layout { flex-direction: column; gap: 18px; }
+  #editarTabContent .edit-side { width: 100%; order: 2; padding-top: 0; }
+  #editarTabContent .edit-form { order: 1; }
+}
+
+/* segurança: quando algo sobrescrever, garantimos que a aba editar tenha topo suficiente */
+#editarTabContent.profile-tab-content { padding-top: 20px !important; box-sizing: border-box !important; }

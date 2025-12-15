@@ -1,5 +1,6 @@
 package br.com.agenda.controllers;
 
+import br.com.agenda.entities.Usuario;
 import br.com.agenda.services.UsuarioService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Controller;
@@ -7,10 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/perfil")
+@RequestMapping("/profile")
 public class PerfilController {
     private final UsuarioService service;
 
@@ -19,15 +21,50 @@ public class PerfilController {
     }
 
     @GetMapping
-    public String mostrarTelaPerfil() {
-        return "perfil";
+    public String mostrarTelaPerfil(Model model) {
+        if (service.getIdAtual() == -1L)
+            return "error401";
+
+        Usuario usuario = service.getUsuarioAtual();
+        model.addAttribute("usuario", usuario);
+
+        return "profile";
+    }
+
+    @PostMapping("/excluir")
+    @Transactional
+    public String excluirConta(RedirectAttributes r) {
+        service.deletarUsuario();
+        return "redirect:/";
     }
 
     @PostMapping
     @Transactional
-    public String processarNovaSenha(@RequestParam String pwd, @RequestParam String newPwd,
-                                     @RequestParam String confirmPwd, RedirectAttributes redirectAttributes) {
+    public String processarNovaSenha(
+            @RequestParam(defaultValue = "false") boolean notificacaoEmail,
+            @RequestParam(defaultValue = "false") boolean resumoSemanal,
+            @RequestParam String nome,
+            @RequestParam String email,
+            @RequestParam(required = false) String pwd,
+            @RequestParam(required = false) String newPwd,
+            @RequestParam(required = false) String confirmPwd,
+            RedirectAttributes r) {
 
-        return "redirect:/perfil";
+        if (!service.verificarAlterarSenha(pwd, newPwd, confirmPwd)) {
+            r.addFlashAttribute("warning", "As senhas não coincidem!");
+            return "redirect:/profile";
+        } else if (pwd.equals(newPwd)) {
+            r.addFlashAttribute("warning", "A nova senha dever ser diferente da anterior!");
+            return "redirect:/profile";
+        } else if (pwd.length() < 6) {
+            r.addFlashAttribute("warning", "A nova senha dever ter, pelo menos, 6 caracteres!");
+            return "redirect:/profile";
+        }
+
+        service.alterarInformacoes(notificacaoEmail, resumoSemanal, nome, email, newPwd);
+        service.reajustarUsuario();
+
+        r.addFlashAttribute("success", "Alterações salvas com sucesso!");
+        return "redirect:/profile";
     }
 }

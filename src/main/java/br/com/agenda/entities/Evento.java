@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "eventos")
@@ -16,21 +17,27 @@ public class Evento {
     @NotNull
     private Long idUsuario;
 
-    @NotBlank(message = "O nome do evento é obrigatório.")
-    @Size(max = 100, message = "O nome do evento deve ter no máximo 100 caracteres.")
-    private String titulo;
+    @NotNull
+    private LocalDate dia;
 
-    @NotNull(message = "A data do evento é obrigatória.")
-    @FutureOrPresent(message = "A data do evento não pode estar no passado.")
-    private LocalDate data;
+    @NotBlank
+    private String disciplina;
+
+    @NotBlank
+    private String descricao;
+
+    @NotNull
+    private LocalTime horario;
 
     public Evento() {
     }
 
-    public Evento(Long idUsuario, String titulo, LocalDate data) {
+    public Evento(Long idUsuario, String disciplina, String descricao, String horario, String dia) {
         this.idUsuario = idUsuario;
-        this.titulo = titulo;
-        this.data = data;
+        this.disciplina = disciplina;
+        this.descricao = descricao;
+        this.horario = LocalTime.parse(horario);
+        this.dia = LocalDate.parse(dia);
     }
 
     public Long getId() {
@@ -49,19 +56,35 @@ public class Evento {
         this.idUsuario = idUsuario;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public LocalDate getDia() {
+        return dia;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setDia(LocalDate dia) {
+        this.dia = dia;
     }
 
-    public LocalDate getData() {
-        return data;
+    public String getDisciplina() {
+        return disciplina;
     }
 
-    public void setData(LocalDate data) {
-        this.data = data;
+    public void setDisciplina(String disciplina) {
+        this.disciplina = disciplina;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public LocalTime getHorario() {
+        return horario;
+    }
+
+    public void setHorario(LocalTime horario) {
+        this.horario = horario;
     }
 }
