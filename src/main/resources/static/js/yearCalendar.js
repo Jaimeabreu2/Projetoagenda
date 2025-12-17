@@ -94,9 +94,12 @@
         const now = new Date();
         year = now.getFullYear();
         renderYear(year);
-        // rolar levemente até o mês atual
+        // rolar levemente até o mês atual (respeita reduzir animações)
         const cur = yearGrid.querySelector('.month-card.current-month');
-        if (cur) cur.scrollIntoView({behavior:'smooth',block:'center'});
+        if (cur) {
+          const behavior = document.documentElement.classList.contains('a11y-reduce-motion') ? 'auto' : 'smooth';
+          cur.scrollIntoView({behavior: behavior, block:'center'});
+        }
       }
 
       // atalhos de teclado: ← → para trocar ano, T para hoje

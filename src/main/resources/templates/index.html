@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="pt-BR" xmlns:th="http://www.w3.org/1999/xhtml">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" href="favicon.ico"/>
-    <meta name="description" content="Agenda acadêmica — organize aulas, provas e compromissos."/>
+    <link rel="icon" href="favicon.ico" />
+    <meta name="description" content="Agenda acadêmica — organize aulas, provas e compromissos." />
     <style>
         /* --- Aprimoramento visual da tela de login --- */
         body.login-page {
@@ -19,17 +20,20 @@
             align-items: center;
             justify-content: center;
         }
+
         .login-wrap {
             min-height: 540px;
-            box-shadow: 0 12px 40px rgba(44,62,80,0.13), 0 2px 8px rgba(44,62,80,0.06);
+            box-shadow: 0 12px 40px rgba(44, 62, 80, 0.13), 0 2px 8px rgba(44, 62, 80, 0.06);
             border-radius: 22px;
-            background: rgba(255,255,255,0.96);
+            background: rgba(255, 255, 255, 0.96);
             overflow: hidden;
             transition: box-shadow 0.2s;
         }
+
         .login-wrap:hover {
-            box-shadow: 0 18px 60px rgba(44,62,80,0.18), 0 4px 16px rgba(44,62,80,0.10);
+            box-shadow: 0 18px 60px rgba(44, 62, 80, 0.18), 0 4px 16px rgba(44, 62, 80, 0.10);
         }
+
         .hero {
             background: linear-gradient(135deg, #e8f5e9 0%, #b9f6ca 100%);
             border-radius: 22px 0 0 22px;
@@ -40,42 +44,49 @@
             justify-content: center;
             min-height: 100%;
         }
+
         .brand {
             margin-bottom: 22px;
         }
+
         .logo {
             width: 76px;
             height: 76px;
             border-radius: 18px;
             background: linear-gradient(135deg, #2e7d32 60%, #43a047 100%);
             font-size: 32px;
-            box-shadow: 0 6px 28px rgba(46,125,50,0.16), 0 1px 4px rgba(44,62,80,0.08);
+            box-shadow: 0 6px 28px rgba(46, 125, 50, 0.16), 0 1px 4px rgba(44, 62, 80, 0.08);
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 18px;
-            text-shadow: 0 2px 8px rgba(46,125,50,0.16);
+            text-shadow: 0 2px 8px rgba(46, 125, 50, 0.16);
             transition: box-shadow 0.2s;
         }
+
         .logo:hover {
-            box-shadow: 0 12px 40px rgba(46,125,50,0.22), 0 2px 8px rgba(44,62,80,0.10);
+            box-shadow: 0 12px 40px rgba(46, 125, 50, 0.22), 0 2px 8px rgba(44, 62, 80, 0.10);
         }
+
         .hero h1 {
             font-size: 2.2rem;
             margin: 0 0 10px 0;
             color: #1a1a1a;
         }
+
         .hero p {
             color: #4d5c5c;
             font-size: 1.08rem;
             margin-bottom: 8px;
         }
+
         .hero .small {
             color: #5e7c6b;
         }
+
         .card {
             border-radius: 22px;
-            box-shadow: 0 8px 32px rgba(44,62,80,0.10);
+            box-shadow: 0 8px 32px rgba(44, 62, 80, 0.10);
             background: #fff;
             padding: 38px 34px 32px 34px;
             min-width: 340px;
@@ -84,6 +95,7 @@
             flex-direction: column;
             justify-content: center;
         }
+
         .card h2 {
             font-size: 1.35rem;
             color: #2e7d32;
@@ -92,10 +104,12 @@
             align-items: center;
             gap: 10px;
         }
+
         .card h2 i {
             color: #43a047;
             font-size: 1.2em;
         }
+
         .input {
             background: #f6faf7;
             border-radius: 12px;
@@ -106,10 +120,12 @@
             gap: 10px;
             transition: border-color 0.18s, box-shadow 0.18s;
         }
+
         .input:focus-within {
             border-color: #43a047;
-            box-shadow: 0 2px 12px rgba(67,160,71,0.10);
+            box-shadow: 0 2px 12px rgba(67, 160, 71, 0.10);
         }
+
         .input input {
             background: transparent;
             border: none;
@@ -118,10 +134,12 @@
             color: #1a1a1a;
             width: 100%;
         }
+
         .input input::placeholder {
             color: #a0b3a0;
             opacity: 1;
         }
+
         .eye {
             background: none;
             border: none;
@@ -131,15 +149,20 @@
             padding: 2px 4px;
             transition: color 0.18s;
         }
-        .eye:hover, .eye:focus {
+
+        .eye:hover,
+        .eye:focus {
             color: #43a047;
         }
+
         .actions {
             margin-top: 10px;
         }
+
         .actions .small {
             color: #6b7280;
         }
+
         .btn {
             display: flex;
             align-items: center;
@@ -151,32 +174,42 @@
             border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(44,62,80,0.10);
+            box-shadow: 0 4px 16px rgba(44, 62, 80, 0.10);
             transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
             font-size: 1rem;
         }
-        .btn:hover, .btn:focus {
+
+        .btn:hover,
+        .btn:focus {
             background: linear-gradient(90deg, #43a047 60%, #2e7d32 100%);
             transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 8px 28px rgba(44,62,80,0.13);
+            box-shadow: 0 8px 28px rgba(44, 62, 80, 0.13);
             outline: none;
         }
+
         .btn.secondary {
             background: transparent;
             color: #2e7d32;
             border: 2px solid #43a047;
             box-shadow: none;
         }
-        .btn.secondary:hover, .btn.secondary:focus {
+
+        .btn.secondary:hover,
+        .btn.secondary:focus {
             background: #e8f5e9;
             color: #43a047;
         }
+
         .btn i {
             font-size: 1.1em;
         }
-        .error, .help, .small {
+
+        .error,
+        .help,
+        .small {
             font-size: 0.95em;
         }
+
         @media (max-width: 960px) {
             .login-wrap {
                 grid-template-columns: 1fr;
@@ -184,11 +217,13 @@
                 padding: 0;
                 min-height: unset;
             }
+
             .hero {
                 border-radius: 22px 22px 0 0;
                 padding: 32px 22px 18px 22px;
                 min-height: unset;
             }
+
             .card {
                 border-radius: 0 0 22px 22px;
                 min-width: unset;
@@ -196,161 +231,187 @@
                 padding: 28px 18px 22px 18px;
             }
         }
+
         @media (max-width: 600px) {
             .login-wrap {
                 max-width: 99vw;
                 min-width: unset;
             }
-            .card, .hero {
+
+            .card,
+            .hero {
                 padding: 18px 8px;
             }
         }
     </style>
 </head>
+
 <body class="login-page">
-<!-- skip link para acessibilidade -->
-<a class="skip-link" href="#loginForm" style="position:absolute;left:-999px;top:auto"
-   onfocus="this.style.left='16px';this.style.top='16px';this.style.width='auto';this.style.height='auto';"
-   onblur="this.style.left='-999px'">Ir para o formulário de login</a>
+    <!-- skip link para acessibilidade -->
+    <a class="skip-link" href="#loginForm" style="position:absolute;left:-999px;top:auto"
+        onfocus="this.style.left='16px';this.style.top='16px';this.style.width='auto';this.style.height='auto';"
+        onblur="this.style.left='-999px'">Ir para o formulário de login</a>
 
-<div class="animated-gradient" aria-hidden="true"></div>
-<svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
-    <defs>
-        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#e8f5e9"/>
-            <stop offset="50%" stop-color="#b9f6ca"/>
-            <stop offset="100%" stop-color="#f5f7fa"/>
-        </linearGradient>
-        <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="60" result="b"/>
-            <feBlend in="SourceGraphic" in2="b"/>
-        </filter>
-    </defs>
-    <!-- formas abstratas suaves -->
-    <g filter="url(#soft)" opacity="0.9" transform="translate(-120,-40) scale(1.2)">
-        <circle cx="220" cy="120" r="220" fill="url(#g1)"/>
-        <ellipse cx="900" cy="220" rx="260" ry="140" fill="url(#g1)"/>
-        <path d="M1200 600 C1000 700 800 760 600 700 C420 640 280 700 120 680 L120 800 L1200 800 Z" fill="url(#g1)"/>
-    </g>
-</svg>
+    <div class="animated-gradient" aria-hidden="true"></div>
+    <svg class="bg-decor" aria-hidden="true" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+        <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#e8f5e9" />
+                <stop offset="50%" stop-color="#b9f6ca" />
+                <stop offset="100%" stop-color="#f5f7fa" />
+            </linearGradient>
+            <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="60" result="b" />
+                <feBlend in="SourceGraphic" in2="b" />
+            </filter>
+        </defs>
+        <!-- formas abstratas suaves -->
+        <g filter="url(#soft)" opacity="0.9" transform="translate(-120,-40) scale(1.2)">
+            <circle cx="220" cy="120" r="220" fill="url(#g1)" />
+            <ellipse cx="900" cy="220" rx="260" ry="140" fill="url(#g1)" />
+            <path d="M1200 600 C1000 700 800 760 600 700 C420 640 280 700 120 680 L120 800 L1200 800 Z"
+                fill="url(#g1)" />
+        </g>
+    </svg>
 
-<div class="app-container">
-    <main class="login-wrap" aria-labelledby="login-title" role="main">
-        <section class="hero" aria-hidden="false">
-            <div class="brand" style="display:flex;align-items:center;">
-                <div class="logo" aria-hidden="false">Ag</div>
-                <div>
-                    <div style="font-weight:700;font-size:1.13em;">Projeto Agenda</div>
-                    <div class="small">Agenda acadêmica — organize suas aulas e compromissos</div>
+    <div class="app-container">
+        <main class="login-wrap" aria-labelledby="login-title" role="main">
+            <section class="hero" aria-hidden="false">
+                <div class="brand" style="display:flex;align-items:center;">
+                    <div class="logo" aria-hidden="false">Ag</div>
+                    <div>
+                        <div style="font-weight:700;font-size:1.13em;">Projeto Agenda</div>
+                        <div class="small">Agenda acadêmica — organize suas aulas e compromissos</div>
+                    </div>
                 </div>
-            </div>
-            <h1 id="login-title">Bem-vindo(a)</h1>
-            <p>Faça login para acessar seu calendário institucional.<br>Se ainda não possuir conta, crie uma.</p>
-            <div class="small" style="margin-top:18px">Dica: use seu e-mail institucional.</div>
-        </section>
-        <section class="card" aria-labelledby="form-title">
-            <h2 id="form-title"><i class="fa-solid fa-right-to-bracket"></i>Acesse sua conta</h2>
-            <span th:if="${warning}" th:text="${warning}" role="alert"
-                  style="display:block;background:#fff3cd;color:#856404;border:1px solid #ffeeba;
+                <h1 id="login-title">Bem-vindo(a)</h1>
+                <p>Faça login para acessar seu calendário institucional.<br>Se ainda não possuir conta, crie uma.</p>
+                <div class="small" style="margin-top:18px">Dica: use seu e-mail institucional.</div>
+            </section>
+            <section class="card" aria-labelledby="form-title">
+                <h2 id="form-title"><i class="fa-solid fa-right-to-bracket"></i>Acesse sua conta</h2>
+                <span th:if="${warning}" th:text="${warning}" role="alert" style="display:block;background:#fff3cd;color:#856404;border:1px solid #ffeeba;
                   padding:10px;border-radius:6px;margin-bottom:12px;text-align:center;">
-            </span>
-            <form id="loginForm" th:action="@{/}" method="post" autocomplete="on" novalidate>
-                <div>
-                    <label for="usuario">Usuário</label>
-                    <div class="input">
-                        <i class="fa-solid fa-user"></i>
-                        <input id="usuario" name="email" type="text"
-                               placeholder="seunome@aluno.uece.br" required aria-required="true"
-                               aria-describedby="usuarioHint" th:value="${email}"/>
+                </span>
+                <form id="loginForm" th:action="@{/}" method="post" autocomplete="on" novalidate>
+                    <div>
+                        <label for="usuario">Usuário</label>
+                        <div class="input">
+                            <i class="fa-solid fa-user"></i>
+                            <input id="usuario" name="email" type="text" placeholder="seunome@aluno.uece.br" required
+                                aria-required="true" aria-describedby="usuarioHint" th:value="${email}" />
+                        </div>
+                        <div id="usuarioHint" class="small">Use seu e-mail institucional.</div>
                     </div>
-                    <div id="usuarioHint" class="small">Use seu e-mail institucional.</div>
-                </div>
 
-                <div>
-                    <label for="senha">Senha</label>
-                    <div class="input">
-                        <i class="fa-solid fa-lock"></i>
-                        <input id="senha" name="senha" type="password"
-                               placeholder="••••••••" required aria-required="true"
-                               aria-describedby="senhaHint" th:value="${senha}"/>
-                        <button type="button" class="eye" id="togglePwd" aria-label="Mostrar senha">
-                            <i class="fa-solid fa-eye"></i>
+                    <div>
+                        <label for="senha">Senha</label>
+                        <div class="input">
+                            <i class="fa-solid fa-lock"></i>
+                            <input id="senha" name="senha" type="password" placeholder="••••••••" required
+                                aria-required="true" aria-describedby="senhaHint" th:value="${senha}" />
+                            <button type="button" class="eye" id="togglePwd" aria-label="Mostrar senha">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <div id="senhaHint" class="small">Mínimo 6 caracteres.</div>
+                    </div>
+                    <div class="actions"
+                        style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <input id="remember" name="manterLogado" type="checkbox" th:checked="${senha}" />
+                            <label for="remember" class="small">Manter-me conectado</label>
+                        </div>
+                        <a th:href="@{/emailEntered}" class="small" id="forgot">Esqueci a senha</a>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:18px">
+                        <button type="submit" class="btn" id="submitBtn"><i
+                                class="fa-solid fa-arrow-right-to-bracket"></i>Entrar
                         </button>
+                        <a th:href="@{/signup}" class="btn secondary" id="signupBtn"><i
+                                class="fa-solid fa-user-plus"></i>Criar
+                            conta</a>
                     </div>
-                    <div id="senhaHint" class="small">Mínimo 6 caracteres.</div>
-                </div>
-                <div class="actions"
-                     style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;">
-                    <div style="display:flex;align-items:center;gap:8px">
-                        <input id="remember" name="manterLogado" type="checkbox" th:checked="${senha}"/>
-                        <label for="remember" class="small">Manter-me conectado</label>
+                    <!-- Botão simulado de acesso como professor (discreto, tipo link) -->
+                    <div style="margin-top:10px;display:flex;justify-content:flex-end">
+                        <a th:href="@{/professor}" id="professorAccessBtn" style="
+        background: none;
+        border: none;
+        color: #2e7d32;
+        font-size: 0.98em;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0 2px;
+        margin: 0;
+        box-shadow: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    ">
+                            <i class="fa-solid fa-chalkboard-user" style="font-size:1em;"></i>
+                            Acessar como professor
+                        </a>
                     </div>
-                    <a th:href="@{/emailEntered}" class="small" id="forgot">Esqueci a senha</a>
-                </div>
-                <div style="display:flex;gap:10px;margin-top:18px">
-                    <button type="submit" class="btn" id="submitBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i>Entrar
-                    </button>
-                    <a th:href="@{/signup}" class="btn secondary" id="signupBtn"><i class="fa-solid fa-user-plus"></i>Criar
-                        conta</a>
-                </div>
-            </form>
-        </section>
-    </main>
-</div>
+                </form>
+            </section>
+        </main>
+    </div>
 
-<!-- FontAwesome para ícones -->
-<script src="https://kit.fontawesome.com/6e6e4c8e5b.js" crossorigin="anonymous"></script>
-<script src="js/accessibility.js"></script>
-<script>
-    // ripple effect para .btn (respeita prefers-reduced-motion)
-    (function(){
-      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      document.addEventListener('click', function(e){
-        const btn = e.target.closest('.btn');
-        if (!btn) return;
-        const rect = btn.getBoundingClientRect();
-        const ripple = document.createElement('span');
-        ripple.className = 'ripple';
-        const size = Math.max(rect.width, rect.height) * 0.9;
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
-        ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
-        btn.appendChild(ripple);
-        setTimeout(()=> { ripple.remove(); }, 700);
-      }, {passive:true});
-    })();
+    <!-- FontAwesome para ícones -->
+    <script src="https://kit.fontawesome.com/6e6e4c8e5b.js" crossorigin="anonymous"></script>
+    <script src="js/accessibility.js"></script>
+    <script>
+        // ripple effect para .btn (respeita prefers-reduced-motion)
+        (function () {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            document.addEventListener('click', function (e) {
+                const btn = e.target.closest('.btn');
+                if (!btn) return;
+                const rect = btn.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const size = Math.max(rect.width, rect.height) * 0.9;
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                btn.appendChild(ripple);
+                setTimeout(() => {ripple.remove();}, 700);
+            }, {passive: true});
+        })();
 
-    // Mostrar/ocultar senha
-    document.addEventListener('DOMContentLoaded', function () {
-          const togglePwd = document.getElementById('togglePwd');
-          const pwdInput = document.getElementById('senha');
-          if (togglePwd && pwdInput) {
-              togglePwd.addEventListener('click', function () {
-                  const type = pwdInput.type === 'password' ? 'text' : 'password';
-                  pwdInput.type = type;
-                  togglePwd.innerHTML = type === 'password'
-                      ? '<i class="fa-solid fa-eye"></i>'
-                      : '<i class="fa-solid fa-eye-slash"></i>';
-              });
-          }
-      });
-
-    // pequeno ajuste: garantir sombra de foco para inputs navegados por teclado
-    document.addEventListener('keydown', function(e){
-      if (e.key === 'Tab') document.body.classList.add('show-focus');
-    });
-
-    // Garante que ao logar, a flag de notificação seja setada para mostrar toast de eventos próximos
-    document.addEventListener('DOMContentLoaded', function () {
-      var loginForm = document.getElementById('loginForm');
-      if (loginForm) {
-        loginForm.addEventListener('submit', function () {
-          try {
-            sessionStorage.setItem('agenda_show_upcoming', '1');
-          } catch (e) {}
+        // Mostrar/ocultar senha
+        document.addEventListener('DOMContentLoaded', function () {
+            const togglePwd = document.getElementById('togglePwd');
+            const pwdInput = document.getElementById('senha');
+            if (togglePwd && pwdInput) {
+                togglePwd.addEventListener('click', function () {
+                    const type = pwdInput.type === 'password' ? 'text' : 'password';
+                    pwdInput.type = type;
+                    togglePwd.innerHTML = type === 'password'
+                        ? '<i class="fa-solid fa-eye"></i>'
+                        : '<i class="fa-solid fa-eye-slash"></i>';
+                });
+            }
         });
-      }
-    });
-</script>
+
+        // pequeno ajuste: garantir sombra de foco para inputs navegados por teclado
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') document.body.classList.add('show-focus');
+        });
+
+        // Garante que ao logar, a flag de notificação seja setada para mostrar toast de eventos próximos
+        document.addEventListener('DOMContentLoaded', function () {
+            var loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function () {
+                    try {
+                        sessionStorage.setItem('agenda_show_upcoming', '1');
+                    } catch (e) { }
+                });
+            }
+        });
+    </script>
 </body>
+
 </html>
