@@ -284,17 +284,21 @@
     /* adiciona pulso a célula pequena do calendário (usado após criação de evento) */
     function _pulseSmallCalendarCell(day) {
       if (!calendarEl) return;
+      // respeitar preferência reduzir animações
+      const disablePulse = document.documentElement.classList.contains('a11y-reduce-motion');
       const cells = Array.from(calendarEl.querySelectorAll('.calendar-cell.small:not(.empty)'));
       for (const c of cells) {
         const numEl = c.querySelector('div') || c.querySelector('.day-num');
         const num = numEl ? parseInt((numEl.textContent || '').trim(), 10) : NaN;
         if (num === day) {
-          c.classList.remove('pulse');
-          // reflow para reiniciar animação
-          void c.offsetWidth;
-          c.classList.add('pulse');
-          c.addEventListener('animationend', () => c.classList.remove('pulse'), { once: true });
-          setTimeout(() => c.classList.remove('pulse'), 1200);
+          if (!disablePulse) {
+            c.classList.remove('pulse');
+            // reflow para reiniciar animação
+            void c.offsetWidth;
+            c.classList.add('pulse');
+            c.addEventListener('animationend', () => c.classList.remove('pulse'), { once: true });
+            setTimeout(() => c.classList.remove('pulse'), 1200);
+          }
           break;
         }
       }

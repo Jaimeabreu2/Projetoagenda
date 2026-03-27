@@ -1,0 +1,469 @@
+/* Regras acessibilidade: high-contrast, large-font, more-spacing, reduce-motion */
+
+/* Variáveis de cores acessíveis (alto contraste) */
+:root {
+  --a11y-bg: #ffffff;
+  --a11y-text: #0f172a;
+  --a11y-link: #0066cc;
+  --a11y-brand: #0066cc;
+  --a11y-border: rgba(15,23,42,0.12);
+  --a11y-focus: #ffea00;
+}
+
+/* 1) Alto contraste - conforto visual aprimorado */
+html.a11y-high-contrast {
+  --a11y-bg: #181818;
+  --a11y-text: #fff;
+  --a11y-link: #ffd400;
+  --a11y-brand: #ffd400;
+  --a11y-border: #444;
+  --a11y-focus: #00ffbf;
+  background-color: var(--a11y-bg) !important;
+  color: var(--a11y-text) !important;
+}
+
+/* Fundo e borda mais suaves, menos branco puro */
+html.a11y-high-contrast body,
+html.a11y-high-contrast .container,
+html.a11y-high-contrast .month-card,
+html.a11y-high-contrast .calendar-cell {
+  background-color: var(--a11y-bg) !important;
+  color: var(--a11y-text) !important;
+  border-color: var(--a11y-border) !important;
+}
+
+/* Células do calendário: fundo escuro, borda clara, sem excesso de branco */
+html.a11y-high-contrast .calendar-cell,
+html.a11y-high-contrast .month-grid .m-day,
+html.a11y-high-contrast .calendar-bg .cell {
+  background-color: #232323 !important;
+  color: var(--a11y-text) !important;
+  border: 1px solid #444 !important;
+  box-shadow: none !important;
+}
+
+/* Números dos dias: sempre brancos, grandes e destacados */
+html.a11y-high-contrast .calendar-cell .day-num,
+html.a11y-high-contrast .month-grid .m-day > div,
+html.a11y-high-contrast .calendar-bg .cell,
+html.a11y-high-contrast .day-num {
+  color: #fff !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+  font-size: 1.15em !important;
+  text-shadow: 0 1px 2px #000 !important;
+  background: transparent !important;
+}
+
+/* Células com evento: leve destaque */
+html.a11y-high-contrast .calendar-cell.has-event,
+html.a11y-high-contrast .month-grid .m-day.has-event,
+html.a11y-high-contrast .calendar-bg .cell.has-event {
+  background-color: #222 !important;
+  border-color: var(--a11y-link) !important;
+}
+
+/* Remove excesso de opacidade e gradientes */
+html.a11y-high-contrast .calendar-cell *,
+html.a11y-high-contrast .calendar-cell small,
+html.a11y-high-contrast .calendar-cell .event-info {
+  color: #fff !important;
+  opacity: 1 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Pontos de evento: amarelo, bem visível */
+html.a11y-high-contrast .event-dot,
+html.a11y-high-contrast .m-day .dot {
+  background: var(--a11y-link) !important;
+  border: 2px solid #232323 !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* Remove borda de células vazias */
+html.a11y-high-contrast .calendar-cell.empty,
+html.a11y-high-contrast .m-day.empty {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* 2) Fonte maior — apenas uma opção, sutil */
+html.a11y-large-font {
+  --a11y-font-scale: 1.07; /* +7% apenas nos elementos JS alvo */
+}
+
+/* 3) Mais espaçamento */
+html.a11y-more-spacing {
+  --a11y-line-height: 1.8;
+  --a11y-padding-scale: 1.15;
+}
+html.a11y-more-spacing body,
+html.a11y-more-spacing .container,
+html.a11y-more-spacing .month-card,
+html.a11y-more-spacing .calendar-cell,
+html.a11y-more-spacing .appointment {
+  line-height: var(--a11y-line-height);
+  letter-spacing: 0.01em;
+}
+html.a11y-more-spacing .row,
+html.a11y-more-spacing label,
+html.a11y-more-spacing .row > * {
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+html.a11y-more-spacing button, html.a11y-more-spacing .btn {
+  padding: calc(0.5rem * var(--a11y-padding-scale)) calc(0.75rem * var(--a11y-padding-scale));
+}
+
+/* 4) Reduzir animações */
+html.a11y-reduce-motion *,
+html.a11y-reduce-motion *::before,
+html.a11y-reduce-motion *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+  will-change: auto !important;
+}
+
+/* Também respeitar preferências do sistema */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0s !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
+}
+
+/* Foco visível (sempre óbvio e grande) */
+:focus, :focus-visible {
+  outline: 3px solid var(--a11y-focus) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.12) !important;
+}
+
+/* Garantir que elementos clicáveis tenham área de toque confortável */
+button, .btn, a, .create-btn, .a11y-toggle-btn {
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+
+/* Indicador de evento mais visível em alto contraste e geral */
+.event-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--a11y-brand);
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+  border: 2px solid rgba(255,255,255,0.0);
+}
+
+/* Em alto contraste, realçar pontos de evento */
+html.a11y-high-contrast .event-dot {
+  background: var(--a11y-link) !important;
+  box-shadow: 0 0 0 2px var(--a11y-bg) inset;
+}
+
+/* Melhor contraste para textos pequenos */
+.small, small {
+  color: rgba(15,23,42,0.6);
+}
+html.a11y-high-contrast .small, html.a11y-high-contrast small {
+  color: rgba(255,255,255,0.85) !important;
+}
+
+/* Ajustes específicos para calendários - aumentar legibilidade */
+.calendar-cell, .month-card, .appointment {
+  border: 1px solid var(--a11y-border);
+  background: transparent;
+  color: var(--a11y-text);
+}
+
+/* Quando ativo 'mais espaçamento', aumentar padding das células do calendário */
+html.a11y-more-spacing .calendar-cell, html.a11y-more-spacing .month-card {
+  padding: 0.75rem;
+}
+
+/* Forçar contraste de bordas e separadores */
+hr, .separator {
+  border-color: var(--a11y-border) !important;
+}
+
+/* Pequenas melhorias responsivas para leitores de tela */
+[role="dialog"][aria-hidden="true"] { display: none !important; }
+[role="dialog"][aria-hidden="false"] { display: block !important; }
+
+/* Opcional: evitar imagens decorativas com baixa visibilidade em alto contraste */
+html.a11y-high-contrast img[alt="decorative"], html.a11y-high-contrast img[role="presentation"] {
+  opacity: 0.6;
+  filter: grayscale(100%) contrast(120%);
+}
+
+/* Pulsação visual usada pelos scripts (respeitada por a11y-reduce-motion) */
+.pulse {
+  animation: a11yPulse 900ms ease-in-out;
+}
+@keyframes a11yPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,0,0,0.12); }
+  50% { transform: scale(1.03); box-shadow: 0 0 0 6px rgba(0,0,0,0.06); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+}
+
+/* Garantir que quando reduzir animações estiver ativo não haja pulso */
+html.a11y-reduce-motion .pulse,
+html.a11y-reduce-motion * { 
+  animation: none !important;
+  transition: none !important;
+}
+
+/* =========================
+   Estilos do widget a11y
+   ========================= */
+#a11yWidget {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9999;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+.a11y-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--a11y-brand);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.12);
+}
+.a11y-toggle-btn:focus { outline-offset: 4px; }
+
+/* painel fechado por padrão (visual) */
+#a11yWidget .panel {
+  display: none;
+  min-width: 300px;
+  max-width: 360px;
+  background: var(--a11y-bg);
+  color: var(--a11y-text);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.12);
+  padding: 12px;
+  margin-bottom: 8px;
+  margin-right: 2px;
+}
+
+/* quando aberto, exibimos */
+#a11yWidget.open .panel,
+#a11yWidget .panel.open {
+  display: block;
+}
+
+/* linhas do painel: usamos flex com wrap para responsividade */
+#a11yWidget .panel .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0;
+  flex-wrap: wrap;
+}
+#a11yWidget .panel .row > span:first-child { flex: 1 1 auto; min-width: 120px; }
+#a11yWidget .panel .a11y-switch { flex: 0 0 auto; }
+
+/* botões/radios mais fáceis de tocar */
+#a11yWidget .panel input[type="checkbox"],
+#a11yWidget .panel input[type="radio"] {
+  transform: scale(1.15);
+  margin-right: 6px;
+  accent-color: var(--a11y-brand);
+}
+
+/* estilização dos labels de rádio para ficarem legíveis e tocáveis */
+#a11yWidget .panel [role="radiogroup"] .a11y-switch label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+/* foco claro no móvel e desktop */
+#a11yWidget .panel [role="radiogroup"] .a11y-switch label:focus-within,
+#a11yWidget .panel [role="radiogroup"] .a11y-switch label:hover {
+  outline: 2px solid var(--a11y-focus);
+  background: rgba(0,0,0,0.03);
+}
+
+/* mobile: painel ocupa largura e fica bottom-fixed para fácil alcance */
+@media (max-width: 600px) {
+  #a11yWidget {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    pointer-events: none; /* evitar overlay issues; painel capta os eventos */
+  }
+  .a11y-toggle-btn {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 10001;
+  }
+  #a11yWidget .panel {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 64px;
+    display: none;
+    pointer-events: auto;
+    max-width: none;
+  }
+  #a11yWidget.open .panel { display: block; }
+
+  /* empilha controles verticalmente no mobile */
+  #a11yWidget .panel .row { flex-direction: column; align-items: stretch; }
+  #a11yWidget .panel .row > span:first-child { min-width: auto; }
+  #a11yWidget .panel [role="radiogroup"] .a11y-switch label { width: 100%; justify-content: flex-start; padding-left: 10px; }
+}
+
+/* respeitar reduzir animações */
+html.a11y-reduce-motion #a11yWidget .panel {
+  transition: none !important;
+}
+
+/* Também respeitar preferências do sistema */
+@media (prefers-reduced-motion: reduce) {
+  #a11yWidget .panel { transition: none !important; }
+}
+
+/* --- MODO ESCURO OTIMIZADO PARA ALTO CONTRASTE (exceto login) --- */
+html.a11y-high-contrast body:not(.login-page),
+html.a11y-high-contrast body:not(.login-page) * {
+  background: #181a1b !important;
+  color: #fff !important;
+  border-color: #444 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  outline-color: #ffd400 !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .calendar-cell,
+html.a11y-high-contrast body:not(.login-page) .month-card,
+html.a11y-high-contrast body:not(.login-page) .calendar-bg,
+html.a11y-high-contrast body:not(.login-page) .calendar-grid,
+html.a11y-high-contrast body:not(.login-page) .calendar-cell.small,
+html.a11y-high-contrast body:not(.login-page) .m-day {
+  background: #232323 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .calendar-cell .day-num,
+html.a11y-high-contrast body:not(.login-page) .month-grid .m-day > div,
+html.a11y-high-contrast body:not(.login-page) .calendar-bg .cell,
+html.a11y-high-contrast body:not(.login-page) .day-num {
+  color: #ffd400 !important;
+  background: transparent !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  display: inline-block !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .calendar-cell.has-event,
+html.a11y-high-contrast body:not(.login-page) .month-grid .m-day.has-event,
+html.a11y-high-contrast body:not(.login-page) .calendar-bg .cell.has-event {
+  background: #232323 !important;
+  border-color: #ffd400 !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .event-dot,
+html.a11y-high-contrast body:not(.login-page) .m-day .dot {
+  background: #ffd400 !important;
+  border: 2px solid #232323 !important;
+  opacity: 1 !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .badge,
+html.a11y-high-contrast body:not(.login-page) .month-title,
+html.a11y-high-contrast body:not(.login-page) .calendar-title,
+html.a11y-high-contrast body:not(.login-page) .month-meta,
+html.a11y-high-contrast body:not(.login-page) .appt-body,
+html.a11y-high-contrast body:not(.login-page) .appointment,
+html.a11y-high-contrast body:not(.login-page) .event-info {
+  color: #fff !important;
+  background: transparent !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .btn,
+html.a11y-high-contrast body:not(.login-page) button,
+html.a11y-high-contrast body:not(.login-page) .a11y-toggle-btn {
+  background: #232323 !important;
+  color: #ffd400 !important;
+  border: 1px solid #ffd400 !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .btn.primary,
+html.a11y-high-contrast body:not(.login-page) button.primary {
+  background: #ffd400 !important;
+  color: #181a1b !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) input,
+html.a11y-high-contrast body:not(.login-page) textarea,
+html.a11y-high-contrast body:not(.login-page) select {
+  background: #232323 !important;
+  color: #fff !important;
+  border: 1px solid #ffd400 !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .calendar-cell.empty,
+html.a11y-high-contrast body:not(.login-page) .m-day.empty {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+html.a11y-high-contrast body:not(.login-page) .calendar-cell * {
+  opacity: 1 !important;
+}
+
+/* Remove fundos claros de modais, listas, cards, etc */
+html.a11y-high-contrast body:not(.login-page) .panel,
+html.a11y-high-contrast body:not(.login-page) .modal,
+html.a11y-high-contrast body:not(.login-page) .month-meta,
+html.a11y-high-contrast body:not(.login-page) .events-list,
+html.a11y-high-contrast body:not(.login-page) .appointment {
+  background: #232323 !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+
+/* Links */
+html.a11y-high-contrast body:not(.login-page) a {
+  color: #ffd400 !important;
+  text-decoration: underline !important;
+}
+
+/* Foco */
+html.a11y-high-contrast body:not(.login-page) :focus,
+html.a11y-high-contrast body:not(.login-page) :focus-visible {
+  outline: 3px solid #ffd400 !important;
+  outline-offset: 2px !important;
+}
+
+/* Login permanece claro (não recebe modo escuro) */
+html.a11y-high-contrast body.login-page,
+html.a11y-high-contrast body.login-page * {
+  background: #fff !important;
+  color: #181a1b !important;
+  border-color: #444 !important;
+}

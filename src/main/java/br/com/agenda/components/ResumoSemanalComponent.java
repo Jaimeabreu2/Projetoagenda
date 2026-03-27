@@ -52,7 +52,7 @@ public class ResumoSemanalComponent {
     }
 
 
-    @Scheduled(cron = "0 0 15 ? * MON")
+    @Scheduled(cron = "0 47 10 ? * TUE")
     public void enviarResumoSemanal() {
         for (Usuario usuario : usuarioService.listarUsuarios()) {
             if (!usuario.getResumoSemanal())

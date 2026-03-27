@@ -94,15 +94,18 @@
 
           // pulso visual: adiciona classe e remove após animação
           try {
-            c.classList.remove('pulse'); // reinicia caso já esteja
-            // forçar reflow para reiniciar a animação
-            // eslint-disable-next-line no-unused-expressions
-            void c.offsetWidth;
-            c.classList.add('pulse');
-            const onEnd = () => { c.classList.remove('pulse'); c.removeEventListener('animationend', onEnd); };
-            c.addEventListener('animationend', onEnd, { once: true });
-            // fallback: garante remoção após 1.1s se animationend não disparar
-            setTimeout(() => c.classList.remove('pulse'), 1200);
+            // respeitar preferência reduzir animações
+            if (!document.documentElement.classList.contains('a11y-reduce-motion')) {
+              c.classList.remove('pulse'); // reinicia caso já esteja
+              // forçar reflow para reiniciar a animação
+              // eslint-disable-next-line no-unused-expressions
+              void c.offsetWidth;
+              c.classList.add('pulse');
+              const onEnd = () => { c.classList.remove('pulse'); c.removeEventListener('animationend', onEnd); };
+              c.addEventListener('animationend', onEnd, { once: true });
+              // fallback: garante remoção após 1.1s se animationend não disparar
+              setTimeout(() => c.classList.remove('pulse'), 1200);
+            }
           } catch (err) {
             // silencioso — não quebrar fluxo se algo falhar
           }
